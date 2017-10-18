@@ -173,7 +173,7 @@ Add:
 
 <?php
 
-class ControllerFeedWebApi extends Controller {
+class ControllerExtensionFeedWebApi extends Controller {
 
 	# Use print_r($json) instead json_encode($json)
 	protected $debug = false;
