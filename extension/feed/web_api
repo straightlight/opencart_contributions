@@ -339,7 +339,7 @@ class ControllerExtensionFeedWebApi extends Controller {
 		foreach ($products as $product) {
 
 			if ($product['image']) {
-				$image = $this->model_tool_image->resize($product['image'], $this->config->get('config_image_product_width'), $this->config->get('config_image_product_height'));
+				$image = $this->model_tool_image->resize($product['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_thumb_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_thumb_height'));
 			} else {
 				$image = false;
 			}
@@ -479,7 +479,7 @@ class ControllerExtensionFeedWebApi extends Controller {
 		foreach ($products as $product) {
 
 			if ($product['image']) {
-				$image = $this->model_tool_image->resize($product['image'], $this->config->get('config_image_product_width'), $this->config->get('config_image_product_height'));
+				$image = $this->model_tool_image->resize($product['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_thumb_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_thumb_height'));
 			} else {
 				$image = false;
 			}
@@ -632,7 +632,7 @@ class ControllerExtensionFeedWebApi extends Controller {
 
 		# product image
 		if ($product['image']) {
-			$image = $this->model_tool_image->resize($product['image'], $this->config->get('config_image_popup_width'), $this->config->get('config_image_popup_height'));
+			$image = $this->model_tool_image->resize($product['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_thumb_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_thumb_height'));
 		} else {
 			$image = '';
 		}
@@ -642,7 +642,7 @@ class ControllerExtensionFeedWebApi extends Controller {
 		$images = array();
 
 		foreach ($additional_images as $additional_image) {
-			$images[] = $this->model_tool_image->resize($additional_image['image'], $this->config->get('config_image_additional_width'), $this->config->get('config_image_additional_height'));
+			$images[] = $this->model_tool_image->resize($additional_image['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_thumb_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_thumb_height'));
 		}
 
 		#specal
