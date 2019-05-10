@@ -11,15 +11,21 @@ class ControllerExtensionModuleBestSeller extends Controller {
 
 		$category_id = 0;
 		
+		$sub_categories = array();
+		
 		if (isset($this->request->get['path'])) {
 			$parts = explode('_', (string)$this->request->get['path']);
 
 			$category_id = (int)array_pop($parts);
+
+			foreach ($parts as $path_id) {
+				$sub_categories[] = $path_id;
+			}
 		}
 
 		$results = $this->model_catalog_product->getBestSellerProducts($setting, $category_id);
 		
-		$search_results = $this->model_catalog_product->getBestSellerProducts($setting, $category_id, 'customer_search');
+		$search_results = $this->model_catalog_product->getBestSellerProducts($setting, $category_id, $sub_categories, 'customer_search');
 		
 		if ($search_results) {
 		    $this->load->model('account/search');
