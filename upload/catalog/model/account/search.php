@@ -5,7 +5,7 @@ class ModelAccountSearch extends Model {
 	}
 	
 	public function deleteSearch($data, $setting) {
-		if ($setting['database_transaction'] == 'delete') {
+		if (!empty($setting['database_transaction']) && $setting['database_transaction'] == 'delete') {
 			$recurring_category_ids = array();
 			
 			foreach ($data as $result) {
