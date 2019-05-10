@@ -114,6 +114,30 @@ class ControllerExtensionModuleBestSeller extends Controller {
 		} else {
 			$data['height'] = 200;
 		}
+		
+		if (isset($this->request->post['database_transaction'])) {
+			$data['database_transaction'] = $this->request->post['database_transaction'];
+		} elseif (!empty($module_info)) {
+			$data['database_transaction'] = $module_info['database_transaction'];
+		} else {
+			$data['database_transaction'] = '';
+		}
+		
+		if (isset($this->request->post['type'])) {
+			$data['type'] = $this->request->post['type'];
+		} elseif (!empty($module_info)) {
+			$data['type'] = $module_info['type'];
+		} else {
+			$data['type'] = '';
+		}
+		
+		if (isset($this->request->post['type_order'])) {
+			$data['type_order'] = $this->request->post['type_order'];
+		} elseif (!empty($module_info)) {
+			$data['type_order'] = $module_info['type_order'];
+		} else {
+			$data['type_order'] = '';
+		}
 
 		if (isset($this->request->post['status'])) {
 			$data['status'] = $this->request->post['status'];
