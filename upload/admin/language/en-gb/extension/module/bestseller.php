@@ -6,6 +6,12 @@ $_['heading_title']    = 'Bestsellers';
 $_['text_extension']   = 'Extensions';
 $_['text_success']     = 'Success: You have modified bestsellers module!';
 $_['text_edit']        = 'Edit Bestsellers Module';
+$_['text_type_asc']    = 'Ascending';
+$_['text_type_desc']   = 'Descending';
+$_['text_type_total']  = 'Total';
+$_['text_type_search'] = 'Search';
+$_['text_database_transaction_delete'] = 'Delete';
+$_['text_database_transaction_update'] = 'Update';
 
 // Entry
 $_['entry_name']       = 'Module Name';
@@ -13,6 +19,9 @@ $_['entry_limit']      = 'Limit';
 $_['entry_image']      = 'Image (W x H) and Resize Type';
 $_['entry_width']      = 'Width';
 $_['entry_height']     = 'Height';
+$_['entry_type']	   = 'Type';
+$_['entry_type_order'] = 'Type Order';
+$_['entry_database_transaction'] = 'Database Transaction';
 $_['entry_status']     = 'Status';
 
 // Error
