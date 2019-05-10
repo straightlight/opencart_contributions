@@ -59,6 +59,48 @@
             </div>
           </div>
           <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-database-transaction">{{ entry_database_transaction }}</label>
+            <div class="col-sm-10">
+              <select name="database_transaction" id="input-database-transaction" class="form-control">
+                {% if database_transaction == 'delete' %}
+                <option value="delete" selected="selected">{{ text_database_transaction_delete }}</option>
+                <option value="update">{{ text_database_transaction_update }}</option>
+                {% else %}
+                <option value="delete">{{ text_database_transaction_delete }}</option>
+                <option value="update" selected="selected">{{ text_database_transaction_update }}</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-type">{{ entry_type }}</label>
+            <div class="col-sm-10">
+              <select name="type" id="input-type" class="form-control">
+                {% if type == 'search' %}
+                <option value="search" selected="selected">{{ text_type_search }}</option>
+                <option value="total">{{ text_type_total }}</option>
+                {% else %}
+                <option value="search">{{ text_type_search }}</option>
+                <option value="total" selected="selected">{{ text_type_total }}</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+		      <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-type_order">{{ entry_type_order }}</label>
+            <div class="col-sm-10">
+              <select name="type_order" id="input-type-order" class="form-control">
+                {% if type_order == 'desc' %}
+                <option value="asc">{{ text_type_asc }}</option>
+                <option value="desc" selected="selected">{{ text_type_desc }}</option>
+                {% else %}
+                <option value="asc" selected="selected">{{ text_type_asc }}</option>
+                <option value="desc">{{ text_type_desc }}</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
             <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
             <div class="col-sm-10">
               <select name="status" id="input-status" class="form-control">
