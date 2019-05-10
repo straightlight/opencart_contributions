@@ -9,7 +9,23 @@ class ControllerExtensionModuleBestSeller extends Controller {
 
 		$data['products'] = array();
 
-		$results = $this->model_catalog_product->getBestSellerProducts($setting['limit']);
+		$category_id = 0;
+		
+		if (isset($this->request->get['path'])) {
+			$parts = explode('_', (string)$this->request->get['path']);
+
+			$category_id = (int)array_pop($parts);
+		}
+
+		$results = $this->model_catalog_product->getBestSellerProducts($setting, $category_id);
+		
+		$search_results = $this->model_catalog_product->getBestSellerProducts($setting, $category_id, 'customer_search');
+		
+		if ($search_results) {
+		    $this->load->model('account/search');
+		    
+		    $this->model_account_search->deleteSearch($search_results, $setting);
+		}
 
 		if ($results) {
 			foreach ($results as $result) {
