@@ -313,16 +313,16 @@ class ModelCatalogProduct extends Model {
 					$sql .= " WHERE (" . implode(" OR ", $complete_implode) . ")";
 					$sql .= " OR (" . implode(" OR ", $processing_implode) . ")";
 					
-					$sql .= " AND `cs`.`customer_id` = `o`.`customer_id`";
-					
-					$sql .= " AND `cs`.`store_id` = '" . (int)$this->config->get('config_store_id') . "'";		
-					$sql .= " AND `o`.`payment_country_id` = '" . (int)$this->config->get('config_country_id') . "'";		
+					$sql .= " AND `cs`.`customer_id` = `o`.`customer_id`";					
+					$sql .= " AND `cs`.`store_id` = '" . (int)$this->config->get('config_store_id') . "'";
+					$sql .= " AND `cs`.`store_id` = `o`.`store_id`"; 
+					$sql .= " AND `cs`.`language_id` = `o`.`language_id`";
+					$sql .= " AND `o`.`payment_country_id` = '" . (int)$this->config->get('config_country_id') . "'";
 					$sql .= " AND `o`.`payment_zone_id` = '" . (int)$this->config->get('config_zone_id') . "'";
 					$sql .= " AND `o`.`language_id` = '" . (int)$this->config->get('config_language_id') . "'";
 					$sql .= " AND `o`.`customer_group_id` = '" . (int)$this->config->get('config_customer_group_id') . "'";
-					
-					$sql .= " AND `cs`.`store_id` = `o`.`store_id`"; 
-					$sql .= " AND `cs`.`language_id` = `o`.`language_id`";
+					$sql .= " AND `o`.`payment_code` NOT LIKE '%free%'";
+					$sql .= " AND `o`.`shipping_code` NOT LIKE '%free%'";
 					
 					if ($category_id) {
 						$sql .= " AND `cs`.`category_id` = '" . (int)$category_id . "'";
@@ -344,17 +344,17 @@ class ModelCatalogProduct extends Model {
 
 					switch($group) {
 						case 'day';
-							$sql .= " GROUP BY YEAR(`o`.`date_added`), MONTH(`o`.`date_added`), DAY(`o`.`date_added`), `cs`.`products`, `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
+							$sql .= " GROUP BY YEAR(`o`.`date_added`), MONTH(`o`.`date_added`), DAY(`o`.`date_added`), `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
 							break;
 						default:
 						case 'week':
-							$sql .= " GROUP BY YEAR(`o`.`date_added`), WEEK(`o`.`date_added`), `cs`.`products`, `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
+							$sql .= " GROUP BY YEAR(`o`.`date_added`), WEEK(`o`.`date_added`), `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
 							break;
 						case 'month':
-							$sql .= " GROUP BY YEAR(`o`.`date_added`), MONTH(`o`.`date_added`), `cs`.`products`, `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
+							$sql .= " GROUP BY YEAR(`o`.`date_added`), MONTH(`o`.`date_added`), `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
 							break;
 						case 'year':
-							$sql .= " GROUP BY YEAR(`o`.`date_added`), `cs`.`products`, `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
+							$sql .= " GROUP BY YEAR(`o`.`date_added`), `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
 							break;
 					}
 
@@ -365,9 +365,17 @@ class ModelCatalogProduct extends Model {
 					$query = $this->db->query($sql)->rows;
 					
 					if ($filter == 'product') {
+					    $tmp_products = array();
+						
+						$tmp_products_related = array();
+						
 					    foreach ($query as $result) {
-						$product_data[$result['product_id']] = $this->getProduct($result['product_id']);
+							$tmp_products[$result['product_id']] = $this->getProduct($result['product_id']);
+							
+							$tmp_products_related[$result['product_id']] = $this->getProductRelated($result['product_id']);
 					    }
+						
+						$product_data = array_merge($tmp_products, $tmp_products_related);
 					    
 					    $this->cache->set('product.bestseller.' . (int)$this->config->get('config_language_id') . '.' . (int)$this->config->get('config_store_id') . '.' . $this->config->get('config_customer_group_id') . '.' . (int)$setting['limit'], $product_data);
 					    
