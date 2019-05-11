@@ -21,7 +21,7 @@ class ModelLocalisationCountry extends Model {
 	}
 
 	public function getCountry($country_id) {
-		$query = $this->db->query("SELECT DISTINCT * FROM " . DB_PREFIX . "country WHERE country_id = '" . (int)$country_id . "'");
+		$query = $this->db->query("SELECT DISTINCT *, `c`.`country_id` AS `country_id`, `z`.`name` AS `zone_name` FROM `" . DB_PREFIX . "zone` `z` INNER JOIN `" . DB_PREFIX . "country` `c` ON (`c`.`country_id` = `z`.`country_id`) WHERE `c`.`country_id` = '" . (int)$country_id . "'");
 
 		return $query->row;
 	}
