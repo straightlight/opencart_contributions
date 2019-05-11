@@ -53,13 +53,13 @@ class ControllerExtensionTotalShipping extends Controller {
 			$json['error']['country'] = $this->language->get('error_country');
 		}
 
-		if ((!isset($this->request->post['zone_id']) || !is_numeric($this->request->post['zone_id'])) || (!empty($country_info['zone_id']) && !isset($this->request->post['zone_id']))) {
-			$json['error']['zone'] = $this->language->get('error_zone');
-		}
-
 		$this->load->model('localisation/country');
 
 		$country_info = $this->model_localisation_country->getCountry($this->request->post['country_id']);
+		
+		if ((!isset($this->request->post['zone_id']) || !is_numeric($this->request->post['zone_id'])) || (!empty($country_info['zone_id']) && !isset($this->request->post['zone_id']))) {
+			$json['error']['zone'] = $this->language->get('error_zone');
+		}
 
 		if ($country_info && $country_info['postcode_required'] && (utf8_strlen(trim($this->request->post['postcode'])) < 2 || utf8_strlen(trim($this->request->post['postcode'])) > 10)) {
 			$json['error']['postcode'] = $this->language->get('error_postcode');
