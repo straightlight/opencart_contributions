@@ -367,7 +367,7 @@ class ModelCatalogProduct extends Model {
 					if ($filter == 'product') {
 					    $tmp_products = array();
 						
-						$tmp_products_related = array();
+					    $tmp_products_related = array();
 						
 					    foreach ($query as $result) {
 							$tmp_products[$result['product_id']] = $this->getProduct($result['product_id']);
@@ -375,7 +375,7 @@ class ModelCatalogProduct extends Model {
 							$tmp_products_related[$result['product_id']] = $this->getProductRelated($result['product_id']);
 					    }
 						
-						$product_data = array_merge($tmp_products, $tmp_products_related);
+					    $product_data = array_merge($tmp_products, $tmp_products_related);
 					    
 					    $this->cache->set('product.bestseller.' . (int)$this->config->get('config_language_id') . '.' . (int)$this->config->get('config_store_id') . '.' . $this->config->get('config_customer_group_id') . '.' . (int)$setting['limit'], $product_data);
 					    
