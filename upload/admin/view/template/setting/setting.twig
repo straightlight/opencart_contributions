@@ -190,7 +190,7 @@
               </div>
               {% endif %} </div>
             <div class="tab-pane" id="tab-local">
-              <div class="form-group">
+              <div class="form-group required">
                 <label class="col-sm-2 control-label" for="input-country">{{ entry_country }}</label>
                 <div class="col-sm-10">
                   <select name="config_country_id" id="input-country" class="form-control">
@@ -208,13 +208,19 @@
                     {% endfor %}
                   
                   </select>
+		  		  {% if error_country %}
+				  	<div class="text-danger">{{ error_country }}</div>
+              	  {% endif %}
                 </div>
               </div>
-              <div class="form-group">
+              <div class="form-group required">
                 <label class="col-sm-2 control-label" for="input-zone">{{ entry_zone }}</label>
                 <div class="col-sm-10">
                   <select name="config_zone_id" id="input-zone" class="form-control">
                   </select>
+				  {% if error_zone %}
+					<div class="text-danger">{{ error_zone }}</div>
+              	  {% endif %}
                 </div>
               </div>
               <div class="form-group">
