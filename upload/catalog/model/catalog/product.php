@@ -323,6 +323,7 @@ class ModelCatalogProduct extends Model {
 					$sql .= " AND `o`.`customer_group_id` = '" . (int)$this->config->get('config_customer_group_id') . "'";
 					$sql .= " AND `o`.`payment_code` NOT LIKE '%free%'";
 					$sql .= " AND `o`.`shipping_code` NOT LIKE '%free%'";
+					$sql .= " AND `o`.`total` >= '1.00'";
 					
 					if ($category_id) {
 						$sql .= " AND `cs`.`category_id` = '" . (int)$category_id . "'";
@@ -344,17 +345,17 @@ class ModelCatalogProduct extends Model {
 
 					switch($group) {
 						case 'day';
-							$sql .= " GROUP BY YEAR(`o`.`date_added`), MONTH(`o`.`date_added`), DAY(`o`.`date_added`), `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
+							$sql .= " GROUP BY YEAR(`o`.`date_added`), MONTH(`o`.`date_added`), DAY(`o`.`date_added`), `op`.`product_id`, `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
 							break;
 						default:
 						case 'week':
-							$sql .= " GROUP BY YEAR(`o`.`date_added`), WEEK(`o`.`date_added`), `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
+							$sql .= " GROUP BY YEAR(`o`.`date_added`), WEEK(`o`.`date_added`), `op`.`product_id`, `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
 							break;
 						case 'month':
-							$sql .= " GROUP BY YEAR(`o`.`date_added`), MONTH(`o`.`date_added`), `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
+							$sql .= " GROUP BY YEAR(`o`.`date_added`), MONTH(`o`.`date_added`), `op`.`product_id`, `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
 							break;
 						case 'year':
-							$sql .= " GROUP BY YEAR(`o`.`date_added`), `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
+							$sql .= " GROUP BY YEAR(`o`.`date_added`), `op`.`product_id`, `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
 							break;
 					}
 
