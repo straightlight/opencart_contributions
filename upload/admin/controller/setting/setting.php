@@ -46,6 +46,18 @@ class ControllerSettingSetting extends Controller {
 		} else {
 			$data['error_address'] = '';
 		}
+		
+		if (isset($this->error['country'])) {
+			$data['error_country'] = $this->error['country'];
+		} else {
+			$data['error_country'] = '';
+		}
+		
+		if (isset($this->error['zone'])) {
+			$data['error_zone'] = $this->error['zone'];
+		} else {
+			$data['error_zone'] = '';
+		}
 
 		if (isset($this->error['email'])) {
 			$data['error_email'] = $this->error['email'];
@@ -902,6 +914,14 @@ class ControllerSettingSetting extends Controller {
 
 		if ((utf8_strlen($this->request->post['config_address']) < 3) || (utf8_strlen($this->request->post['config_address']) > 256)) {
 			$this->error['address'] = $this->language->get('error_address');
+		}
+		
+		if (!isset($this->request->post['country_id']) || !filter_var($this->request->post['country_id'], FILTER_VALIDATE_INT)) {
+			$this->error['country'] = $this->language->get('error_country');
+		}
+
+		if (!isset($this->request->post['zone_id']) || !filter_var($this->request->post['zone_id'], FILTER_VALIDATE_INT)) {
+			$this->error['zone'] = $this->language->get('error_zone');
 		}
 
 		if ((utf8_strlen($this->request->post['config_email']) > 96) || !filter_var($this->request->post['config_email'], FILTER_VALIDATE_EMAIL)) {
