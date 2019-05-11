@@ -1,7 +1,7 @@
 <?php
 class ModelLocalisationCountry extends Model {
 	public function getCountry($country_id) {
-		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "country WHERE country_id = '" . (int)$country_id . "' AND status = '1'");
+		$query = $this->db->query("SELECT *, `c`.`country_id` AS `country_id` FROM `" . DB_PREFIX . "zone` `z` LEFT JOIN `" . DB_PREFIX . "country` `c` ON (`c`.`country_id` = `z`.`country_id`) WHERE `c`.`country_id` = '" . (int)$country_id . "' AND `c`.`status` = '1'");
 
 		return $query->row;
 	}
