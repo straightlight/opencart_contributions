@@ -130,7 +130,7 @@ class ControllerCheckoutPaymentAddress extends Controller {
 					$json['error']['country'] = $this->language->get('error_country');
 				}
 
-				if ((!isset($this->request->post['zone_id']) || !is_numeric($this->request->post['zone_id'])) || (!empty($country_info['zone_id']) && !isset($this->request->post['zone_id']))) {
+				if ((!isset($this->request->post['zone_id']) || !filter_var($this->request->post['zone_id'], FILTER_VALIDATE_INT)) || (!empty($country_info['zone_id']) && !isset($this->request->post['zone_id']))) {
 					$json['error']['zone'] = $this->language->get('error_zone');
 				}
 
