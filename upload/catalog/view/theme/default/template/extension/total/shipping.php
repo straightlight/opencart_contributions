@@ -185,7 +185,7 @@ $('select[name=\'country_id\']').on('change', function() {
 
 			html = '<option value="">{{ text_select }}</option>';
 
-			if (json['zone'] && json['zone'] != '') {
+			if (json['zone'] && json['zone'] != '' && json['zone_id']) {
 				for (i = 0; i < json['zone'].length; i++) {
 					html += '<option value="' + json['zone'][i]['zone_id'] + '"';
 
