@@ -1037,7 +1037,7 @@ class ControllerCustomerCustomer extends Controller {
 					$this->error['address'][$key]['country'] = $this->language->get('error_country');
 				}
 
-				if ((!isset($value['zone_id']) || !is_numeric($value['zone_id'])) || (!empty($country_info['zone_id']) && !isset($value['zone_id']))) {
+				if ((!isset($value['zone_id']) || !filter_var($value['zone_id'], FILTER_VALIDATE_INT)) || (!empty($country_info['zone_id']) && !isset($value['zone_id']))) {
 					$this->error['address'][$key]['zone'] = $this->language->get('error_zone');
 				}
 
