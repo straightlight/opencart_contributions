@@ -341,7 +341,11 @@ class ModelCatalogProduct extends Model {
 						}
 					}
 					
-					$group = 'week';
+					if (!empty($setting['group'])) {
+						$group = $setting['group'];
+					} else {
+						$group = 'week';	
+					}
 
 					switch($group) {
 						case 'day';
