@@ -16,6 +16,7 @@ $_['entry_postcode']       = 'Post Code';
 $_['error_postcode']       = 'Postcode must be between 2 and 10 characters!';
 $_['error_country']        = 'Please select a country!';
 $_['error_zone']           = 'Please select a region / state!';
+$_['error_zone_status']    = 'Either the zone has been deactivated or the country from our records does not match the country you have selected!';
 $_['error_country_match']  = 'The selected country does not match with the selected zone in our records. Please select another country when selecting the zone!';
 $_['error_shipping']       = 'Warning: Shipping method required!';
 $_['error_no_shipping']    = 'Warning: No Shipping options are available. Please <a href="%s">contact us</a> for assistance!';
