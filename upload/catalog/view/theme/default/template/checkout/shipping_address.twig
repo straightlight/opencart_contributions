@@ -334,7 +334,7 @@ $('#collapse-shipping-address select[name=\'country_id\']').on('change', functio
 					html += '>' + json['zone'][i]['name'] + '</option>';
 				}
 			} else {
-				html += '<option value="0" selected="selected">{{ text_none }}</option>';
+				html = '<option value="0" selected="selected">{{ text_none }}</option>';
 			}
 
 			$('#collapse-shipping-address select[name=\'zone_id\']').html(html);
