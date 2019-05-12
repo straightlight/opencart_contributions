@@ -48,11 +48,11 @@ class ControllerExtensionTotalShipping extends Controller {
 		if (!$this->cart->hasShipping()) {
 			$json['error']['warning'] = sprintf($this->language->get('error_no_shipping'), $this->url->link('information/contact'));
 		}
-
-		if (!isset($this->request->post['zone_id']) || !is_numeric($this->request->post['zone_id'])) {
-			$json['error']['zone'] = $this->language->get('error_zone');
-		} elseif (!isset($this->request->post['country_id']) || !is_numeric($this->request->post['country_id'])) {
+		
+		if (!isset($this->request->post['country_id']) || !is_numeric($this->request->post['country_id'])) {
 			$json['error']['country'] = $this->language->get('error_country');
+		} elseif (!isset($this->request->post['zone_id']) || !is_numeric($this->request->post['zone_id'])) {
+			$json['error']['zone'] = $this->language->get('error_zone');		
 		} else {
 			$this->load->model('localisation/country');
 
