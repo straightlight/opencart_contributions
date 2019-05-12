@@ -455,10 +455,10 @@ class ControllerAccountAddress extends Controller {
 				$this->error['postcode'] = $this->language->get('error_postcode');
 			} else {
 				$this->load->model('localisation/zone');
-	
-				$match = $this->model_localisation_zone->getZoneWithCountryId($this->request->post['zone_id'], $this->request->post['country_id']);
 
-				if (!$match) {
+				$match = $this->model_localisation_zone->getZonesByCountryId($this->request->post['country_id']);
+		
+				if (!$match && !empty($this->request->post['zone_id'])) {
 					$this->error['country'] = $this->language->get('error_country_match');
 				}
 			}
