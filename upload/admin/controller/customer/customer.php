@@ -1024,11 +1024,11 @@ class ControllerCustomerCustomer extends Controller {
 				if ((utf8_strlen($value['city']) < 2) || (utf8_strlen($value['city']) > 128)) {
 					$this->error['address'][$key]['city'] = $this->language->get('error_city');
 				}
-
-				if (!isset($value['zone_id']) || !is_numeric($value['zone_id'])) {
-					$this->error['address'][$key]['zone'] = $this->language->get('error_zone');
-				} elseif (!isset($value['country_id']) || !is_numeric($value['country_id'])) {
+				
+				if (!isset($value['country_id']) || !is_numeric($value['country_id'])) {
 					$this->error['address'][$key]['country'] = $this->language->get('error_country');
+				} elseif (!isset($value['zone_id']) || !is_numeric($value['zone_id'])) {
+					$this->error['address'][$key]['zone'] = $this->language->get('error_zone');
 				} else {
 					$this->load->model('localisation/country');
 	
