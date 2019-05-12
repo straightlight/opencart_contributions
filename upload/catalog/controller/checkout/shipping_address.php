@@ -132,22 +132,34 @@ class ControllerCheckoutShippingAddress extends Controller {
 				if (!isset($this->request->post['country_id']) || !is_numeric($this->request->post['country_id'])) {
 					$json['error']['country'] = $this->language->get('error_country');
 				} elseif (!isset($this->request->post['zone_id']) || !is_numeric($this->request->post['zone_id'])) {
-					$json['error']['zone'] = $this->language->get('error_zone');				
+					$json['error']['zone'] = $this->language->get('error_zone');
 				} else {
-					$this->load->model('localisation/country');
+					$this->load->model('localisation/country');	
 
 					$country_info = $this->model_localisation_country->getCountry($this->request->post['country_id']);
 
-					if ($country_info && $country_info['postcode_required'] && (utf8_strlen(trim($this->request->post['postcode'])) < 2 || utf8_strlen(trim($this->request->post['postcode'])) > 10)) {
-						$json['error']['postcode'] = $this->language->get('error_postcode');
-					} else {
-						$this->load->model('localisation/zone');
+					if (isset($country_info['status']) && $country_info['status'] == 1) {
+						if (isset($country_info['postcode_required']) && $country_info['postcode_required'] && (utf8_strlen(trim($this->request->post['postcode'])) < 2 || utf8_strlen(trim($this->request->post['postcode'])) > 10)) {
+							$json['error']['postcode'] = $this->language->get('error_postcode');
+						} else {
+							$this->load->model('localisation/zone');
+					
+							$match = $this->model_localisation_zone->getZonesByCountryId($this->request->post['country_id']);
 
-						$match = $this->model_localisation_zone->getZonesByCountryId($this->request->post['country_id']);
-		
-						if (!$match && !empty($this->request->post['zone_id'])) {
-							$json['error']['country'] = $this->language->get('error_country_match');
+							if (!$match) {
+								if (!empty($this->request->post['zone_id'])) {
+									$json['error']['country'] = $this->language->get('error_country_match');
+								}
+							} else {
+								$zone_info = $this->model_localisation_zone->getZone($this->request->post['zone_id']);
+						
+								if ((!isset($zone_info['status']) || !isset($zone_info['country_id'])) || ($zone_info['status'] != 1) || ($zone_info['country_id'] != (int)$this->request->post['country_id'])) {
+									$json['error']['country'] = $this->language->get('error_zone_status');
+								}
+							}
 						}
+					} else {
+						$json['error']['country'] = $this->language->get('error_country');
 					}
 				}
 
