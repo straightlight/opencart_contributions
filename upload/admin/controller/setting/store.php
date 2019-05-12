@@ -687,9 +687,9 @@ class ControllerSettingStore extends Controller {
 		}
 		
 		if (!isset($this->request->post['country_id']) || !is_numeric($this->request->post['country_id'])) {
-			$this->error['address'][$key]['country'] = $this->language->get('error_country');
+			$this->error['address']['country'] = $this->language->get('error_country');
 		} elseif (!isset($this->request->post['zone_id']) || !is_numeric($this->request->post['zone_id'])) {
-			$this->error['address'][$key]['zone'] = $this->language->get('error_zone');
+			$this->error['address']['zone'] = $this->language->get('error_zone');
 		} else {
 			$this->load->model('localisation/country');	
 
@@ -697,7 +697,7 @@ class ControllerSettingStore extends Controller {
 
 			if (isset($country_info['status']) && $country_info['status'] == 1) {
 				if (isset($country_info['postcode_required']) && $country_info['postcode_required'] && (utf8_strlen(trim($this->request->post['postcode'])) < 2 || utf8_strlen(trim($this->request->post['postcode'])) > 10)) {
-					$this->error['address'][$key]['postcode'] = $this->language->get('error_postcode');
+					$this->error['address']['postcode'] = $this->language->get('error_postcode');
 				} else {
 					$this->load->model('localisation/zone');
 					
@@ -705,20 +705,20 @@ class ControllerSettingStore extends Controller {
 
 					if (!$match) {
 						if (!empty($this->request->post['zone_id'])) {
-							$this->error['address'][$key]['country'] = $this->language->get('error_country_match');
+							$this->error['address']['country'] = $this->language->get('error_country_match');
 						}
 
 					} else {
 						$zone_info = $this->model_localisation_zone->getZone($this->request->post['zone_id']);
 						
 						if ((!isset($zone_info['status']) || !isset($zone_info['country_id'])) || ($zone_info['status'] != 1) || ($zone_info['country_id'] != (int)$this->request->post['country_id'])) {
-							$this->error['address'][$key]['country'] = $this->language->get('error_zone_status');
+							$this->error['address']['country'] = $this->language->get('error_zone_status');
 						}
 					}
 				}
 
 			} else {
-				$this->error['address'][$key]['country'] = $this->language->get('error_country');
+				$this->error['address']['country'] = $this->language->get('error_country');
 			}
 		}
 
