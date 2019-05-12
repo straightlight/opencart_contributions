@@ -922,10 +922,10 @@ class ControllerSettingSetting extends Controller {
 			$this->error['zone'] = $this->language->get('error_zone');		
 		} else {
 			$this->load->model('localisation/zone');
+
+			$match = $this->model_localisation_zone->getZonesByCountryId($this->request->post['country_id']);
 		
-			$match = $this->model_localisation_zone->getZoneWithCountryId($this->request->post['zone_id'], $this->request->post['country_id']);
-		
-			if (!$match) {
+			if (!$match && !empty($this->request->post['zone_id'])) {
 				$this->error['country'] = $this->language->get('error_country_match');			
 			}
 		}
