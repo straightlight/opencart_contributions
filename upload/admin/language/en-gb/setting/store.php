@@ -93,6 +93,7 @@ $_['error_owner']                  = 'Store Owner must be between 3 and 64 chara
 $_['error_address']                = 'Store Address must be between 10 and 256 characters!';
 $_['error_country']                = 'Please select a country!';
 $_['error_zone']                   = 'Please select a region / state!';
+$_['error_zone_status']            = 'Either the zone has been deactivated or the country from our records does not match the country you have selected!';
 $_['error_country_match']          = 'The selected country does not match the selected zone in our records. Please select another country when selecting the zone!';
 $_['error_email']                  = 'E-Mail Address does not appear to be valid!';
 $_['error_telephone']              = 'Telephone must be between 3 and 32 characters!';
