@@ -442,20 +442,26 @@ class ControllerAccountAddress extends Controller {
 			$this->error['city'] = $this->language->get('error_city');
 		}
 
-		$this->load->model('localisation/country');
-
-		$country_info = $this->model_localisation_country->getCountry($this->request->post['country_id']);
-
-		if ($country_info && $country_info['postcode_required'] && (utf8_strlen(trim($this->request->post['postcode'])) < 2 || utf8_strlen(trim($this->request->post['postcode'])) > 10)) {
-			$this->error['postcode'] = $this->language->get('error_postcode');
-		}
-
-		if ($this->request->post['country_id'] == '' || !is_numeric($this->request->post['country_id'])) {
-			$this->error['country'] = $this->language->get('error_country');
-		}
-
-		if ((!isset($this->request->post['zone_id']) || !filter_var($this->request->post['zone_id'], FILTER_VALIDATE_INT)) || (!empty($country_info['zone_id']) && !isset($this->request->post['zone_id']))) {
+		if (empty($this->request->post['zone_id']) || !filter_var($this->request->post['zone_id'], FILTER_VALIDATE_INT)) {
 			$this->error['zone'] = $this->language->get('error_zone');
+		} elseif (empty($this->request->post['country_id']) || !filter_var($this->request->post['country_id'], FILTER_VALIDATE_INT)) {
+			$this->error['country'] = $this->language->get('error_country');
+		} else {
+			$this->load->model('localisation/country');
+
+			$country_info = $this->model_localisation_country->getCountry($this->request->post['country_id']);
+
+			if ($country_info && $country_info['postcode_required'] && (utf8_strlen(trim($this->request->post['postcode'])) < 2 || utf8_strlen(trim($this->request->post['postcode'])) > 10)) {
+				$this->error['postcode'] = $this->language->get('error_postcode');
+			} else {
+				$this->load->model('localisation/zone');
+	
+				$match = $this->model_localisation_zone->getZoneWithCountryId($this->request->post['zone_id'], $this->request->post['country_id']);
+
+				if (!$match) {
+					$this->error['country'] = $this->language->get('error_country_match');
+				}
+			}
 		}
 
 		// Custom field validation
