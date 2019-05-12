@@ -918,7 +918,6 @@ class ControllerSettingSetting extends Controller {
 		
 		if (!isset($this->request->post['country_id']) || !is_numeric($this->request->post['country_id'])) {
 			$this->error['address'][$key]['country'] = $this->language->get('error_country');
-
 		} elseif (!isset($this->request->post['zone_id']) || !is_numeric($this->request->post['zone_id'])) {
 			$this->error['address'][$key]['zone'] = $this->language->get('error_zone');
 		} else {
