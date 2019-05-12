@@ -131,10 +131,10 @@ class ControllerCheckoutPaymentAddress extends Controller {
 						$json['error']['postcode'] = $this->language->get('error_postcode');
 					} else {
 						$this->load->model('localisation/zone');
-	
-						$match = $this->model_localisation_zone->getZoneWithCountryId($this->request->post['zone_id'], $this->request->post['country_id']);
 
-						if (!$match) {
+						$match = $this->model_localisation_zone->getZonesByCountryId($this->request->post['country_id']);
+		
+						if (!$match && !empty($this->request->post['zone_id'])) {
 							$json['error']['country'] = $this->language->get('error_country_match');
 						}
 					}
