@@ -129,9 +129,9 @@ class ControllerCheckoutShippingAddress extends Controller {
 					$json['error']['city'] = $this->language->get('error_city');
 				}
 
-				if (!isset($this->request->post['zone_id']) || !filter_var($this->request->post['zone_id'], FILTER_VALIDATE_INT)) {
+				if (!isset($this->request->post['zone_id']) || !is_numeric($this->request->post['zone_id'])) {
 					$json['error']['zone'] = $this->language->get('error_zone');
-				} elseif (!isset($this->request->post['country_id']) || !filter_var($this->request->post['country_id'], FILTER_VALIDATE_INT)) {
+				} elseif (!isset($this->request->post['country_id']) || !is_numeric($this->request->post['country_id'])) {
 					$json['error']['country'] = $this->language->get('error_country');
 				} else {
 					$this->load->model('localisation/country');
