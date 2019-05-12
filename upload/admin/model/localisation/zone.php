@@ -76,6 +76,12 @@ class ModelLocalisationZone extends Model {
 		return $query;
 	}
 	
+	public function getCountryByZoneName($name, $country_id) {
+		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone WHERE LCASE(TRIM(name)) = '" . trim(strtolower($name)) . "' AND country_id = '" . (int)$country_id . "'")->row;
+		
+		return $query;
+	}
+	
 	public function getTotalZones() {
 		$query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "zone");
 
