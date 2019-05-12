@@ -138,9 +138,7 @@ class ControllerCheckoutGuest extends Controller {
 		}
 		
 		$this->response->setOutput($this->load->view('checkout/guest', $data));
-	}
-
-	public function save() {
+$json['error']function save() {
 		$this->load->language('checkout/checkout');
 
 		$json = array();
@@ -187,23 +185,23 @@ class ControllerCheckoutGuest extends Controller {
 			}
 
 			if (!isset($this->request->post['zone_id']) || !filter_var($this->request->post['zone_id'], FILTER_VALIDATE_INT)) {
-				$this->error['zone'] = $this->language->get('error_zone');
+				$json['error']['zone'] = $this->language->get('error_zone');
 			} elseif (!isset($this->request->post['country_id']) || !filter_var($this->request->post['country_id'], FILTER_VALIDATE_INT)) {
-				$this->error['country'] = $this->language->get('error_country');
+				$json['error']['country'] = $this->language->get('error_country');
 			} else {
 				$this->load->model('localisation/country');
 
 				$country_info = $this->model_localisation_country->getCountry($this->request->post['country_id']);
 
 				if ($country_info && $country_info['postcode_required'] && (utf8_strlen(trim($this->request->post['postcode'])) < 2 || utf8_strlen(trim($this->request->post['postcode'])) > 10)) {
-					$this->error['postcode'] = $this->language->get('error_postcode');
+					$json['error']['postcode'] = $this->language->get('error_postcode');
 				} else {
 					$this->load->model('localisation/zone');
 	
 					$match = $this->model_localisation_zone->getZoneWithCountryId($this->request->post['zone_id'], $this->request->post['country_id']);
 
 					if (!$match) {
-						$this->error['country'] = $this->language->get('error_country_match');
+						$json['error']['country'] = $this->language->get('error_country_match');
 					}
 				}
 			}
