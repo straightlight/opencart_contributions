@@ -364,16 +364,16 @@ class ControllerLocalisationZone extends Controller {
 			$this->error['name'] = $this->language->get('error_name');
 		}
 		
-		if (empty($this->request->post['zone_id'])) {
+		if (empty($this->request->post['zone_id']) || !filter_var($this->request->post['zone_id'], FILTER_VALIDATE_INT)) {
 			$this->error['zone'] = $this->language->get('error_zone');
-		} elseif (empty($this->request->post['country_id'])) {
+		} elseif (empty($this->request->post['country_id']) || !filter_var($this->request->post['country_id'], FILTER_VALIDATE_INT)) {
 			$this->error['country'] = $this->language->get('error_country');
 		} else {
 			$this->load->model('localisation/zone');
-                    	
-			$country_zone_match = $this->model_localisation_zone->getZoneWithCountryId($this->request->post['zone_id'], $this->request->post['country_id']);
-		
-			if ($country_zone_match) {
+	
+			$match = $this->model_localisation_zone->getZoneWithCountryId($this->request->post['zone_id'], $this->request->post['country_id']);
+
+			if ($match) {
 				$this->error['country'] = $this->language->get('error_country_match');
 			}
 		}
