@@ -1034,16 +1034,28 @@ class ControllerCustomerCustomer extends Controller {
 	
 					$country_info = $this->model_localisation_country->getCountry($value['country_id']);
 
-					if ($country_info && $country_info['postcode_required'] && (utf8_strlen(trim($value['postcode'])) < 2 || utf8_strlen(trim($value['postcode'])) > 10)) {
-						$this->error['address'][$key]['postcode'] = $this->language->get('error_postcode');
-					} else {
-						$this->load->model('localisation/zone');
+					if (isset($country_info['status']) && $country_info['status'] == 1) {
+						if (isset($country_info['postcode_required']) && $country_info['postcode_required'] && (utf8_strlen(trim($value['postcode'])) < 2 || utf8_strlen(trim($value['postcode'])) > 10)) {
+							$this->error['address'][$key]['postcode'] = $this->language->get('error_postcode');
+						} else {
+							$this->load->model('localisation/zone');
 		
-						$match = $this->model_localisation_zone->getZonesByCountryId($value['country_id']);
-		
-						if (!$match && !empty($value['zone_id'])) {
-							$this->error['address'][$key]['country'] = $this->language->get('error_country_match');
+							$match = $this->model_localisation_zone->getZonesByCountryId($value['country_id']);
+
+							if (!$match) {
+								if (!empty($value['zone_id'])) {
+									$this->error['address'][$key]['country'] = $this->language->get('error_country_match');
+								}
+							} else {
+								$zone_info = $this->model_localisation_zone->getZone($value['zone_id']);
+
+								if ((!isset($zone_info['status']) || !isset($zone_info['country_id'])) || ($zone_info['status'] != 1) || ($zone_info['country_id'] != (int)$value['country_id'])) {
+									$this->error['address'][$key]['country'] = $this->language->get('error_zone_status');
+								}
+							}
 						}
+					} else {
+						$this->error['address'][$key]['country'] = $this->language->get('error_country');
 					}
 				}
 
