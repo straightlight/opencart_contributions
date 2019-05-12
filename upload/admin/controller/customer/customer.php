@@ -1039,9 +1039,9 @@ class ControllerCustomerCustomer extends Controller {
 					} else {
 						$this->load->model('localisation/zone');
 		
-						$match = $this->model_localisation_zone->getZoneWithCountryId($value['zone_id'], $value['country_id']);
+						$match = $this->model_localisation_zone->getZonesByCountryId($value['country_id']);
 		
-						if (!$match) {
+						if (!$match && !empty($value['zone_id'])) {
 							$this->error['address'][$key]['country'] = $this->language->get('error_country_match');
 						}
 					}
