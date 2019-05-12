@@ -34,5 +34,5 @@ $_['error_postcode']     = 'Postcode must be between 2 and 10 characters!';
 $_['error_city']         = 'City must be between 2 and 128 characters!';
 $_['error_country']      = 'Please select a country!';
 $_['error_zone']         = 'Please select a region / state!';
-$_['error_country_match']    = 'The selected country already match with this zone in the records. Please select another country when selecting the zone!';
+$_['error_country_match']    = 'The selected country does not match with the selected zone in our records. Please select another country when selecting the zone!';
 $_['error_custom_field'] = '%s required!';
