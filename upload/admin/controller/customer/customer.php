@@ -1025,9 +1025,9 @@ class ControllerCustomerCustomer extends Controller {
 					$this->error['address'][$key]['city'] = $this->language->get('error_city');
 				}
 
-				if (!isset($value['zone_id']) || !filter_var($value['zone_id'], FILTER_VALIDATE_INT)) {
+				if (!isset($value['zone_id']) || !is_numeric($value['zone_id'])) {
 					$this->error['address'][$key]['zone'] = $this->language->get('error_zone');
-				} elseif (!isset($value['country_id']) || !filter_var($value['country_id'], FILTER_VALIDATE_INT)) {
+				} elseif (!isset($value['country_id']) || !is_numeric($value['country_id'])) {
 					$this->error['address'][$key]['country'] = $this->language->get('error_country');
 				} else {
 					$this->load->model('localisation/country');
