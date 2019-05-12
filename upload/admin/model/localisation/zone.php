@@ -74,11 +74,15 @@ class ModelLocalisationZone extends Model {
 
 			$this->cache->set('zone.' . (int)$country_id, $zone_data);
 		}
-
-		return $zone_data;
 	}
-  
-  public function getTotalZones() {
+	
+	public function getZoneWithCountryId($zone_id, $country_id) {
+		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone WHERE zone_id = '" . (int)$zone_id . "' AND country_id = '" . (int)$country_id . "'")->row;
+		
+		return $query;
+	}
+		
+	public function getTotalZones() {
 		$query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "zone");
 
 		return $query->row['total'];
@@ -87,6 +91,10 @@ class ModelLocalisationZone extends Model {
 	public function getTotalZonesByCountryId($country_id) {
 		$query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "zone WHERE country_id = '" . (int)$country_id . "'");
 
-		return $query->row['total'];
+		
+		return $zone_data;
+	}
+  
+  return $query->row['total'];
 	}
 }
