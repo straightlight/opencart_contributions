@@ -22,10 +22,16 @@ class ControllerExtensionModuleBestSeller extends Controller {
 				$sub_categories[] = $path_id;
 			}
 		}
-
-		$results = $this->model_catalog_product->getBestSellerProducts($setting, $category_id);
 		
-		$search_results = $this->model_catalog_product->getBestSellerProducts($setting, $category_id, $sub_categories, 'customer_search');
+		if (isset($this->request->get['product_id'])) {
+			$product_id = $this->request->get['product_id'];
+		} else {
+			$product_id = 0;
+		}
+
+		$results = $this->model_catalog_product->getBestSellerProducts($setting, $category_id, $sub_categories, $product_id);
+		
+		$search_results = $this->model_catalog_product->getBestSellerProducts($setting, $category_id, $sub_categories, $product_id, 'customer_search');
 		
 		if ($search_results) {
 		    $this->load->model('account/search');
