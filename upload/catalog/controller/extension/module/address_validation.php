@@ -44,7 +44,7 @@ class ControllerExtensionModuleAddressValidation extends Controller {
 
 						$method = $this->{'model_extension_payment_' . $result['code']}->getMethod($this->session->data['payment_address'], $total);
 
-						if (!$method || (float)$total <= 0) {
+						if (!$method || (float)$total <= 0.1) {
 							$this->load->language('extension/payment/' . $result['code']);
 							
 							if (!empty($this->language->get('text_title'))) {
@@ -79,7 +79,7 @@ class ControllerExtensionModuleAddressValidation extends Controller {
 
 						$quote = $this->{'model_extension_shipping_' . $result['code']}->getQuote($this->session->data['shipping_address']);
 
-						if (!$quote || (float)$total <= 0) {
+						if (!$quote) {
 							$this->load->language('extension/shipping/' . $result['code']);
 							
 							if (!empty($this->language->get('text_title'))) {
