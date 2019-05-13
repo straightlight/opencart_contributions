@@ -288,7 +288,7 @@ class ModelCatalogProduct extends Model {
 		return $product_data;
 	}
 
-	public function getBestSellerProducts($setting, $category_id = 0, $sub_categories = array(), $filter = 'product') {
+	public function getBestSellerProducts($setting, $category_id = 0, $sub_categories = array(), $product_id = 0, $filter = 'product') {
                 $product_data = $this->cache->get('product.bestseller.' . (int)$this->config->get('config_language_id') . '.' . (int)$this->config->get('config_store_id') . '.' . $this->config->get('config_customer_group_id') . '.' . (int)$setting['limit']);
                 
                 if (!$product_data) {
@@ -339,6 +339,10 @@ class ModelCatalogProduct extends Model {
 						if ($sub_categories_implode) {
 							$sql .= " AND (" . implode(" OR ", $sub_categories_implode) . ")";	
 						}
+					}
+			
+					if ($product_id) {
+						$sql .= " AND `op`.`product_id` = '" . (int)$product_id . "'";	
 					}
 					
 					if (!empty($setting['group'])) {
