@@ -44,7 +44,7 @@ class ControllerExtensionModuleAddressValidation extends Controller {
 
 						$method = $this->{'model_extension_payment_' . $result['code']}->getMethod($this->session->data['payment_address'], $total);
 
-						if (!$method && (float)$total < 0.1) {
+						if (!$method) {
 							$this->load->language('extension/payment/' . $result['code']);
 							
 							if (!empty($this->language->get('text_title'))) {
