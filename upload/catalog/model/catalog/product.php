@@ -378,13 +378,29 @@ class ModelCatalogProduct extends Model {
 						
 					    $tmp_products_related = array();
 						
+						$latest_products = $this->getLatestProducts($setting['limit']);
+						
+						$tmp_latest_products = array();
+						
+						$popular_products = $this->getPopularProducts($setting['limit']);
+						
+						$tmp_popular_products = array();
+						
 					    foreach ($query as $result) {
 							$tmp_products[$result['product_id']] = $this->getProduct($result['product_id']);
 							
 							$tmp_products_related[$result['product_id']] = $this->getProductRelated($result['product_id']);
+							
+							if (!empty($latest_products[$result['product_id']])) {
+								$tmp_latest_products[$result['product_id']] = $latest_products[$result['product_id']];	
+							}
+							
+							if (!empty($popular_products[$result['product_id']])) {
+								$tmp_popular_products[$result['product_id']] = $popular_products[$result['product_id']];	
+							}
 					    }
 						
-					    $product_data = array_merge($tmp_products, $tmp_products_related);
+					    $product_data = array_merge($tmp_products, $tmp_products_related, $tmp_latest_products, $tmp_popular_products);
 					    
 					    $this->cache->set('product.bestseller.' . (int)$this->config->get('config_language_id') . '.' . (int)$this->config->get('config_store_id') . '.' . $this->config->get('config_customer_group_id') . '.' . (int)$setting['limit'], $product_data);
 					    
