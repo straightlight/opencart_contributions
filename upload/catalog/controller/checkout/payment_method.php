@@ -31,8 +31,6 @@ class ControllerCheckoutPaymentMethod extends Controller {
 			}
 
 			// Payment Methods
-			$this->load->model('setting/extension');
-
 			$method_data = $this->model_setting_extension->getPaymentMethods($this->session->data['payment_address'], $total);
 			
 			$this->session->data['payment_methods'] = $method_data;
