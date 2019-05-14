@@ -376,10 +376,10 @@ class ControllerLocalisationZone extends Controller {
 			$this->load->model('localisation/geo_zone');
 			
 			if (isset($this->request->post['status']) && !empty($this->request->get['zone_id']) && !$this->request->post['status']) {
-				$geo_zone_info = $this->model_localisation_geo_zone->getGeoZoneByZoneId($this->request->get['zone_id']);
-			
-				if ($geo_zone_info) {
-					$this->error['warning'] = $this->language->get('error_disabled');
+				$zone_to_geo_zone_total = $this->model_localisation_geo_zone->getTotalZoneToGeoZoneByZoneId($zone_id);
+
+				if ($zone_to_geo_zone_total) {
+					$this->error['warning'] = sprintf($this->language->get('error_disabled'), $zone_to_geo_zone_total);
 				}
 			}
 		}
