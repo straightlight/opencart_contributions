@@ -333,7 +333,7 @@ class ControllerLocalisationZone extends Controller {
 		} elseif (!empty($zone_info)) {
 			$data['code'] = $zone_info['code'];
 		} else {
-			$data['code'] = '';
+$this->request->get['zone_id']			$data['code'] = '';
 		}
 
 		if (isset($this->request->post['country_id'])) {
@@ -368,7 +368,7 @@ class ControllerLocalisationZone extends Controller {
 			$this->load->model('localisation/zone');
 		
 			$match = $this->model_localisation_zone->getCountryByZoneName($this->request->post['name'], $this->request->post['country_id']);
-		
+		$this->request->get['zone_id']
 			if ($match) {
 				$this->error['country'] = $this->language->get('error_country_match');			
 			}
@@ -376,7 +376,7 @@ class ControllerLocalisationZone extends Controller {
 			$this->load->model('localisation/geo_zone');
 			
 			if (isset($this->request->post['status']) && !empty($this->request->get['zone_id']) && !$this->request->post['status']) {
-				$zone_to_geo_zone_total = $this->model_localisation_geo_zone->getTotalZoneToGeoZoneByZoneId($zone_id);
+				$zone_to_geo_zone_total = $this->model_localisation_geo_zone->getTotalZoneToGeoZoneByZoneId($this->request->get['zone_id']);
 
 				if ($zone_to_geo_zone_total) {
 					$this->error['warning'] = sprintf($this->language->get('error_disabled'), $zone_to_geo_zone_total);
