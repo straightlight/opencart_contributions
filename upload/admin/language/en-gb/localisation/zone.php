@@ -31,3 +31,4 @@ $_['error_country_match']    = 'The selected country already match with this zon
 $_['error_zone']             = 'Please select a region / state!';
 $_['error_affiliate']        = 'Warning: This zone cannot be deleted as it is currently assigned to %s affiliates!';
 $_['error_zone_to_geo_zone'] = 'Warning: This zone cannot be deleted as it is currently assigned to %s zones to geo zones!';
+$_['error_disabled']         = 'Warning: This zone cannot be disabled as it is currently assigned to %s zones to geo zones!';
