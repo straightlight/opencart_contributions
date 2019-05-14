@@ -368,7 +368,7 @@ $this->request->get['zone_id']			$data['code'] = '';
 			$this->load->model('localisation/zone');
 		
 			$match = $this->model_localisation_zone->getCountryByZoneName($this->request->post['name'], $this->request->post['country_id']);
-		$this->request->get['zone_id']
+		
 			if ($match) {
 				$this->error['country'] = $this->language->get('error_country_match');			
 			}
