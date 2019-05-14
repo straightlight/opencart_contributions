@@ -379,7 +379,7 @@ class ControllerLocalisationZone extends Controller {
 				$geo_zone_info = $this->model_localisation_geo_zone->getGeoZoneByZoneId($this->request->get['zone_id']);
 			
 				if ($geo_zone_info) {
-					$this->error['warning'] = $this->language->get('error_zone_to_geo_zone_status');
+					$this->error['warning'] = $this->language->get('error_disabled');
 				}
 			}
 		}
