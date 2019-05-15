@@ -17,6 +17,7 @@ $_['entry_alipay_public_key']        = 'Alipay Public Key';
 $_['entry_test']                     = 'Test mode';
 $_['entry_total']                    = 'Total';
 $_['entry_order_status']             = 'Completed Status';
+$_['entry_geo_address']				       = 'Geo Zone / Address';
 $_['entry_geo_zone']                 = 'Geo Zone';
 $_['entry_status']                   = 'Status';
 $_['entry_sort_order']               = 'Sort Order';
