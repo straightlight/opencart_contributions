@@ -19,13 +19,15 @@ class ModelExtensionPaymentAlipay extends Model {
 	public function getMethod($address, $total) {
 		$this->load->language('extension/payment/alipay');
 
-		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . (int)$this->config->get('payment_alipay_geo_zone_id') . "' AND country_id = '" . (int)$address['country_id'] . "' AND (zone_id = '" . (int)$address['zone_id'] . "' OR zone_id = '0')");
-
-		if ($this->config->get('payment_alipay_total') > 0 && $this->config->get('payment_alipay_total') > $total) {
+		if ($this->config->get('payment_alipay_geo_address') == 'geo_zones') {
+			$query = $this->db->query("SELECT *, c.* FROM " . DB_PREFIX . "zone_to_geo_zone z2gz LEFT JOIN " .  DB_PREFIX . "country c ON (z2gz.country_id = c.country_id) LEFT JOIN " . DB_PREFIX . "zone z ON (c.country_id = z.country_id) WHERE z2gz.geo_zone_id = '" . (int)$this->config->get('payment_alipay_geo_zone_id') . "' AND z2gz.country_id = '" . (int)$address['country_id'] . "' AND ((z.zone_id = '" . (int)$address['zone_id'] . "') OR z2gz.zone_id = '0') AND c.status = '1' AND z.status = '1'");
+		} elseif ($this->config->get('payment_alipay_geo_address') == 'addresses' && !empty($this->request->post['payment_address']['country_id'])) {
+			$status = true;
+		} elseif ($this->config->get('payment_alipay_total') > 0 && $this->config->get('payment_alipay_total') > $total) {
 			$status = false;
 		} elseif (!$this->config->get('payment_alipay_geo_zone_id')) {
 			$status = true;
-		} elseif ($query->num_rows) {
+		} elseif (isset($query) && $query->num_rows) {
 			$status = true;
 		} else {
 			$status = false;
