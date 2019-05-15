@@ -74,6 +74,20 @@
               </div>
             </div>
             <div class="form-group">
+              <label class="col-sm-2 control-label" for="input-geo-address">{{ entry_geo_address }}</label>
+              <div class="col-sm-10">
+                <select name="payment_alipay_geo_address" id="input-geo-address" class="form-control">
+                  {% for key|address_option in entry_geo_address_option %}
+                  {% if key == payment_alipay_geo_address %}
+					<option value="{{ key }}" selected="selected">{{ address_option }}</option>
+                  {% else %}
+					<option value="{{ key }}">{{ address_option }}</option>
+                  {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
               <label class="col-sm-2 control-label" for="input-geo-zone">{{ entry_geo_zone }}</label>
               <div class="col-sm-10">
                 <select name="payment_alipay_geo_zone_id" id="input-geo-zone" class="form-control">
