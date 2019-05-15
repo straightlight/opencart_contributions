@@ -21,6 +21,9 @@ $_['entry_geo_address']				       = 'Geo Zone / Address';
 $_['entry_geo_zone']                 = 'Geo Zone';
 $_['entry_status']                   = 'Status';
 $_['entry_sort_order']               = 'Sort Order';
+$_['entry_geo_address_option']		 = array('Addresses',
+											                     'Geo Zones',
+											                    );
 
 // Help
 $_['help_total']                     = 'The checkout total the order must reach before this payment method becomes active';
