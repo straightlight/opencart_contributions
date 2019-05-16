@@ -139,7 +139,7 @@ class ControllerCheckoutPaymentMethod extends Controller {
 			$payment_code = $this->session->data['payment_methods'][$this->request->post['payment_method']]['code'];
 			
 			if (!$this->config->get('payment_' . $payment_code . '_status') && (!empty($this->session->data['payment_address']['country_id']) || !empty($this->session->data['payment_address']['postcode']))) {
-				$json['error']['warning'] = $this->language->get('error_payment_available');
+				$json['error']['warning'] = $this->language->get('error_no_payment');
 			} else {
 				$this->session->data['payment_method'] = $this->session->data['payment_methods'][$this->request->post['payment_method']];
 			}
