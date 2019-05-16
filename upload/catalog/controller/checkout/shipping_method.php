@@ -89,7 +89,13 @@ class ControllerCheckoutShippingMethod extends Controller {
 		}
 
 		if (!$json) {
-			$this->session->data['shipping_method'] = $this->session->data['shipping_methods'][$shipping[0]]['quote'][$shipping[1]];
+			$shipping_code = $this->session->data['shipping_methods'][$this->request->post['shipping_method']]['code'];			
+
+			if (!$this->config->get('shipping_' . $shipping_code . '_status') && (!empty($this->session->data['shipping_address']['country_id']) || !empty($this->session->data['shipping_address']['postcode']))) {
+				$json['error']['warning'] = sprintf($this->language->get('error_no_shipping'), $this->url->link('information/contact'));
+			} else {
+				$this->session->data['shipping_method'] = $this->session->data['shipping_methods'][$this->request->post['shipping_method']];
+			}
 
 			$this->session->data['comment'] = strip_tags($this->request->post['comment']);
 		}
