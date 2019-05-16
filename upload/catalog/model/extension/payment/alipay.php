@@ -21,7 +21,7 @@ class ModelExtensionPaymentAlipay extends Model {
 
 		$this->load->library('geozone');
 		
-		$status = $this->geozones->validateGeoZone($this->registry, $address, $total);
+		$status = $this->geozone->validateGeoZone($this->registry, $address, $total);
 		
 		$method_data = array();
 
