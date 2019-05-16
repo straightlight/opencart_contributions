@@ -92,7 +92,7 @@ class ControllerCheckoutShippingMethod extends Controller {
 			$shipping_code = $this->session->data['shipping_methods'][$this->request->post['shipping_method']]['code'];			
 
 			if (!$this->config->get('shipping_' . $shipping_code . '_status') && (!empty($this->session->data['shipping_address']['country_id']) || !empty($this->session->data['shipping_address']['postcode']))) {
-				$json['error']['warning'] = sprintf($this->language->get('error_no_shipping'), $this->url->link('information/contact'));
+				$json['error']['warning'] = sprintf($this->language->get('error_no_shipping'), $this->url->link('information/contact', 'language=' . $this->config->get('config_language')));
 			} else {
 				$this->session->data['shipping_method'] = $this->session->data['shipping_methods'][$this->request->post['shipping_method']];
 			}
