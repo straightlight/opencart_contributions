@@ -10,32 +10,22 @@ class Geozone {
 		} elseif (!$this->config->get($method . '_' . $code . '_geo_zone_id')) {
 			$status = true;
 		} elseif ($this->config->get($method . '_' . $code . '_geo_address') == 'geo_zones' && !empty($address['country_id'])) {
-			$country_info = $this->model_localisation_country->getCountry($address['country_id']);
-			
-			if ($country_info && $country_info['status'] && $country_info['postcode_required']) {
-				$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone WHERE country_id = '" . (int)$country_info['country_id'] . "' AND status = '1'");
-				
-				$country_implode = array();
-				
-				$zone_implode = array();
-				
-				foreach ($query as $result) {
-					$country_implode[] = "country_id = '" . (int)$result['country_id'] . "'";
-					
-					$zone_implode[] = "zone_id = '" . (int)$result['zone_id'] . "'";
+			$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . (int)$this->config->get($method . '_' . $code . '_geo_zone_id') . "' AND country_id = '" . (int)$address['country_id'] . "' AND (zone_id = '" . $address['zone_id'] . "' OR zone_id = '0')");
+
+			if ($query->row) {
+				if ($query->row['zone_id'] == 0) {
+					$result = $this->db->query("SELECT * FROM " . DB_PREFIX . "country WHERE country_id = '" . (int)$address['country_id'] . "' AND status = '1'");
+				} else {
+					$result = $this->db->query("SELECT * FROM " . DB_PREFIX . "country c LEFT JOIN " .  DB_PREFIX . "zone z ON (c.country_id = z.country_id) WHERE z.zone_id = '" . (int)$address['zone_id'] . "' AND c.status = '1' AND z.status = '1'");
 				}
-				
-				if ($country_implode && $zone_implode) {
-					$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . (int)$this->config->get($method . '_' . $code . '_geo_zone_id') . "' AND (" . implode(" OR ", $country_implode) . ") AND (" . implode(" OR ", $zone_implode) . ") OR zone_id = '0'");
-					
-					if ($query->num_rows) {
-						$status = true;
-					} else {
-						$status = false;
-					}
+
+				if ($result->num_rows) {
+					$status = true;
 				} else {
 					$status = false;
 				}
+			} else {
+				$status = false;
 			}
 			
 		} elseif ($this->config->get($method . '_' . $code . '_geo_address') == 'addresses' && !empty($address['postcode']) && !empty($address['country_id'])) {
