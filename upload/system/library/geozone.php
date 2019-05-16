@@ -26,7 +26,7 @@ class Geozone {
 				}
 				
 				if ($country_implode && $zone_implode) {
-					$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . (int)$this->config->get($method . '_' . $code . '_geo_zone_id') . "' AND (" . implode(" OR ", $country_implode) . ") AND (" . implode(" OR ", $zone_implode) . ")");
+					$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . (int)$this->config->get($method . '_' . $code . '_geo_zone_id') . "' AND (" . implode(" OR ", $country_implode) . ") AND (" . implode(" OR ", $zone_implode) . ") OR zone_id = '0'");
 					
 					if ($query->num_rows) {
 						$status = true;
