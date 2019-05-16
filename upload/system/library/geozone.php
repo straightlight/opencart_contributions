@@ -13,7 +13,7 @@ class Geozone {
 			$country_info = $this->model_localisation_country->getCountry($address['country_id']);
 			
 			if ($country_info && $country_info['status'] && $country_info['postcode_required']) {
-				$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone WHERE country_id = '" . (int)$country_info['country_id'] . "'");
+				$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone WHERE country_id = '" . (int)$country_info['country_id'] . "' AND status = '1'");
 				
 				$country_implode = array();
 				
