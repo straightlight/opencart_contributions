@@ -92,4 +92,5 @@ $_['error_shipping']                 = 'Warning: Shipping method required!';
 $_['error_no_shipping']              = 'Warning: No Shipping options are available. Please <a href="%s">contact us</a> for assistance!';
 $_['error_payment']                  = 'Warning: Payment method required!';
 $_['error_no_payment']               = 'Warning: No Payment options are available. Please <a href="%s">contact us</a> for assistance!';
+$_['error_payment_available']		 = 'Error: The selected payment method is not available at this time. Pleasw select another payment provider to complete this transaction or contact the store for more information!';
 $_['error_custom_field']             = '%s required!';
