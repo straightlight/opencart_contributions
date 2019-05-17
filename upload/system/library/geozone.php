@@ -7,7 +7,7 @@ class Geozone {
 		
 		$this->load->model('localisation/country');
 		
-		if ($this->config->get($method . '_' . $code . '_total') > 0 && $this->config->get($method . '_' . $code . '_total') > $total) {
+		if ($this->config->get($method . '_' . $code . '_total') && $this->config->get($method . '_' . $code . '_total') > $total) {
 			$status = false;
 		} elseif ($this->config->get($method . '_' . $code . '_geo_address') == 'geo_zones' && !empty($address['country_id'])) {
 			if (!$this->config->get($method . '_' . $code . '_geo_zone_id')) {
