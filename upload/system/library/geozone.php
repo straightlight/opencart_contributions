@@ -1,12 +1,12 @@
 <?php
 class Geozone {
 	protected $registry;
-	
+
 	public function validateGeoZone($registry, $address, $method, $code, $total) {
 		$this->registry = $registry;
-		
+
 		$this->load->model('localisation/country');
-		
+
 		if ($this->config->get($method . '_' . $code . '_total') && $this->config->get($method . '_' . $code . '_total') > $total) {
 			$status = false;
 		} elseif ($this->config->get($method . '_' . $code . '_geo_address') == 'geo_zones' && !empty($address['country_id'])) {
@@ -17,12 +17,30 @@ class Geozone {
 
 				if ($query->row) {
 					if (!empty($address['zone_id'])) {
-						$result = $this->db->query("SELECT * FROM " . DB_PREFIX . "country c LEFT JOIN " . DB_PREFIX . "zone z ON (c.country_id = z.country_id) WHERE c.country_id = '" . (int)$address['country_id'] . "' AND z.zone_id = '" . (int)$address['zone_id'] . "' AND c.status = '1' AND z.status = '1'");
+						$country_info = $this->model_localisation_country->getCountry($address['country_id']);
+
+						if ($country_info && $country_info['status']) {
+							$this->load->model('localisation/zone');
+
+							$zone_info = $this->model_localisation_zone->getZone($address['zone_id']);
+
+							if ($zone_info && $zone_info['status'] && $zone_info['country_id'] == $address['country_id']) {
+								$status = true;
+							} else {
+								$status = false;
+							}
+						} else {
+							$status = false;
+						}
 					} else {
 						$result = $this->db->query("SELECT * FROM " . DB_PREFIX . "country WHERE country_id = '" . (int)$address['country_id'] . "' AND status = '1'");
+						
+						if ($result->num_rows) {
+							$status = true;
+						} else {
+							$status = false;	
+						}
 					}
-
-					$status = ($result->num_rows) ? true : false;
 				} else {
 					$status = false;
 				}
