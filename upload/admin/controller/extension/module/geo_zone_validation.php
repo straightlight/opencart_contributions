@@ -8,7 +8,7 @@ class ControllerExtensionModuleGeoZoneValidation extends Controller {
 			foreach ($query->rows as $result) {
 				$this->log->write('Geo Zone Validation for Geo Zone Name: ' . htmlspecialchars_decode($result['geo_zone_name']) . ' - Duplicated country ID: ' . (int)$result['country_id'] . ' and countries count: ' . (int)$result['total_countries'] . ' . Duplicated zone ID: ' . (int)$result['zone_id'] . ' and zones count: ' . (int)$result['total_zones'] . '.');
 				
-				$this->db->query("UPDATE " . DB_PREFIX . "zone_to_geo_zone SET date_modified = NOW() WHERE country_id = '" . (int)$result['country_id'] . " AND zone_id = '" . (int)$result['zone_id'] . "'");
+				$this->db->query("UPDATE " . DB_PREFIX . "zone_to_geo_zone SET date_modified = NOW() WHERE country_id = '" . (int)$result['country_id'] . "' AND zone_id = '" . (int)$result['zone_id'] . "'");
 			}
 		}
 	}
