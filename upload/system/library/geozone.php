@@ -1,14 +1,8 @@
 <?php
 class Geozone {
-	protected $config;
-	protected $db;
-	protected $load;
 	protected $registry;
 	
 	public function validateGeoZone($registry, $address, $method, $code, $total) {
-		$this->config = $registry->get('config');
-		$this->db = $registry->get('db');
-		$this->load = $registry->get('load');
 		$this->registry = $registry;
 		
 		$this->load->model('localisation/country');
@@ -44,5 +38,9 @@ class Geozone {
 		}
 		
 		return $status;
+	}
+	
+	public function __get($name) {
+		return $this->registry->get($name);	
 	}
 }
