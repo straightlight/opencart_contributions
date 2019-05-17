@@ -73,6 +73,10 @@ class Geozone {
 							$status = false;	
 						}
 				} else {
+					if ($this->config->get($method . '_' . $code . '_debug')) {
+						$this->log->write(':: ' . strtoupper($code) . ' DEBUG :: GEO ZONE :: Could not be captured!');
+					}
+						
 					$status = false;
 				}
 			}
@@ -80,11 +84,23 @@ class Geozone {
 			$country_info = $this->model_localisation_country->getCountry($address['country_id']);
 
 			if ($country_info && $country_info['status'] && $country_info['postcode_required']) {
+				if ($this->config->get($method . '_' . $code . '_debug')) {
+					$this->log->write(':: ' . strtoupper($code) . ' DEBUG :: ADDRESS :: Country: ' . htmlspecialchars_decode($country_info['name']) . ' is active!');
+				}
+				
 				$status = true;
 			} else {
+				if ($this->config->get($method . '_' . $code . '_debug')) {
+					$this->log->write(':: ' . strtoupper($code) . ' DEBUG :: ADDRESS :: Relative country ID: ' . (int)$address['country_id'] . ' is not active!');
+				}
+				
 				$status = false;
 			}
 		} else {
+			if ($this->config->get($method . '_' . $code . '_debug')) {
+				$this->log->write(':: ' . strtoupper($code) . ' DEBUG :: ADDRESS :: Information could not be captured!');
+			}
+				
 			$status = false;
 		}
 		
