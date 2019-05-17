@@ -33,14 +33,13 @@ class Geozone {
 							$status = false;
 						}
 					} else {
-						$result = $this->db->query("SELECT * FROM " . DB_PREFIX . "country WHERE country_id = '" . (int)$address['country_id'] . "' AND status = '1'");
+						$country_info = $this->model_localisation_country->getCountry($address['country_id']);
 						
-						if ($result->num_rows) {
+						if ($country_info && $country_info['status']) {
 							$status = true;
 						} else {
 							$status = false;	
 						}
-					}
 				} else {
 					$status = false;
 				}
