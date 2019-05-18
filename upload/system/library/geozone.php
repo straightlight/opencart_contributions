@@ -14,7 +14,7 @@ class Geozone {
 			}
 			
 			$status = false;
-		} elseif ($this->config->get($method . '_' . $code . '_geo_address') == 'geo_zone' && !empty($address['country_id'])) {
+		} elseif ($this->config->get($method . '_' . $code . '_location') == 'geo_zone' && !empty($address['country_id'])) {
 			if (!$this->config->get($method . '_' . $code . '_geo_zone_id')) {
 				if ($this->config->get($method . '_' . $code . '_debug')) {
 					$this->log->write(':: ' . strtoupper($code) . ' DEBUG :: GEO ZONE :: Geo Zone ID not configured!');	
@@ -80,7 +80,7 @@ class Geozone {
 					$status = false;
 				}
 			}
-		} elseif ($this->config->get($method . '_' . $code . '_geo_address') == 'address' && !empty($address['postcode']) && !empty($address['country_id'])) {
+		} elseif ($this->config->get($method . '_' . $code . '_location') == 'address' && !empty($address['postcode']) && !empty($address['country_id'])) {
 			$country_info = $this->model_localisation_country->getCountry($address['country_id']);
 
 			if ($country_info && $country_info['status'] && $country_info['postcode_required']) {
