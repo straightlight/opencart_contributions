@@ -14,7 +14,7 @@ class Geozone {
 			}
 			
 			$status = false;
-		} elseif ($this->config->get($method . '_' . $code . '_geo_address') == 'geo_zones' && !empty($address['country_id'])) {
+		} elseif ($this->config->get($method . '_' . $code . '_geo_address') == 'geo_zone' && !empty($address['country_id'])) {
 			if (!$this->config->get($method . '_' . $code . '_geo_zone_id')) {
 				if ($this->config->get($method . '_' . $code . '_debug')) {
 					$this->log->write(':: ' . strtoupper($code) . ' DEBUG :: GEO ZONE :: Geo Zone ID not configured!');	
