@@ -72,6 +72,7 @@ class Geozone {
 							
 							$status = false;	
 						}
+					}
 				} else {
 					if ($this->config->get($method . '_' . $code . '_debug')) {
 						$this->log->write(':: ' . strtoupper($code) . ' DEBUG :: GEO ZONE :: Could not be captured!');
