@@ -20,7 +20,7 @@ class Geozone {
 					$this->log->write(':: ' . strtoupper($code) . ' DEBUG :: GEO ZONE :: Geo Zone ID not configured!');	
 				}
 				
-				$status = true;
+				$status = false;			
 			} else {
 				$this->load->model('localisation/geo_zone');
 				
