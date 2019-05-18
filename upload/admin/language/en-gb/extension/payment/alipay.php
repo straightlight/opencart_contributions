@@ -17,18 +17,18 @@ $_['entry_alipay_public_key']        = 'Alipay Public Key';
 $_['entry_test']                     = 'Test mode';
 $_['entry_total']                    = 'Total';
 $_['entry_order_status']             = 'Completed Status';
-$_['entry_geo_address']				       = 'Geo Zone / Address';
+$_['entry_location']	       	     = 'Location';
 $_['entry_geo_zone']                 = 'Geo Zone';
 $_['entry_status']                   = 'Status';
 $_['entry_sort_order']               = 'Sort Order';
-$_['entry_geo_address_option']	     = array('address'		=> 'Addresses',
+$_['entry_location_option']	     = array('address'		=> 'Addresses',
 					     'geo_zone'		=> 'Geo Zones',
 					    );
 
 // Help
 $_['help_total']                     = 'The checkout total the order must reach before this payment method becomes active';
 $_['help_alipay_setup']              = '<a target="_blank" href="http://www.opencart.cn/docs/alipay">Click here</a> to learn how to set up Alipay account.';
-$_['help_geo_address']		     = 'Customers location by address or geo zone settings';
+$_['help_location']		     = 'Customers location by address or geo zone settings';
 
 // Error
 $_['error_permission']               = 'Warning: You do not have permission to modify payment Alipay!';
