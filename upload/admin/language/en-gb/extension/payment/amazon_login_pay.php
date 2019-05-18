@@ -22,7 +22,6 @@ $_['text_payment']                  = 'Payment';
 $_['text_account']                  = 'Account';
 $_['text_guest']					= 'Guest';
 $_['text_no_capture']               = '--- No Automatic Capture ---';
-$_['text_all_geo_zones']            = 'All Geo Zones';
 $_['text_button_settings']          = 'Checkout Button Settings';
 $_['text_colour']                   = 'Colour';
 $_['text_orange']                   = 'Orange';
