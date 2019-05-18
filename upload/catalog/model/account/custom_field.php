@@ -14,6 +14,8 @@ class ModelAccountCustomField extends Model {
 		} else {
 			$custom_field_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "custom_field_customer_group` cfcg LEFT JOIN `" . DB_PREFIX . "custom_field` cf ON (cfcg.custom_field_id = cf.custom_field_id) LEFT JOIN `" . DB_PREFIX . "custom_field_description` cfd ON (cf.custom_field_id = cfd.custom_field_id) WHERE cf.status = '1' AND cfd.language_id = '" . (int)$this->config->get('config_language_id') . "' AND cfcg.customer_group_id = '" . (int)$customer_group_id . "' ORDER BY cf.sort_order ASC");
 		}
+		
+		$this->load->model('localisation/geo_zone');
 
 		foreach ($custom_field_query->rows as $custom_field) {
 			$custom_field_value_data = array();
@@ -28,6 +30,8 @@ class ModelAccountCustomField extends Model {
 					);
 				}
 			}
+			
+			$zone_to_geo_zones = $this->model_localisation->getZoneToGeoZoneLocation($custom_field['location']);
 
 			$custom_field_data[] = array(
 				'custom_field_id'    => $custom_field['custom_field_id'],
@@ -37,6 +41,8 @@ class ModelAccountCustomField extends Model {
 				'value'              => $custom_field['value'],
 				'validation'         => $custom_field['validation'],
 				'location'           => $custom_field['location'],
+				'payment_address'	 => (!empty($zone_to_geo_zones['payment_address']) ? true : false),
+				'shipping_address'	 => (!empty($zone_to_geo_zones['shipping_address']) ? true : false),
 				'required'           => empty($custom_field['required']) || $custom_field['required'] == 0 ? false : true,
 				'sort_order'         => $custom_field['sort_order']
 			);
