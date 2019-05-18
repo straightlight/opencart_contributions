@@ -9,6 +9,7 @@ $_['text_edit']                      = 'Edit Alipay Pay';
 $_['text_alipay']                    = '<a target="_BLANK" href="https://open.alipay.com"><img src="view/image/payment/alipay.png" alt="Alipay Pay Website" title="Alipay Pay Website" style="border: 1px solid #EEEEEE;" /></a>';
 $_['text_live']                      = 'Live';
 $_['text_sandbox']                   = 'Sandbox';
+$_['text_all_countries']	     = 'All Countries';
 
 // Entry
 $_['entry_app_id']                   = 'App ID';
