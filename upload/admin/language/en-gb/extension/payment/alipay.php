@@ -21,8 +21,8 @@ $_['entry_geo_address']				       = 'Geo Zone / Address';
 $_['entry_geo_zone']                 = 'Geo Zone';
 $_['entry_status']                   = 'Status';
 $_['entry_sort_order']               = 'Sort Order';
-$_['entry_geo_address_option']	     = array('addresses'		=> 'Addresses',
-					     'geo_zones'		=> 'Geo Zones',
+$_['entry_geo_address_option']	     = array('address'		=> 'Addresses',
+					     'geo_zone'		=> 'Geo Zones',
 					    );
 
 // Help
