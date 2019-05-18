@@ -71,7 +71,11 @@
                     {% endif %}
                     {% endfor %}
                   
-                  </select></td>
+                  </select>
+		  {% if error_country %}
+              		<div class="text-danger">{{ error_country }}</div>
+              	  {% endif %} </div>
+		  </td>
                 <td class="text-left"><select name="zone_to_geo_zone[{{ zone_to_geo_zone_row }}][zone_id]" class="form-control" disabled="disabled">
                   </select></td>
                 <td class="text-left"><button type="button" onclick="$('#zone-to-geo-zone-row{{ zone_to_geo_zone_row }}').remove();" data-toggle="tooltip" title="{{ button_remove }}" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button></td>
@@ -130,7 +134,7 @@ $('#zone-to-geo-zone').on('change', 'select[name$=\'[country_id]\']', function()
 				$('button[form=\'form-geo-zone\']').prop('disabled', false);
 			},
 			success: function(json) {
-				html = '<option value="0">{{ text_all_countries }}</option>';
+				html = '<option value="0">{{ text_all_zones }}</option>';
 				
 				if (json['zone'] && json['zone'] != '') {	
 					for (i = 0; i < json['zone'].length; i++) {
