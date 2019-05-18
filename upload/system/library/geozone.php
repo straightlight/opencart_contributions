@@ -22,9 +22,11 @@ class Geozone {
 				
 				$status = true;
 			} else {
-				$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . (int)$this->config->get($method . '_' . $code . '_geo_zone_id') . "' AND country_id = '" . (int)$address['country_id'] . "' AND (zone_id = '" . $address['zone_id'] . "' OR zone_id = '0')");
+				$this->load->model('localisation/geo_zone');
+				
+				$zone_to_geo_zone = $this->model_localisation_geo_zone->getZoneToGeoZoneByKey($address, $method . '_' . $code . '_geo_zone_id');
 
-				if ($query->row) {
+				if ($zone_to_geo_zone) {
 					if (!empty($address['zone_id'])) {
 						$country_info = $this->model_localisation_country->getCountry($address['country_id']);
 
