@@ -31,8 +31,8 @@
             {% if order.store_fax %}
             <b>{{ text_fax }}</b> {{ order.store_fax }}<br />
             {% endif %}
-			{% if store_country.name %}<br />
-			<b>{{ store_country.name }}{% if store_zone.name %}, {{ store_zone.name }}{% endif %}</b><br />
+			{% if order.store_country.name %}<br />
+			<b>{{ order.store_country.name }}{% if order.store_zone.name %}, {{ order.store_zone.name }}{% endif %}</b><br />
 			{% endif %}
             <b>{{ text_email }}</b> {{ order.store_email }}<br />
             <b>{{ text_website }}</b> <a href="{{ order.store_url }}">{{ order.store_url }}</a></td>
