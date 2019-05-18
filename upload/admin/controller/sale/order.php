@@ -1491,6 +1491,8 @@ class ControllerSaleOrder extends Controller {
 		}
 		
 		$this->load->model('localisation/country');
+		
+		$this->load->model('localisation/zone');
 
 		foreach ($orders as $order_id) {
 			$order_info = $this->model_sale_order->getOrder($order_id);
