@@ -8,7 +8,7 @@ $_['text_list']          = 'Geo Zone List';
 $_['text_add']           = 'Add Geo Zone';
 $_['text_edit']          = 'Edit Geo Zone';
 $_['text_geo_zone']      = 'Geo Zones';
-$_['text_all_countries'] = 'All';
+$_['text_all_countries'] = 'All Countries';
 
 // Column
 $_['column_name']        = 'Geo Zone Name';
