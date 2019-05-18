@@ -1489,6 +1489,8 @@ class ControllerSaleOrder extends Controller {
 		} elseif (isset($this->request->get['order_id'])) {
 			$orders[] = $this->request->get['order_id'];
 		}
+		
+		$this->load->model('localisation/country');
 
 		foreach ($orders as $order_id) {
 			$order_info = $this->model_sale_order->getOrder($order_id);
@@ -1501,11 +1503,27 @@ class ControllerSaleOrder extends Controller {
 					$store_email = $store_info['config_email'];
 					$store_telephone = $store_info['config_telephone'];
 					$store_fax = $store_info['config_fax'];
+					
+					$store_country_id = $store_info['config_country_id'];
+					
+					$store_country = $this->model_localisation_country->getCountry($store_country_id);
+					
+					$store_zone_id = $store_info['config_zone_id'];
+					
+					$store_zone = $this->model_localisation_zone->getZone($store_zone_id);
 				} else {
 					$store_address = $this->config->get('config_address');
 					$store_email = $this->config->get('config_email');
 					$store_telephone = $this->config->get('config_telephone');
 					$store_fax = $this->config->get('config_fax');
+					
+					$store_country_id = $this->config->get('config_country_id');
+					
+					$store_country = $this->model_localisation_country->getCountry($store_country_id);
+					
+					$store_zone_id = $this->config->get('config_zone_id');
+					
+					$store_zone = $this->model_localisation_zone->getZone($store_zone_id);
 				}
 
 				if ($order_info['invoice_no']) {
@@ -1654,6 +1672,8 @@ class ControllerSaleOrder extends Controller {
 					'store_email'      => $store_email,
 					'store_telephone'  => $store_telephone,
 					'store_fax'        => $store_fax,
+					'store_country'	   => $store_country,
+					'store_zone'	   => $store_zone,
 					'email'            => $order_info['email'],
 					'telephone'        => $order_info['telephone'],
 					'shipping_address' => $shipping_address,
