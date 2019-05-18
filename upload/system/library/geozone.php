@@ -1,7 +1,4 @@
 <?php
-if ($this->config->get($method . '_' . $code . '_debug')) {
-				$this->log->write(':: ALIPAY DEBUG :: Geo Zone ID not configured!');	
-			}
 
 class Geozone {
 	protected $registry;
