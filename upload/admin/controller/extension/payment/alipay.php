@@ -96,10 +96,10 @@ class ControllerExtensionPaymentAlipay extends Controller {
 
 		$data['order_statuses'] = $this->model_localisation_order_status->getOrderStatuses();
 		
-		if (isset($this->request->post['payment_alipay_geo_address'])) {
-			$data['payment_alipay_geo_address'] = $this->request->post['payment_alipay_geo_address'];
+		if (isset($this->request->post['payment_alipay_location'])) {
+			$data['payment_alipay_location'] = $this->request->post['payment_alipay_location'];
 		} else {
-			$data['payment_alipay_geo_address'] = $this->config->get('payment_alipay_geo_address');
+			$data['payment_alipay_location'] = $this->config->get('payment_alipay_location');
 		}
 
 		if (isset($this->request->post['payment_alipay_geo_zone_id'])) {
