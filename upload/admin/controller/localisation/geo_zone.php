@@ -265,6 +265,12 @@ class ControllerLocalisationGeoZone extends Controller {
 		} else {
 			$data['error_description'] = '';
 		}
+		
+		if (isset($this->error['country'])) {
+			$data['error_country'] = $this->error['country'];
+		} else {
+			$data['error_country'] = '';	
+		}
 
 		$url = '';
 
@@ -352,6 +358,16 @@ class ControllerLocalisationGeoZone extends Controller {
 
 		if ((utf8_strlen($this->request->post['description']) < 3) || (utf8_strlen($this->request->post['description']) > 255)) {
 			$this->error['description'] = $this->language->get('error_description');
+		}
+		
+		if (isset($this->request->post['country_id'])) {
+			$this->load->model('localisation/country');
+			
+			$country_info = $this->model_localisation_country->getCountry($this->request->post['country_id']);
+			
+			if (!$country_info) {
+				$this->error['country'] = $this->language->get('error_country');	
+			}
 		}
 
 		return !$this->error;
