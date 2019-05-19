@@ -72,13 +72,15 @@ class ModelLocalisationGeoZone extends Model {
 						}
 					}
 
-					$results = $this->model_setting_extension->getExtensions('shipping');
+					if ($shipping_info) {
+						$results = $this->model_setting_extension->getExtensions('shipping');
 
-					foreach ($results as $result) {
-						if (!empty($shipping_info['shipping_' . $result['code'] . '_status']) && $shipping_info['shipping_' . $result['code'] . '_status']) {
-							// Addresses
-							if (!empty($shipping_info['shipping_' . $result['code'] . '_location']) && $location == $shipping_info['shipping_' . $result['code'] . '_location'] && $shipping_info['shipping_' . $result['code'] . '_location'] == 'address') {
-								$address_data['shipping_address'][$result['code']] = true;
+						foreach ($results as $result) {
+							if (!empty($shipping_info['shipping_' . $result['code'] . '_status']) && $shipping_info['shipping_' . $result['code'] . '_status']) {
+								// Addresses
+								if (!empty($shipping_info['shipping_' . $result['code'] . '_location']) && $location == $shipping_info['shipping_' . $result['code'] . '_location'] && $shipping_info['shipping_' . $result['code'] . '_location'] == 'address') {
+									$address_data['shipping_address'][$result['code']] = true;
+								}
 							}
 						}
 					}
