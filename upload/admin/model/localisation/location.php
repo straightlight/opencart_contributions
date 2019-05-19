@@ -56,6 +56,12 @@ class ModelLocalisationLocation extends Model {
 
 		return $query->rows;
 	}
+	
+	public function getLocationByRegion($address, $store_id) {
+		$query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "location WHERE LCASE(address) = '" . $this->db->escape(strtolower($address)) . "' AND store_id = '" . (int)$store_id . "'");
+		
+		return $query->row['total'];
+	}
 
 	public function getTotalLocations() {
 		$query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "location");
