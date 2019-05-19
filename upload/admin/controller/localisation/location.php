@@ -174,18 +174,24 @@ class ControllerLocalisationLocation extends Controller {
 		$this->load->model('setting/store');
 
 		foreach ($results as $result) {
-			$store_info = $this->model_setting_store->getStore($result['store_id']);
-			
-			$data['location'][] =   array(
-				'location_id' => $result['location_id'],
-				'name'        => $result['name'],
-				'address'     => $result['address'],
-				'store'	      => $store_info,
-				'store_id'    => $store_info['store_id'],
-				'edit'        => $this->url->link('localisation/location/edit', 'user_token=' . $this->session->data['user_token'] . '&location_id=' . $result['location_id'] . $url. '&language=' . $this->config->get('config_language'))
+			if ($result['store_id']) {
+				$store_info = $this->model_setting_store->getStore($result['store_id']);
+				
+				$store_name = $store_info['name'];
+			} else {
+				$store_name = $this->config->get('config_name');
+			}
+
+			$data['location'][] = array(
+				'location_id'  		=> $result['location_id'],
+				'name'           	=> $result['name'],
+				'address'       	=> $result['address'],
+				'store_id'       	=> $result['store_id']
+				'store_name' 		=> $store_name,
+				'edit'              	=> $this->url->link('localisation/location/edit', 'user_token=' . $this->session->data['user_token'] . '&location_id=' . $result['location_id'] . $url. '&language=' . $this->config->get('config_language'))
 			);
 		}
-
+		
 		if (isset($this->error['warning'])) {
 			$data['error_warning'] = $this->error['warning'];
 		} else {
