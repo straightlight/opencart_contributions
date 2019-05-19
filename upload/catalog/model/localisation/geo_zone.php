@@ -52,12 +52,12 @@ class ModelLocalisationGeoZone extends Model {
 				foreach ($results as $result) {
 					if (!empty($this->config->get('payment_' . $result['code'] . '_status') && $this->config->get('payment_' . $result['code'] . '_status') {
 						// Accounts
-						if (!empty($this->config->get('payment_' . $result['code'] . '_location') && $location == $this->config->get('payment_' . $result['code'] . '_location'] && $this->config->get('payment_' . $result['code'] . '_location'] == 'account') {
+						if (!empty($this->config->get('payment_' . $result['code'] . '_location') && $location == $this->config->get('payment_' . $result['code'] . '_location') && $this->config->get('payment_' . $result['code'] . '_location') == 'account') {
 							$address_data['payment_account'][$result['code']] = true;
 						}
 							
 						// Addresses
-						if (!empty($this->config->get('payment_' . $result['code'] . '_location') && $location == $this->config->get('payment_' . $result['code'] . '_location'] && $this->config->get('payment_' . $result['code'] . '_location'] == 'address') {
+						if (!empty($this->config->get('payment_' . $result['code'] . '_location') && $location == $this->config->get('payment_' . $result['code'] . '_location') && $this->config->get('payment_' . $result['code'] . '_location') == 'address') {
 							$address_data['payment_address'][$result['code']] = true;
 						}
 					}
@@ -66,9 +66,9 @@ class ModelLocalisationGeoZone extends Model {
 				$results = $this->model_setting_extension->getExtensions('shipping');
 
 				foreach ($results as $result) {
-					if (!empty($shipping_info['shipping_' . $result['code'] . '_status') && $shipping_info['shipping_' . $result['code'] . '_status') {
+					if (!empty($this->config->get('shipping_' . $result['code'] . '_status') && $this->config->get('shipping_' . $result['code'] . '_status') {
 						// Addresses
-						if (!empty($shipping_info['shipping_' . $result['code'] . '_location') && $location == $shipping_info['shipping_' . $result['code'] . '_location'] && $shipping_info['shipping_' . $result['code'] . '_location'] == 'address') {
+						if (!empty($this->config->get('shipping_' . $result['code'] . '_location') && $location == $this->config->get('shipping_' . $result['code'] . '_location') && $this->config->get('shipping_' . $result['code'] . '_location') == 'address') {
 							$address_data['shipping_address'][$result['code']] = true;
 						}
 					}
