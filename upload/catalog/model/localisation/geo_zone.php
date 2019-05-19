@@ -6,7 +6,7 @@ class ModelLocalisationGeoZone extends Model {
 		return $query->row;
 	}
 	
-	public function getZoneToGeoZoneByGeocode($geocode) {
+	public function getZoneToGeoZoneByGeocode($location, $geocode) {
 		if (empty($geocode)) {
 			return false;			
 		} else {
@@ -59,7 +59,7 @@ class ModelLocalisationGeoZone extends Model {
 					foreach ($results as $result) {
 						if (!empty($store_info['payment_' . $result['code'] . '_status']) && $store_info['payment_' . $result['code'] . '_status']) {
 							// Addresses
-							if (!empty($store_info['payment_' . $result['code'] . '_location']) && $store_info['payment_' . $result['code'] . '_location'] == 'address') {
+							if (!empty($store_info['payment_' . $result['code'] . '_location']) && $location == $store_info['payment_' . $result['code'] . '_location'] && $store_info['payment_' . $result['code'] . '_location'] == 'address') {
 								$address_data['payment_address'][$result['code']] = true;
 							}
 						}
@@ -70,7 +70,7 @@ class ModelLocalisationGeoZone extends Model {
 					foreach ($results as $result) {
 						if (!empty($store_info['shipping_' . $result['code'] . '_status']) && $store_info['shipping_' . $result['code'] . '_status']) {
 							// Addresses
-							if (!empty($store_info['shipping_' . $result['code'] . '_location']) && $store_info['shipping_' . $result['code'] . '_location'] == 'address') {
+							if (!empty($store_info['shipping_' . $result['code'] . '_location']) && $location == $store_info['shipping_' . $result['code'] . '_location'] && $store_info['shipping_' . $result['code'] . '_location'] == 'address') {
 								$address_data['shipping_address'][$result['code']] = true;
 							}
 						}
