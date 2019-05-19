@@ -64,13 +64,7 @@
                     {% endif %}</td>
                   <td class="text-left">{{ locations.name }}</td>
                   <td class="text-left">{{ locations.address }}</td>
-		  <td class="text-left">
-		  {% if locations.store_id == 0 %}
-		  	{{ locations.store.name }} ({{ text_default }})
-		  {% else %}
-		  	{{ locations.store.name }}
-		  {% endif %}
-		  </td>
+		  <td class="text-left">{{ locations.store_name }}</td>
                   <td class="text-right"><a href="{{ locations.edit }}" data-toggle="tooltip" title="{{ button_edit }}" class="btn btn-primary"><i class="fa fa-pencil"></i></a></td>
                 </tr>
                 {% endfor %}
