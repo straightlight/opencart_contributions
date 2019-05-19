@@ -19,9 +19,9 @@ class ModelLocalisationGeoZone extends Model {
 			} else {
 				$this->load->model('setting/setting');
 				
-				$payment_info = $this->model_setting_setting->getSettingValue('payment', $geocode_info['store_id']);
+				$payment_info = $this->model_setting_setting->getSetting('payment', $geocode_info['store_id']);
 				
-				$shipping_info = $this->model_setting_setting->getSettingValue('payment', $geocode_info['store_id']);
+				$shipping_info = $this->model_setting_setting->getSetting('shipping', $geocode_info['store_id']);
 				
 				if (!$payment_info) {
 					return false;
