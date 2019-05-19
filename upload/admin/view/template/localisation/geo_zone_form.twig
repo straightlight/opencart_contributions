@@ -134,7 +134,7 @@ $('#zone-to-geo-zone').on('change', 'select[name$=\'[country_id]\']', function()
 				$('button[form=\'form-geo-zone\']').prop('disabled', false);
 			},
 			success: function(json) {
-				html = '<option value="0">{{ text_all_zones }}</option>';
+				html = '<option value="0">{{ text_none }}</option>';
 				
 				if (json['zone'] && json['zone'] != '') {	
 					for (i = 0; i < json['zone'].length; i++) {
