@@ -117,6 +117,12 @@ class ControllerExtensionPaymentAlipay extends Controller {
 		} else {
 			$data['payment_alipay_test'] = $this->config->get('payment_alipay_test');
 		}
+		
+		if (isset($this->request->post['payment_alipay_debug'])) {
+			$data['payment_alipay_debug'] = $this->request->post['payment_alipay_debug'];
+		} else {
+			$data['payment_alipay_debug'] = $this->config->get('payment_alipay_debug');
+		}
 
 		if (isset($this->request->post['payment_alipay_status'])) {
 			$data['payment_alipay_status'] = $this->request->post['payment_alipay_status'];
