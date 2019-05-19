@@ -265,6 +265,24 @@ class ControllerLocalisationLocation extends Controller {
 		} else {
 			$data['error_address'] = '';
 		}
+		
+		if (isset($this->error['store'])) {
+			$data['error_store'] = $this->error['store'];
+		} else {
+			$data['error_store'] = '';
+		}
+		
+		if (isset($this->error['region'])) {
+			$data['error_region'] = $this->error['region'];
+		} else {
+			$data['error_region'] = '';
+		}
+		
+		if (isset($this->error['location'])) {
+			$data['error_location'] = $this->error['location'];
+		} else {
+			$data['error_location'] = '';
+		}
 
 		if (isset($this->error['telephone'])) {
 			$data['error_telephone'] = $this->error['telephone'];
@@ -337,6 +355,14 @@ class ControllerLocalisationLocation extends Controller {
 		} else {
 			$data['geocode'] = '';
 		}
+		
+		if (isset($this->request->post['store_id'])) {
+			$data['store_id'] = $this->request->post['store_id'];
+		} elseif (!empty($location_info)) {
+			$data['store_id'] = $location_info['store_id'];
+		} else {
+			$data['store_id'] = '';
+		}
 
 		if (isset($this->request->post['telephone'])) {
 			$data['telephone'] = $this->request->post['telephone'];
@@ -370,6 +396,22 @@ class ControllerLocalisationLocation extends Controller {
 			$data['thumb'] = $this->model_tool_image->resize($location_info['image'], 100, 100);
 		} else {
 			$data['thumb'] = $this->model_tool_image->resize('no_image.png', 100, 100);
+		}
+		
+		$data['stores'] = array();
+
+		$data['stores'][] = array(
+			'store_id' => 0,
+			'name'     => $this->config->get('config_name') . $this->language->get('text_default'),
+		);
+
+		$results = $this->model_setting_store->getStores();
+
+		foreach ($results as $result) {
+			$data['stores'][] = array(
+				'store_id' => $result['store_id'],
+				'name'     => $result['name'],
+			);
 		}
 
 		$data['placeholder'] = $this->model_tool_image->resize('no_image.png', 100, 100);
@@ -408,6 +450,33 @@ class ControllerLocalisationLocation extends Controller {
 
 		if ((utf8_strlen($this->request->post['address']) < 3) || (utf8_strlen($this->request->post['address']) > 128)) {
 			$this->error['address'] = $this->language->get('error_address');
+		} else {
+			if (empty($this->request->post['store_id'])) {
+				$this->error['store'] = $this->language->get('error_store');
+				
+			} else {
+				$this->load->model('setting/store');
+				
+				$store_info = $this->model_setting_store->getStore($this->request->post['store_id']);
+				
+				if ($store_info) {
+					$this->load->model('localisation/location');
+					
+					$store_info = $this->model_localisation_location->getLocationsByRegion($this->request->post['address'], $this->request->post['store_id']);
+					
+					if (!isset($this->request->get['location_id']) && $store_info) {
+						$this->error['region'] = $this->language->get('error_region');
+					} elseif (isset($this->request->get['location_id'])) {
+						$location_info = $this->model_localisation_location->getLocation($this->request->get['location_id']);
+						
+						if (!$location_info) {
+							$this->error['location'] = $this->language->get('error_location');
+						}
+					}
+				} else {
+					$this->error['store'] = $this->language->get('error_store');
+				}
+			}
 		}
 
 		if ((utf8_strlen($this->request->post['telephone']) < 3) || (utf8_strlen($this->request->post['telephone']) > 32)) {
