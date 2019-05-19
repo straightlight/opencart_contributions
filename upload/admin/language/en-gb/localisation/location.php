@@ -36,3 +36,6 @@ $_['error_permission'] = 'Warning: You do not have permission to modify store lo
 $_['error_name']       = 'Store name must be between 3 and 32 characters!';
 $_['error_address']    = 'Address must be between 3 and 128 characters!';
 $_['error_telephone']  = 'Telephone must be between 3 and 32 characters!';
+$_['error_store']      = 'Please select a store!';
+$_['error_region']     = 'The address associated with the store already exists!';
+$_['error_location']   = 'The specified location, where the data attempts to be saved into, cannot be found!';
