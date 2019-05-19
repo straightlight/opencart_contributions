@@ -179,7 +179,7 @@ class ControllerLocalisationLocation extends Controller {
 				
 				$store_name = $store_info['name'];
 			} else {
-				$store_name = $this->config->get('config_name');
+				$store_name = $this->config->get('config_name') . $this->language->get('text_default');
 			}
 
 			$data['location'][] = array(
