@@ -296,6 +296,12 @@ class ControllerLocalisationLocation extends Controller {
 		} else {
 			$data['error_location'] = '';
 		}
+		
+		if (isset($this->error['geocode'])) {
+			$data['error_geocode'] = $this->error['geocode'];
+		} else {
+			$data['error_geocode'] = '';
+		}
 
 		if (isset($this->error['telephone'])) {
 			$data['error_telephone'] = $this->error['telephone'];
@@ -477,8 +483,18 @@ class ControllerLocalisationLocation extends Controller {
 					
 					$location_info = $this->model_localisation_location->getLocationByRegion($this->request->post['address'], $this->request->post['store_id']);
 					
-					if (!isset($this->request->get['location_id']) && $location_info) {
-						$this->error['region'] = $this->language->get('error_region');
+					if (!isset($this->request->get['location_id'])) {
+						if ($location_info) {
+							$this->error['region'] = $this->language->get('error_region');
+						}
+						
+						if (!empty($this->request->post['geocode'])) {
+							$location_info = $this->model_localisation_location->getLocationByGeocode($this->request->post['geocode']);
+							
+							if ($location_info) {
+								$this->error['geocode'] = $this->language->get('error_geocode');
+							}
+						}
 					} elseif (isset($this->request->get['location_id'])) {
 						$location_info = $this->model_localisation_location->getLocation($this->request->get['location_id']);
 						
