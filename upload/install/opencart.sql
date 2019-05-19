@@ -1928,6 +1928,7 @@ CREATE TABLE `oc_location` (
   `telephone` varchar(32) NOT NULL,
   `fax` varchar(32) NOT NULL,
   `geocode` varchar(32) NOT NULL,
+  `store_id` int(11) NOT NULL DEFAULT '0',
   `image` varchar(255) DEFAULT NULL,
   `open` text NOT NULL,
   `comment` text NOT NULL,
