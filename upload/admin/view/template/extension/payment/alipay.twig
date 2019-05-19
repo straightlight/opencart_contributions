@@ -77,7 +77,7 @@
                <label class="col-sm-2 control-label" for="input-location"><span data-toggle="tooltip" title="{{ help_location }}">{{ entry_location }}</span></label>
               <div class="col-sm-10">
                 <select name="payment_alipay_location" id="input-location" class="form-control">
-                  {% for key|address_option in entry_location_option %}
+                  {% for key, address_option in entry_location_option %}
                   	{% if key == payment_alipay_location %}
 				<option value="{{ key }}" selected="selected">{{ address_option }}</option>
                   	{% else %}
