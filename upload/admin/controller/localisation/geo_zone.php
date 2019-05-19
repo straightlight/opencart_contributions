@@ -360,13 +360,25 @@ class ControllerLocalisationGeoZone extends Controller {
 			$this->error['description'] = $this->language->get('error_description');
 		}
 		
-		if (isset($this->request->post['country_id'])) {
+		if (!empty($this->request->post['zone_to_geo_zone'])) {
+			$this->error['country'] = array();
+			
+			$i = 0;
+			
 			$this->load->model('localisation/country');
+	
+			foreach ($this->request->post['zone_to_geo_zone'] as $result) {
+				if (!empty($result['country_id'])) {
+					$country_info = $this->model_localisation_country->getCountry($result['country_id']);
 			
-			$country_info = $this->model_localisation_country->getCountry($this->request->post['country_id']);
-			
-			if (!$country_info) {
-				$this->error['country'] = $this->language->get('error_country');	
+					if (!$country_info) {
+						$this->error['country'][$i] = $this->language->get('error_country');
+					}
+				} else {
+					$this->error['country'][$i] = $this->language->get('error_country');
+				}
+		
+				++$i;
 			}
 		}
 
