@@ -43,6 +43,7 @@ class ModelAccountCustomField extends Model {
 				'location'           => $custom_field['location'],
 				'payment_address'    => ($custom_field['location'] == 'address' && !empty($zone_to_geo_zones['payment_address']) ? $zone_to_geo_zones['payment_address'] : array()),
 				'shipping_address'   => ($custom_field['location'] == 'address' && !empty($zone_to_geo_zones['shipping_address']) ? $zone_to_geo_zones['shipping_address'] : array()),
+				'payment_account'    => ($custom_field['location'] == 'account' && !empty($zone_to_geo_zones['payment_account']) ? $zone_to_geo_zones['payment_account'] : array()),
 				'required'           => empty($custom_field['required']) || $custom_field['required'] == 0 ? false : true,
 				'sort_order'         => $custom_field['sort_order']
 			);
