@@ -6,7 +6,7 @@ class ModelLocalisationGeoZone extends Model {
 		return $query->row;
 	}
 	
-	public function getZoneToGeoZoneByGeocode($location, $geocode) {
+	public function getZoneToGeoZoneLocation($location, $geocode) {
 		if (empty($geocode)) {
 			return false;			
 		} else {
