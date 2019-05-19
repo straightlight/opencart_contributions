@@ -451,7 +451,7 @@ class ControllerLocalisationLocation extends Controller {
 		if ((utf8_strlen($this->request->post['address']) < 3) || (utf8_strlen($this->request->post['address']) > 128)) {
 			$this->error['address'] = $this->language->get('error_address');
 		} else {
-			if (empty($this->request->post['store_id'])) {
+			if (!isset($this->request->post['store_id'])) {
 				$this->error['store'] = $this->language->get('error_store');
 				
 			} else {
@@ -459,7 +459,7 @@ class ControllerLocalisationLocation extends Controller {
 				
 				$store_info = $this->model_setting_store->getStore($this->request->post['store_id']);
 				
-				if ($store_info) {
+				if ($store_info || $this->request->post['store_id'] == 0) {
 					$this->load->model('localisation/location');
 					
 					$store_info = $this->model_localisation_location->getLocationByRegion($this->request->post['address'], $this->request->post['store_id']);
