@@ -58,6 +58,11 @@ class ModelLocalisationGeoZone extends Model {
 
 					foreach ($results as $result) {
 						if (!empty($store_info['payment_' . $result['code'] . '_status']) && $store_info['payment_' . $result['code'] . '_status']) {
+							// Accounts
+							if (!empty($store_info['payment_' . $result['code'] . '_location']) && $location == $store_info['payment_' . $result['code'] . '_location'] && $store_info['payment_' . $result['code'] . '_location'] == 'account') {
+								$address_data['payment_account'][$result['code']] = true;
+							}
+							
 							// Addresses
 							if (!empty($store_info['payment_' . $result['code'] . '_location']) && $location == $store_info['payment_' . $result['code'] . '_location'] && $store_info['payment_' . $result['code'] . '_location'] == 'address') {
 								$address_data['payment_address'][$result['code']] = true;
