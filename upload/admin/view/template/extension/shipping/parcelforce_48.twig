@@ -125,7 +125,7 @@
             <label class="col-sm-2 control-label" for="input-geo-zone">{{ entry_geo_zone }}</label>
             <div class="col-sm-10">
               <select name="shipping_parcelforce_48_geo_zone_id" id="input-geo-zone" class="form-control">
-                <option value="0">{{ text_all_zones }}</option>
+                <option value="0">{{ text_none }}</option>
                 {% for geo_zone in geo_zones %}
                 {% if geo_zone.geo_zone_id == shipping_parcelforce_48_geo_zone_id %}
                 <option value="{{ geo_zone.geo_zone_id }}" selected="selected">{{ geo_zone.name }}</option>
