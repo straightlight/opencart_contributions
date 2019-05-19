@@ -31,6 +31,7 @@ $_['entry_location_option']	     = array('address'		=> 'Addresses',
 $_['help_total']                     = 'The checkout total the order must reach before this payment method becomes active';
 $_['help_alipay_setup']              = '<a target="_blank" href="http://www.opencart.cn/docs/alipay">Click here</a> to learn how to set up Alipay account.';
 $_['help_location']		     = 'Customers location by address or geo zone settings';
+$_['help_debug']		     = 'Enabling debug will write sensitive data to a log file. You should always disable unless instructed otherwise';
 
 // Error
 $_['error_permission']               = 'Warning: You do not have permission to modify payment Alipay!';
