@@ -75,8 +75,8 @@
 		  {% if error_country %}
 		  	{% set error_country_row = 0 %}
 			
-		  	{% for err_key|err_country in error_country %}
-				{% if err_key == error_country_row %}
+		  	{% for err_country in error_country %}
+				{% if error_country_row == zone_to_geo_zone_row %}
               				<div class="text-danger">{{ err_country }}</div>
 				{% endif %}
 				
