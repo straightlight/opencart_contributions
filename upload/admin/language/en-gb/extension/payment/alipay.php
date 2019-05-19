@@ -20,6 +20,7 @@ $_['entry_total']                    = 'Total';
 $_['entry_order_status']             = 'Completed Status';
 $_['entry_location']	       	     = 'Location';
 $_['entry_geo_zone']                 = 'Geo Zone';
+$_['entry_debug']		     = 'Debug logging';
 $_['entry_status']                   = 'Status';
 $_['entry_sort_order']               = 'Sort Order';
 $_['entry_location_option']	     = array('address'		=> 'Addresses',
