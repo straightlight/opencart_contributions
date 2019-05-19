@@ -73,8 +73,16 @@
                   
                   </select>
 		  {% if error_country %}
-              		<div class="text-danger">{{ error_country }}</div>
-              	  {% endif %} </div>
+		  	{% set error_country_row = 0 %}
+			
+		  	{% for err_key|err_country in error_country %}
+				{% if err_key == error_country_row %}
+              				<div class="text-danger">{{ err_country }}</div>
+				{% endif %}
+				
+				{% set error_country_row = error_country_row + 1 %}
+			{% endfor %}
+              	  {% endif %}</div>
 		  </td>
                 <td class="text-left"><select name="zone_to_geo_zone[{{ zone_to_geo_zone_row }}][zone_id]" class="form-control" disabled="disabled">
                   </select></td>
