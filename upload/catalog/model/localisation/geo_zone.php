@@ -19,9 +19,11 @@ class ModelLocalisationGeoZone extends Model {
 			} else {
 				$this->load->model('setting/setting');
 				
-				$store_info = $this->model_setting_setting->getSettingValue('payment', $geocode_info['store_id']);
+				$payment_info = $this->model_setting_setting->getSettingValue('payment', $geocode_info['store_id']);
 				
-				if (!$store_info) {
+				$shipping_info = $this->model_setting_setting->getSettingValue('payment', $geocode_info['store_id']);
+				
+				if (!$payment_info) {
 					return false;
 				} else {
 					$this->load->model('setting/extension');
@@ -57,14 +59,14 @@ class ModelLocalisationGeoZone extends Model {
 					$results = $this->model_setting_extension->getExtensions('payment');
 
 					foreach ($results as $result) {
-						if (!empty($store_info['payment_' . $result['code'] . '_status']) && $store_info['payment_' . $result['code'] . '_status']) {
+						if (!empty($payment_info['payment_' . $result['code'] . '_status']) && $payment_info['payment_' . $result['code'] . '_status']) {
 							// Accounts
-							if (!empty($store_info['payment_' . $result['code'] . '_location']) && $location == $store_info['payment_' . $result['code'] . '_location'] && $store_info['payment_' . $result['code'] . '_location'] == 'account') {
+							if (!empty($payment_info['payment_' . $result['code'] . '_location']) && $location == $payment_info['payment_' . $result['code'] . '_location'] && $payment_info['payment_' . $result['code'] . '_location'] == 'account') {
 								$address_data['payment_account'][$result['code']] = true;
 							}
 							
 							// Addresses
-							if (!empty($store_info['payment_' . $result['code'] . '_location']) && $location == $store_info['payment_' . $result['code'] . '_location'] && $store_info['payment_' . $result['code'] . '_location'] == 'address') {
+							if (!empty($payment_info['payment_' . $result['code'] . '_location']) && $location == $payment_info['payment_' . $result['code'] . '_location'] && $payment_info['payment_' . $result['code'] . '_location'] == 'address') {
 								$address_data['payment_address'][$result['code']] = true;
 							}
 						}
@@ -73,9 +75,9 @@ class ModelLocalisationGeoZone extends Model {
 					$results = $this->model_setting_extension->getExtensions('shipping');
 
 					foreach ($results as $result) {
-						if (!empty($store_info['shipping_' . $result['code'] . '_status']) && $store_info['shipping_' . $result['code'] . '_status']) {
+						if (!empty($shipping_info['shipping_' . $result['code'] . '_status']) && $shipping_info['shipping_' . $result['code'] . '_status']) {
 							// Addresses
-							if (!empty($store_info['shipping_' . $result['code'] . '_location']) && $location == $store_info['shipping_' . $result['code'] . '_location'] && $store_info['shipping_' . $result['code'] . '_location'] == 'address') {
+							if (!empty($shipping_info['shipping_' . $result['code'] . '_location']) && $location == $shipping_info['shipping_' . $result['code'] . '_location'] && $shipping_info['shipping_' . $result['code'] . '_location'] == 'address') {
 								$address_data['shipping_address'][$result['code']] = true;
 							}
 						}
