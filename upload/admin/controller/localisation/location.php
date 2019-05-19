@@ -462,7 +462,7 @@ class ControllerLocalisationLocation extends Controller {
 				if ($store_info) {
 					$this->load->model('localisation/location');
 					
-					$store_info = $this->model_localisation_location->getLocationsByRegion($this->request->post['address'], $this->request->post['store_id']);
+					$store_info = $this->model_localisation_location->getLocationByRegion($this->request->post['address'], $this->request->post['store_id']);
 					
 					if (!isset($this->request->get['location_id']) && $store_info) {
 						$this->error['region'] = $this->language->get('error_region');
