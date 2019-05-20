@@ -147,7 +147,7 @@
 					$.ajax({
 						url: '{{ catalog }}index.php?route=api/location&api_token=' + json['api_token'] + '&session_id=' + json['api_session_id'] + '&store_id={{ store_id }}',
 						type: 'post',
-						data: 'customer_group_id=' + $('select[name=\'customer_group_id\'] option:selected').val(),						
+						data: 'address=' + $('textarea[name=\'address\']).val() + '&geocode=' + $('input[name=\'geocode\']).val() + '&customer_group_id=' + $('select[name=\'customer_group_id\'] option:selected').val() + '&store_id={{ store_id }}',
 						dataType: 'json',
 						beforeSend: function() {
 								
