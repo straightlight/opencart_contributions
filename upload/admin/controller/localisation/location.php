@@ -342,12 +342,6 @@ class ControllerLocalisationLocation extends Controller {
 				'edit'     => $this->url->link('setting/store/edit', 'user_token=' . $this->session->data['user_token'] . '&store_id=' . $result['store_id'], true)
 			);
 		}
-		
-		if (isset($this->request->post['store_id'])) {
-			$data['store_id'] = $this->request->post['store_id'];
-		} else {
-			$data['store_id'] = 0;
-		}
 
 		if (isset($this->request->post['name'])) {
 			$data['name'] = $this->request->post['name'];
@@ -429,6 +423,22 @@ class ControllerLocalisationLocation extends Controller {
 			$data['customer_group_id'] = $this->request->post['customer_group_id'];
 		} else {
 			$data['customer_group_id'] = 0;
+		}
+		
+		if (isset($this->request->post['is_partner'])) {
+			$data['is_partner'] = $this->request->post['is_partner'];
+		} elseif (!empty($location_info)) {
+			$data['is_partner'] = $location_info['is_partner'];
+		} else {
+			$data['is_partner'] = 0;
+		}
+		
+		if (isset($this->request->post['store_id'])) {
+			$data['store_id'] = $this->request->post['store_id'];
+		} elseif (!empty($location_info)) {
+			$data['store_id'] = $location_info['store_id'];
+		} else {
+			$data['store_id'] = 0;
 		}
 		
 		$this->load->model('customer/customer_group');
