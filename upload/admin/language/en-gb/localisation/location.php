@@ -14,7 +14,6 @@ $_['text_geocode']     = 'Geocode was not successful for the following reason:';
 // Column
 $_['column_name']      = 'Store Name';
 $_['column_address']   = 'Address';
-$_['column_store']     = 'Store';
 $_['column_action']    = 'Action';
 
 // Entry
@@ -26,19 +25,19 @@ $_['entry_fax']        = 'Fax';
 $_['entry_image']      = 'Image';
 $_['entry_open']       = 'Opening Times';
 $_['entry_comment']    = 'Comment';
-$_['entry_store']      = 'Store';
+$_['entry_customer_group'] = 'Customer Groups (Debug)';
+
+// Button
+$_['button_location_login'] = 'Login';
 
 // Help
 $_['help_geocode']     = 'Please enter your store location geocode manually.';
 $_['help_open']        = 'Fill in your stores opening times.';
 $_['help_comment']     = 'This field is for any special notes you would like to tell the customer i.e. Store does not accept cheques.';
+$_['help_customer_group'] = 'For Account Management purposes only - to pull the custom fields information with payment, shipping and account information!';
 
 // Error
 $_['error_permission'] = 'Warning: You do not have permission to modify store locations!';
 $_['error_name']       = 'Store name must be between 3 and 32 characters!';
 $_['error_address']    = 'Address must be between 3 and 128 characters!';
 $_['error_telephone']  = 'Telephone must be between 3 and 32 characters!';
-$_['error_store']      = 'Please select a store!';
-$_['error_region']     = 'The address associated with the store already exists!';
-$_['error_location']   = 'The specified location, where the data attempts to be saved into, cannot be found!';
-$_['error_geocode']    = 'Error: Only one unique geocode is allowed!';
