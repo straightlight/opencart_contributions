@@ -11,4 +11,10 @@ class ModelLocalisationLocation extends Model {
 		
 		return $query->row;
 	}
+	
+	public function getLocationByStores($store_id) {
+		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "location" WHERE store_id = '" . (int)$store_id . "'");
+		
+		return $query->rows;
+	}
 }
