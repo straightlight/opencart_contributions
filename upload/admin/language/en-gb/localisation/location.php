@@ -40,4 +40,6 @@ $_['help_customer_group'] = 'For Account Management purposes only - to pull the 
 $_['error_permission'] = 'Warning: You do not have permission to modify store locations!';
 $_['error_name']       = 'Store name must be between 3 and 32 characters!';
 $_['error_address']    = 'Address must be between 3 and 128 characters!';
+$_['error_address_found'] = 'Error: The entered address cannot be saved!';
 $_['error_telephone']  = 'Telephone must be between 3 and 32 characters!';
+$_['error_geocode']	   = 'Error: The entered geocode cannot be saved!';
