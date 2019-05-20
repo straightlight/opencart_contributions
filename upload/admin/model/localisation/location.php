@@ -62,6 +62,12 @@ class ModelLocalisationLocation extends Model {
 		
 		return $query->row['total'];
 	}
+	
+	public function getLocationByGeocode($geocode) {
+		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "location WHERE geocode = '" . $this->db->escape($geocode) . "'");
+		
+		return $query->row;
+	}
 
 	public function getTotalLocations() {
 		$query = $this->db->query("SELECT COUNT(*) AS total FROM " . DB_PREFIX . "location");
