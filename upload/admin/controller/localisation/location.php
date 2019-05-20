@@ -38,7 +38,7 @@ class ControllerLocalisationLocation extends Controller {
 				$url .= '&page=' . $this->request->get['page'];
 			}
 
-			$this->response->redirect($this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language')));
+			$this->response->redirect($this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url, true));
 		}
 
 		$this->getForm();
@@ -70,7 +70,7 @@ class ControllerLocalisationLocation extends Controller {
 				$url .= '&page=' . $this->request->get['page'];
 			}
 
-			$this->response->redirect($this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language')));
+			$this->response->redirect($this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url, true));
 		}
 
 		$this->getForm();
@@ -104,7 +104,7 @@ class ControllerLocalisationLocation extends Controller {
 				$url .= '&page=' . $this->request->get['page'];
 			}
 
-			$this->response->redirect($this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language')));
+			$this->response->redirect($this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url, true));
 		}
 
 		$this->getList();
@@ -147,16 +147,16 @@ class ControllerLocalisationLocation extends Controller {
 
 		$data['breadcrumbs'][] =   array(
 			'text' =>  $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'))
+			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
 		);
 
 		$data['breadcrumbs'][] =   array(
 			'text' =>  $this->language->get('heading_title'),
-			'href' =>  $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language'))
+			'href' =>  $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url, true)
 		);
 
-		$data['add'] = $this->url->link('localisation/location/add', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language'));
-		$data['delete'] = $this->url->link('localisation/location/delete', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language'));
+		$data['add'] = $this->url->link('localisation/location/add', 'user_token=' . $this->session->data['user_token'] . $url, true);
+		$data['delete'] = $this->url->link('localisation/location/delete', 'user_token=' . $this->session->data['user_token'] . $url, true);
 
 		$data['location'] = array();
 
@@ -170,28 +170,16 @@ class ControllerLocalisationLocation extends Controller {
 		$location_total = $this->model_localisation_location->getTotalLocations();
 
 		$results = $this->model_localisation_location->getLocations($filter_data);
-		
-		$this->load->model('setting/store');
 
 		foreach ($results as $result) {
-			if ($result['store_id']) {
-				$store_info = $this->model_setting_store->getStore($result['store_id']);
-				
-				$store_name = $store_info['name'];
-			} else {
-				$store_name = $this->config->get('config_name') . $this->language->get('text_default');
-			}
-
-			$data['location'][] = array(
-				'location_id'  		=> $result['location_id'],
-				'name'           	=> $result['name'],
-				'address'       	=> $result['address'],
-				'store_id'       	=> $result['store_id']
-				'store_name' 		=> $store_name,
-				'edit'              	=> $this->url->link('localisation/location/edit', 'user_token=' . $this->session->data['user_token'] . '&location_id=' . $result['location_id'] . $url. '&language=' . $this->config->get('config_language'))
+			$data['location'][] =   array(
+				'location_id' => $result['location_id'],
+				'name'        => $result['name'],
+				'address'     => $result['address'],
+				'edit'        => $this->url->link('localisation/location/edit', 'user_token=' . $this->session->data['user_token'] . '&location_id=' . $result['location_id'] . $url, true)
 			);
 		}
-		
+
 		if (isset($this->error['warning'])) {
 			$data['error_warning'] = $this->error['warning'];
 		} else {
@@ -224,9 +212,8 @@ class ControllerLocalisationLocation extends Controller {
 			$url .= '&page=' . $this->request->get['page'];
 		}
 
-		$data['sort_name'] = $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . '&sort=name' . $url. '&language=' . $this->config->get('config_language'));
-		$data['sort_address'] = $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . '&sort=address' . $url. '&language=' . $this->config->get('config_language'));
-		$data['sort_store'] = $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . '&sort=store' . $url. '&language=' . $this->config->get('config_language'));
+		$data['sort_name'] = $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . '&sort=name' . $url, true);
+		$data['sort_address'] = $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . '&sort=address' . $url, true);
 
 		$url = '';
 
@@ -242,7 +229,7 @@ class ControllerLocalisationLocation extends Controller {
 		$pagination->total = $location_total;
 		$pagination->page = $page;
 		$pagination->limit = $this->config->get('config_limit_admin');
-		$pagination->url = $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url . '&page={page}'. '&language=' . $this->config->get('config_language'));
+		$pagination->url = $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url . '&page={page}', true);
 
 		$data['pagination'] = $pagination->render();
 
@@ -278,30 +265,6 @@ class ControllerLocalisationLocation extends Controller {
 		} else {
 			$data['error_address'] = '';
 		}
-		
-		if (isset($this->error['store'])) {
-			$data['error_store'] = $this->error['store'];
-		} else {
-			$data['error_store'] = '';
-		}
-		
-		if (isset($this->error['region'])) {
-			$data['error_region'] = $this->error['region'];
-		} else {
-			$data['error_region'] = '';
-		}
-		
-		if (isset($this->error['location'])) {
-			$data['error_location'] = $this->error['location'];
-		} else {
-			$data['error_location'] = '';
-		}
-		
-		if (isset($this->error['geocode'])) {
-			$data['error_geocode'] = $this->error['geocode'];
-		} else {
-			$data['error_geocode'] = '';
-		}
 
 		if (isset($this->error['telephone'])) {
 			$data['error_telephone'] = $this->error['telephone'];
@@ -327,21 +290,21 @@ class ControllerLocalisationLocation extends Controller {
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'))
+			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
 		);
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language'))
+			'href' => $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url, true)
 		);
 
 		if (!isset($this->request->get['location_id'])) {
-			$data['action'] = $this->url->link('localisation/location/add', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language'));
+			$data['action'] = $this->url->link('localisation/location/add', 'user_token=' . $this->session->data['user_token'] . $url, true);
 		} else {
-			$data['action'] = $this->url->link('localisation/location/edit', 'user_token=' . $this->session->data['user_token'] .  '&location_id=' . $this->request->get['location_id'] . $url. '&language=' . $this->config->get('config_language'));
+			$data['action'] = $this->url->link('localisation/location/edit', 'user_token=' . $this->session->data['user_token'] .  '&location_id=' . $this->request->get['location_id'] . $url, true);
 		}
 
-		$data['cancel'] = $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language'));
+		$data['cancel'] = $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url, true);
 
 		if (isset($this->request->get['location_id']) && ($this->request->server['REQUEST_METHOD'] != 'POST')) {
 			$location_info = $this->model_localisation_location->getLocation($this->request->get['location_id']);
@@ -349,7 +312,36 @@ class ControllerLocalisationLocation extends Controller {
 
 		$data['user_token'] = $this->session->data['user_token'];
 
+		// Stores
 		$this->load->model('setting/store');
+		
+		$data['stores'] = array();
+
+		$data['stores'][] = array(
+			'store_id' => 0,
+			'name'     => $this->config->get('config_name') . ' (' . $this->language->get('text_default') . ')',
+			'url'      => $this->config->get('config_secure') ? HTTPS_CATALOG : HTTP_CATALOG,
+			'edit'     => $this->url->link('setting/setting', 'user_token=' . $this->session->data['user_token'], true)
+		);
+
+		$store_total = $this->model_setting_store->getTotalStores();
+
+		$results = $this->model_setting_store->getStores();
+
+		foreach ($results as $result) {
+			$data['stores'][] = array(
+				'store_id' => $result['store_id'],
+				'name'     => $result['name'],
+				'url'      => $result['url'],
+				'edit'     => $this->url->link('setting/store/edit', 'user_token=' . $this->session->data['user_token'] . '&store_id=' . $result['store_id'], true)
+			);
+		}
+		
+		if (isset($this->request->post['store_id'])) {
+			$data['store_id'] = $this->request->post['store_id'];
+		} else {
+			$data['store_id'] = 0;
+		}
 
 		if (isset($this->request->post['name'])) {
 			$data['name'] = $this->request->post['name'];
@@ -373,14 +365,6 @@ class ControllerLocalisationLocation extends Controller {
 			$data['geocode'] = $location_info['geocode'];
 		} else {
 			$data['geocode'] = '';
-		}
-		
-		if (isset($this->request->post['store_id'])) {
-			$data['store_id'] = $this->request->post['store_id'];
-		} elseif (!empty($location_info)) {
-			$data['store_id'] = $location_info['store_id'];
-		} else {
-			$data['store_id'] = '';
 		}
 
 		if (isset($this->request->post['telephone'])) {
@@ -416,22 +400,6 @@ class ControllerLocalisationLocation extends Controller {
 		} else {
 			$data['thumb'] = $this->model_tool_image->resize('no_image.png', 100, 100);
 		}
-		
-		$data['stores'] = array();
-
-		$data['stores'][] = array(
-			'store_id' => 0,
-			'name'     => $this->config->get('config_name') . $this->language->get('text_default'),
-		);
-
-		$results = $this->model_setting_store->getStores();
-
-		foreach ($results as $result) {
-			$data['stores'][] = array(
-				'store_id' => $result['store_id'],
-				'name'     => $result['name'],
-			);
-		}
 
 		$data['placeholder'] = $this->model_tool_image->resize('no_image.png', 100, 100);
 
@@ -449,6 +417,44 @@ class ControllerLocalisationLocation extends Controller {
 			$data['comment'] = $location_info['comment'];
 		} else {
 			$data['comment'] = '';
+		}
+		
+		if (isset($this->request->post['customer_group_id'])) {
+			$data['customer_group_id'] = $this->request->post['customer_group_id'];
+		} else {
+			$data['customer_group_id'] = 0;
+		}
+		
+		$this->load->model('customer/customer_group');
+		
+		$data['customer_groups'] = array();
+		
+		$customer_groups = $this->model_customer_customer_group->getCustomerGroups();
+		
+		foreach ($customer_groups as $customer_group) {
+			if ($customer_group['customer_group_id'] == $this->config->get('config_customer_group_id')) {
+				$customer_group_name = $customer_group['name'] . ' (' . $this->language->get('text_default') . ')';
+			} else {
+				$customer_group_name = $customer_group['name'];
+			}
+			
+			$data['customer_groups'][] = array(
+				'customer_group_id'			=> $customer_group['customer_group_id'],
+				'name'						=> $customer_group_name,
+			);
+		}
+		
+		// API login
+		$data['catalog'] = $this->request->server['HTTPS'] ? HTTPS_CATALOG : HTTP_CATALOG;
+		
+		$this->load->model('user/api');
+
+		$api_info = $this->model_user_api->getApi($this->config->get('config_api_id'));
+		
+		if ($api_info && $this->user->hasPermission('modify', 'localisation/location')) {
+			$data['api_key'] = $api_info['key'];
+		} else {			
+			$data['api_key'] = '';
 		}
 
 		$data['header'] = $this->load->controller('common/header');
@@ -469,43 +475,6 @@ class ControllerLocalisationLocation extends Controller {
 
 		if ((utf8_strlen($this->request->post['address']) < 3) || (utf8_strlen($this->request->post['address']) > 128)) {
 			$this->error['address'] = $this->language->get('error_address');
-		} else {
-			if (!isset($this->request->post['store_id'])) {
-				$this->error['store'] = $this->language->get('error_store');
-				
-			} else {
-				$this->load->model('setting/store');
-				
-				$store_info = $this->model_setting_store->getStore($this->request->post['store_id']);
-				
-				if ($store_info || $this->request->post['store_id'] == 0) {
-					$this->load->model('localisation/location');
-					
-					$location_info = $this->model_localisation_location->getLocationByRegion($this->request->post['address'], $this->request->post['store_id']);
-					
-					if (!isset($this->request->get['location_id'])) {
-						if ($location_info) {
-							$this->error['region'] = $this->language->get('error_region');
-						}
-						
-						if (!empty($this->request->post['geocode'])) {
-							$location_info = $this->model_localisation_location->getLocationByGeocode($this->request->post['geocode']);
-							
-							if ($location_info) {
-								$this->error['geocode'] = $this->language->get('error_geocode');
-							}
-						}
-					} elseif (isset($this->request->get['location_id'])) {
-						$location_info = $this->model_localisation_location->getLocation($this->request->get['location_id']);
-						
-						if (!$location_info) {
-							$this->error['location'] = $this->language->get('error_location');
-						}
-					}
-				} else {
-					$this->error['store'] = $this->language->get('error_store');
-				}
-			}
 		}
 
 		if ((utf8_strlen($this->request->post['telephone']) < 3) || (utf8_strlen($this->request->post['telephone']) > 32)) {
@@ -521,5 +490,14 @@ class ControllerLocalisationLocation extends Controller {
 		}
 
 		return !$this->error;
+	}
+	
+	public function login() {
+		$json = array();
+		
+		$json['success'] = 'Works';
+	
+		$this->response->addHeader('Content-Type: application/json');
+		$this->response->setOutput(json_encode($json));
 	}
 }
