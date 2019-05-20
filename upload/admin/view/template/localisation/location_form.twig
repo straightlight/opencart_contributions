@@ -18,20 +18,6 @@
     <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
       <button type="button" class="close" data-dismiss="alert">&times;</button>
     </div>
-	{% if error_store %}
-    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_store }}
-      <button type="button" class="close" data-dismiss="alert">&times;</button>
-    </div>
-    {% endif %}
-	{% if error_region %}
-    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_region }}
-      <button type="button" class="close" data-dismiss="alert">&times;</button>
-    </div>
-    {% endif %}
-	{% if error_location %}
-    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_location }}
-      <button type="button" class="close" data-dismiss="alert">&times;</button>
-    </div>
     {% endif %}
     <div class="panel panel-default">
       <div class="panel-heading">
@@ -39,6 +25,21 @@
       </div>
       <div class="panel-body">
         <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-location" class="form-horizontal">
+		  <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-customer-group"><span data-toggle="tooltip" data-container="#content" title="{{ help_customer_group }}">{{ entry_customer_group }}</span></label>
+                <div class="col-sm-10">
+                  <select name="customer_group_id" id="input-customer-group" class="form-control">
+					<option>{{ text_select }}</option>
+                    {% for customer_group in customer_groups %}
+						{% if customer-group.customer_group_id == customer_group_id %}
+							<option value="{{ customer-group.customer_group_id }}" selected="selected">{{ customer_group.name }}</option>
+						{% else %}
+							<option value="{{ customer-group.customer_group_id }}">{{ customer_group.name }}</option>
+						{% endif %}
+                    {% endfor %}
+                  </select>
+                </div>
+          </div>
           <div class="form-group required">
             <label class="col-sm-2 control-label" for="input-name">{{ entry_name }}</label>
             <div class="col-sm-10">
@@ -61,9 +62,6 @@
             <label class="col-sm-2 control-label" for="input-geocode"><span data-toggle="tooltip" data-container="#content" title="{{ help_geocode }}">{{ entry_geocode }}</span></label>
             <div class="col-sm-10">
               <input type="text" name="geocode" value="{{ geocode }}" placeholder="{{ entry_geocode }}" id="input-geocode" class="form-control" />
-	      {% if error_geocode %}
-              	<div class="text-danger">{{ error_geocode }}</div>
-              {% endif %}
             </div>
           </div>
           <div class="form-group required">
@@ -80,21 +78,7 @@
             <div class="col-sm-10">
               <input type="text" name="fax" value="{{ fax }}" placeholder="{{ entry_fax }}" id="input-fax" class="form-control" />
             </div>
-          </div>
-		  <div class="form-group required">
-                <label class="col-sm-2 control-label" for="input-store">{{ entry_store }}</label>
-                <div class="col-sm-10">
-                  <select name="store_id" id="input-store" class="form-control">                    
-                    {% for store in stores %}
-						{% if store.store_id == store_id %}                    
-							<option value="{{ store.store_id }}" selected="selected">{{ store.name }}</option>                    
-						{% else %}                    
-							<option value="{{ store.store_id }}">{{ store.name }}</option>                    
-						{% endif %}
-                    {% endfor %}                  
-                  </select>
-                </div>
-          </div>
+          </div>          
           <div class="form-group">
             <label class="col-sm-2 control-label" for="input-image">{{ entry_image }}</label>
             <div class="col-sm-10"><a href="" id="thumb-image" data-toggle="image" class="img-thumbnail"><img src="{{ thumb }}" alt="" title="" data-placeholder="{{ placeholder }}" /></a>
@@ -117,5 +101,127 @@
       </div>
     </div>
   </div>
-</div>
+// Customer Groups
+<script type="text/javascript"><!--
+	$('select[name=\'customer_group_id\']').on('change', function() {
+		$.ajax({
+			url: '{{ catalog }}index.php?route=api/login&user_token={{ user_token }}',
+			type: 'post',
+			data: 'key={{ api_key }}',
+			dataType: 'json',
+			crossDomain: true,
+			beforeSend: function() {
+				$('select[name=\'customer_group_id\']').prop('disabled', true);
+			},
+			complete: function() {
+				
+			},
+			success: function(json) {
+				$('.alert-dismissible, .text-danger').remove();
+						
+				$('.form-location').removeClass('has-error');
+				
+				if (json['error']['ip']) {
+					$('#content > .container-fluid').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error']['ip'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+
+					// Highlight any found errors
+					$('select[name=\'customer_group_id\']').closest('.form-location').addClass('has-error');
+				} else if (json['api_token'] && json['api_session_id'] && json['success']) {
+					$.ajax({
+						url: '{{ catalog }}index.php?route=api/location&api_token=' + json['api_token'] + '&session_id=' + json['api_session_id'] + '&store_id={{ store_id }}',
+						type: 'post',
+						data: 'customer_group_id=' + $('select[name=\'customer_group_id\'] option:selected').val(),						
+						dataType: 'json',
+						beforeSend: function() {
+								
+						},
+						complete: function() {
+							$('select[name=\'customer_group_id\']').prop('disabled', false);
+						},
+						success: function(location) {
+							html = '';
+							
+							$('.alert-dismissible, .text-danger').remove();
+								
+							$('.form-location').removeClass('has-error');
+							
+							if (location['error']['warning']) {
+								event = 'danger';
+							} else {
+								event = 'success';
+							}
+							
+							html += '<div class="alert alert-' + event + ' alert-dismissible">';
+								if (location['error']['warning']) {
+									html += '<i class="fa fa-check-circle"></i> ';
+									html += location['error']['warning'];
+									
+									// Highlight any found errors
+									$('select[name=\'customer_group_id\']').closest('.form-location').addClass('has-error');
+								}
+										
+								if (location['payment_address_success'] && location['payment_address']) {
+										html += '<i class="fa fa-check-circle"></i> ';
+										html += location['payment_address_success'] + '<br /><br />';
+										
+										html += '<div class="well">';
+											html += '<ul class="list-check">';
+											
+											for (i in location['payment_address']) {
+												html += '<li>' + location['payment_address'][i] + '</li>';
+											}
+												
+											html += '</ul>';
+										html += '</div>';
+								}
+								
+								if (location['shipping_address_success'] && location['shipping_address']) {
+										html += '<i class="fa fa-check-circle"></i> ';
+										html += location['shipping_address_success'] + '<br /><br />';
+										
+										html += '<div class="well">';
+											html += '<ul class="list-check">';
+											
+											for (i in location['shipping_address']) {
+												html += '<li>' + location['shipping_address'][i] + '</li>';
+											}
+												
+											html += '</ul>';
+										html += '</div>';
+								}
+								
+								if (location['payment_account_success'] && location['payment_account']) {
+										html += '<i class="fa fa-check-circle"></i> ';
+										html += location['payment_account_success'] + '<br /><br />';
+										
+										html += '<div class="well">';
+											html += '<ul class="list-check">';
+											
+											for (i in location['payment_account']) {
+												html += '<li>' + location['payment_account'][i] + '</li>';
+											}
+												
+											html += '</ul>';
+										html += '</div>';
+								}
+									
+								html += '<button type="button" class="close" data-dismiss="alert">&times;</button>';
+							html += '</div>';
+								
+							if ($html) {
+								$('#content > .container-fluid').prepend(html);
+							}
+						},
+						error: function(xhr, ajaxOptions, thrownError) {
+							alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+						}
+					});				
+				}
+			},
+			error: function(xhr, ajaxOptions, thrownError) {
+				alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+			}
+		});
+	});
+//--></script></div>
 {{ footer }}
