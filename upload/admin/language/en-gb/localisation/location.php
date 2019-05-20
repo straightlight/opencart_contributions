@@ -27,6 +27,7 @@ $_['entry_open']       = 'Opening Times';
 $_['entry_comment']    = 'Comment';
 $_['entry_customer_group'] = 'Customer Groups (Debug)';
 $_['entry_store']      = 'Stores';
+$_['entry_is_partner'] = 'Business Partner';
 
 // Button
 $_['button_location_login'] = 'Login';
