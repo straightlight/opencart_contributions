@@ -271,6 +271,12 @@ class ControllerLocalisationLocation extends Controller {
 		} else {
 			$data['error_telephone'] = '';
 		}
+		
+		if (isset($this->error['geocode'])) {
+			$data['error_geocode'] = $this->error['geocode'];
+		} else {
+			$data['error_geocode'] = '';
+		}
 
 		$url = '';
 
@@ -468,6 +474,8 @@ class ControllerLocalisationLocation extends Controller {
 		if (!$this->user->hasPermission('modify', 'localisation/location')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
+		
+		$this->load->model('localisation/location');
 
 		if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 32)) {
 			$this->error['name'] = $this->language->get('error_name');
@@ -475,10 +483,24 @@ class ControllerLocalisationLocation extends Controller {
 
 		if ((utf8_strlen($this->request->post['address']) < 3) || (utf8_strlen($this->request->post['address']) > 128)) {
 			$this->error['address'] = $this->language->get('error_address');
+		} else {
+			$location_info = $this->model_localisation_location->getLocationByRegion($this->request->post['address'], $this->request->post['store_id']);
+			
+			if ($location_info) {
+				$this->error['address'] = $this->language->get('error_address_found');
+			}
 		}
 
 		if ((utf8_strlen($this->request->post['telephone']) < 3) || (utf8_strlen($this->request->post['telephone']) > 32)) {
 			$this->error['telephone'] = $this->language->get('error_telephone');
+		}
+		
+		if (!empty($this->request->post['geocode'])) {
+			$location_info = $this->model_localisation_location->getLocationByGeocode($this->request->post['geocode']);
+			
+			if ($location_info) {
+				$this->error['geocode'] = $this->language->get('error_geocode');
+			}
 		}
 
 		return !$this->error;
