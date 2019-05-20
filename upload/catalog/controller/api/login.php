@@ -24,6 +24,8 @@ class ControllerApiLogin extends Controller {
 				$ip_data[] = trim($result['ip']);
 			}
 			
+			$json['error']['ip'] = $this->language->get('error_permission');
+	
 			if (!in_array($this->request->server['REMOTE_ADDR'], $ip_data)) {
 				$json['error']['ip'] = sprintf($this->language->get('error_ip'), $this->request->server['REMOTE_ADDR']);
 			}
@@ -38,6 +40,8 @@ class ControllerApiLogin extends Controller {
 				$this->model_account_api->addApiSession($api_info['api_id'], $session->getId(), $this->request->server['REMOTE_ADDR']);
 				
 				$session->data['api_id'] = $api_info['api_id'];
+				
+				$json['api_session_id'] = $session->getId();
 				
 				// Create Token
 				$json['api_token'] = $session->getId();
