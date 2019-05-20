@@ -1923,15 +1923,16 @@ INSERT INTO `oc_length_class_description` (`length_class_id`, `language_id`, `ti
 DROP TABLE IF EXISTS `oc_location`;
 CREATE TABLE `oc_location` (
   `location_id` int(11) NOT NULL AUTO_INCREMENT,
+  `store_id` int(11) NOT NULL DEFAULT '0',
   `name` varchar(32) NOT NULL,
   `address` text NOT NULL,
   `telephone` varchar(32) NOT NULL,
   `fax` varchar(32) NOT NULL,
-  `geocode` varchar(32) NOT NULL,
-  `store_id` int(11) NOT NULL DEFAULT '0',
+  `geocode` varchar(32) NOT NULL,  
   `image` varchar(255) DEFAULT NULL,
   `open` text NOT NULL,
   `comment` text NOT NULL,
+  `is_partner` int(1) NOT NULL,
   PRIMARY KEY (`location_id`),
   KEY `name` (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
