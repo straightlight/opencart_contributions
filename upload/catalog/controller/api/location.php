@@ -9,9 +9,9 @@ class ControllerApiLocation extends Controller {
 			$json['error']['warning'] = $this->language->get('error_permission');
 		} elseif (!isset($this->request->post['customer_group_id'])) {
 			$json['error']['warning'] = $this->language->get('error_customer_group');
-		} elseif (empty($this->request->post['location_id']) && empty($this->request->post['customer_group_id'])) {
+		} elseif (empty($this->request->post['address']) || empty($this->request->post['geocode']) || empty($this->request->post['customer_group_id'])) {
 			$json['error']['warning'] = $this->language->get('error_location');		
-		} elseif (!empty($this->request->post['location_id']) && !empty($this->request->post['customer_group_id'])) {
+		} elseif (!empty($this->request->post['address']) && !empty($this->request->post['geocode']) && !empty($this->request->post['customer_group_id'])) {
 			$this->load->model('account/customer_group');
 				
 			$customer_group = $this->model_account_customer_group->getCustomerGroup($this->request->post['customer_group_id']);
