@@ -26,6 +26,7 @@ $_['entry_image']      = 'Image';
 $_['entry_open']       = 'Opening Times';
 $_['entry_comment']    = 'Comment';
 $_['entry_customer_group'] = 'Customer Groups (Debug)';
+$_['entry_store']      = 'Stores';
 
 // Button
 $_['button_location_login'] = 'Login';
