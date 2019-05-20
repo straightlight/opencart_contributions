@@ -491,13 +491,4 @@ class ControllerLocalisationLocation extends Controller {
 
 		return !$this->error;
 	}
-	
-	public function login() {
-		$json = array();
-		
-		$json['success'] = 'Works';
-	
-		$this->response->addHeader('Content-Type: application/json');
-		$this->response->setOutput(json_encode($json));
-	}
 }
