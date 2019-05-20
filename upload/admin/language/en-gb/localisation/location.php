@@ -36,6 +36,7 @@ $_['help_geocode']     = 'Please enter your store location geocode manually.';
 $_['help_open']        = 'Fill in your stores opening times.';
 $_['help_comment']     = 'This field is for any special notes you would like to tell the customer i.e. Store does not accept cheques.';
 $_['help_customer_group'] = 'For Account Management purposes only - to pull the custom fields information with payment, shipping and account information!';
+$_['help_store']       = 'Select the store related to this location.';
 
 // Error
 $_['error_permission'] = 'Warning: You do not have permission to modify store locations!';
