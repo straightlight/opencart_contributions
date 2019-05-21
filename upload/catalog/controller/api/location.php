@@ -21,9 +21,9 @@ class ControllerApiLocation extends Controller {
 			} else {
 				$this->load->model('account/custom_field');
 					
-				$geo_zones = $this->model_account_custom_field->getCustomFields($this->request->post['customer_group_id'], $this->request->post['api_session_id']);
+				$custom_fields = $this->model_account_custom_field->getCustomFields($this->request->post['customer_group_id']);
 					
-				if (!$geo_zones) {
+				if (!$custom_fields) {
 					$json['error']['warning'] = $this->language->get('error_geo_zone_customer_custom_field');
 				} else {
 					// Payment Address
