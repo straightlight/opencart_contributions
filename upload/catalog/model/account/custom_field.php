@@ -6,7 +6,7 @@ class ModelAccountCustomField extends Model {
 		return $query->row;
 	}
 
-	public function getCustomFields($customer_group_id = 0, $geocode = '') {
+	public function getCustomFields($customer_group_id = 0) {
 		$custom_field_data = array();
 
 		if (!$customer_group_id) {
@@ -31,7 +31,7 @@ class ModelAccountCustomField extends Model {
 				}
 			}
 			
-			$zone_to_geo_zones = $this->model_localisation_geo_zone->getZoneToGeoZoneLocation($custom_field['location'], $geocode);
+			$zone_to_geo_zones = $this->model_localisation_geo_zone->getZoneToGeoZoneLocation($custom_field['location']);
 
 			$custom_field_data[] = array(
 				'custom_field_id'    => $custom_field['custom_field_id'],
