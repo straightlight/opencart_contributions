@@ -391,7 +391,7 @@ class ModelCatalogProduct extends Model {
 					    foreach ($query as $result) {
 							$tmp_products[$result['product_id']] = $this->getProduct($result['product_id']);
 							
-							if (!empty($tmp_products[$result['product_id']]['rating'])) {
+							if ($rating && !empty($tmp_products[$result['product_id']]['rating'])) {
 								$tmp_rating_products[$result['product_id']] = $tmp_products[$result['product_id']]['rating'];
 							}
 							
