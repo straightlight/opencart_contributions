@@ -12,6 +12,11 @@ $_['text_type_total']  = 'Total';
 $_['text_type_search'] = 'Search';
 $_['text_database_transaction_delete'] = 'Delete';
 $_['text_database_transaction_update'] = 'Update';
+$_['text_groups']      = array('day'        => 'day',
+                               'week'       => 'week',
+                               'month'      => 'month',
+                               'year'       => 'year',
+                              );
 
 // Entry
 $_['entry_name']       = 'Module Name';
@@ -22,6 +27,8 @@ $_['entry_height']     = 'Height';
 $_['entry_type']	   = 'Type';
 $_['entry_type_order'] = 'Type Order';
 $_['entry_database_transaction'] = 'Database Transaction';
+$_['entry_group']      = 'Group By';
+$_['entry_rating']     = 'Rating';
 $_['entry_status']     = 'Status';
 
 // Error
