@@ -288,7 +288,7 @@ class ModelCatalogProduct extends Model {
 		return $product_data;
 	}
 
-	public function getBestSellerProducts($setting, $category_id = 0, $sub_categories = array(), $product_id = 0, $filter = 'product', $rating = false) {
+	public function getBestSellerProducts($setting, $category_id = 0, $sub_categories = array(), $product_id = 0, $filter = 'product') {
                 $product_data = $this->cache->get('product.bestseller.' . (int)$this->config->get('config_language_id') . '.' . (int)$this->config->get('config_store_id') . '.' . $this->config->get('config_customer_group_id') . '.' . (int)$setting['limit']);
                 
                 if (!$product_data) {
@@ -391,7 +391,7 @@ class ModelCatalogProduct extends Model {
 					    foreach ($query as $result) {
 							$tmp_products[$result['product_id']] = $this->getProduct($result['product_id']);
 							
-							if ($rating && !empty($tmp_products[$result['product_id']]['rating'])) {
+							if ($setting['rating'] && !empty($tmp_products[$result['product_id']]['rating'])) {
 								$tmp_rating_products[$result['product_id']] = $tmp_products[$result['product_id']]['rating'];
 							}
 							
