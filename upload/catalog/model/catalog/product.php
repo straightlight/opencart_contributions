@@ -288,7 +288,7 @@ class ModelCatalogProduct extends Model {
 		return $product_data;
 	}
 
-	public function getBestSellerProducts($setting, $category_id = 0, $sub_categories = array(), $product_id = 0, $filter = 'product') {
+	public function getBestSellerProducts($setting, $category_id = 0, $sub_categories = array(), $product_id = 0, $filter = 'product', $rating = false) {
                 $product_data = $this->cache->get('product.bestseller.' . (int)$this->config->get('config_language_id') . '.' . (int)$this->config->get('config_store_id') . '.' . $this->config->get('config_customer_group_id') . '.' . (int)$setting['limit']);
                 
                 if (!$product_data) {
@@ -314,9 +314,9 @@ class ModelCatalogProduct extends Model {
 					$sql .= " OR (" . implode(" OR ", $processing_implode) . ")";
 					
 					$sql .= " AND `cs`.`customer_id` = `o`.`customer_id`";					
-					$sql .= " AND `cs`.`store_id` = '" . (int)$this->config->get('config_store_id') . "'";
-					$sql .= " AND `cs`.`store_id` = `o`.`store_id`"; 
 					$sql .= " AND `cs`.`language_id` = `o`.`language_id`";
+					$sql .= " AND `cs`.`store_id` = `o`.`store_id`"; 
+					$sql .= " AND `cs`.`store_id` = '" . (int)$this->config->get('config_store_id') . "'";					
 					$sql .= " AND `o`.`payment_country_id` = '" . (int)$this->config->get('config_country_id') . "'";
 					$sql .= " AND `o`.`payment_zone_id` = '" . (int)$this->config->get('config_zone_id') . "'";
 					$sql .= " AND `o`.`language_id` = '" . (int)$this->config->get('config_language_id') . "'";
@@ -386,8 +386,14 @@ class ModelCatalogProduct extends Model {
 						
 						$tmp_popular_products = array();
 						
+						$tmp_rating_products[0] = 0;
+						
 					    foreach ($query as $result) {
 							$tmp_products[$result['product_id']] = $this->getProduct($result['product_id']);
+							
+							if (!empty($tmp_products[$result['product_id']]['rating'])) {
+								$tmp_rating_products[$result['product_id']] = $tmp_products[$result['product_id']]['rating'];
+							}
 							
 							$tmp_products_related[$result['product_id']] = $this->getProductRelated($result['product_id']);
 							
@@ -400,7 +406,7 @@ class ModelCatalogProduct extends Model {
 							}
 					    }
 						
-					    $product_data = array_merge($tmp_products, $tmp_products_related, $tmp_latest_products, $tmp_popular_products);
+					    $product_data = array_merge($tmp_products, $tmp_products_related, $tmp_latest_products, $tmp_popular_products, $tmp_rating_products);
 					    
 					    $this->cache->set('product.bestseller.' . (int)$this->config->get('config_language_id') . '.' . (int)$this->config->get('config_store_id') . '.' . $this->config->get('config_customer_group_id') . '.' . (int)$setting['limit'], $product_data);
 					    
