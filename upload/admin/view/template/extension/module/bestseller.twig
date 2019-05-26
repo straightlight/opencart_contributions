@@ -108,7 +108,7 @@
 					{% if key == group %}
 						<option value="{{ key }}" selected="selected">{{ text_group }}</option>						
 					{% else %}						
-						<option value="{{ key }}" selected="selected">{{ text_group }}</option>
+						<option value="{{ key }}">{{ text_group }}</option>
 					{% endif %}
 				{% endfor %}
               </select>
@@ -118,13 +118,13 @@
             <label class="col-sm-2 control-label" for="input-rating">{{ entry_rating }}</label>
             <div class="col-sm-10">
               <select name="rating" id="input-rating" class="form-control">
-				{% for key, text_rating in text_ratings %}
-					{% if key == rating %}
-						<option value="{{ key }}" selected="selected">{{ text_rating }}</option>
-					{% else %}
-						<option value="{{ key }}">{{ text_rating }}</option>
-					{% endif %}
-				{% endfor %}
+				{% if rating == 1 %}
+					<option value="1" selected="selected">{{ text_yes }}</option>
+					<option value="0">{{ text_no }}</option>
+				{% else %}
+					<option value="1">{{ text_yes }}</option>
+					<option value="0" selected="selected">{{ text_no }}</option>
+				{% endif %}
               </select>
             </div>
           </div>
