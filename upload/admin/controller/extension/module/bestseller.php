@@ -138,6 +138,22 @@ class ControllerExtensionModuleBestSeller extends Controller {
 		} else {
 			$data['type_order'] = '';
 		}
+		
+		if (isset($this->request->post['group'])) {
+			$data['group'] = $this->request->post['group'];
+		} elseif (!empty($module_info)) {
+			$data['group'] = $module_info['group'];
+		} else {
+			$data['group'] = array();
+		}
+		
+		if (isset($this->request->post['rating'])) {
+			$data['rating'] = $this->request->post['rating'];
+		} elseif (!empty($module_info)) {
+			$data['rating'] = $module_info['rating'];
+		} else {
+			$data['rating'] = 0;
+		}
 
 		if (isset($this->request->post['status'])) {
 			$data['status'] = $this->request->post['status'];
