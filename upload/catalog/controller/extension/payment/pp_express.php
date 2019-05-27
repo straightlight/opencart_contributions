@@ -113,14 +113,14 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 			$this->model_extension_payment_pp_express->log('Unable to create PayPal call: ' . json_encode($result));
 
 			$this->response->redirect($this->url->link('checkout/checkout', '', true));
-		}
+		} elseif (isset($result['TOKEN']) && $result['TOKEN'] != '') {
+			$this->session->data['paypal']['token'] = $result['TOKEN'];
 
-		$this->session->data['paypal']['token'] = $result['TOKEN'];
-
-		if ($this->config->get('payment_pp_express_test')) {
-			$this->response->redirect('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=' . $result['TOKEN']);
-		} else {
-			$this->response->redirect('https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=' . $result['TOKEN']);
+			if ($this->config->get('payment_pp_express_test')) {
+				$this->response->redirect('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=' . $result['TOKEN']);
+			} else {
+				$this->response->redirect('https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=' . $result['TOKEN']);
+			}
 		}
 	}
 
@@ -1632,10 +1632,10 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 				 * If PayPal debug log is off then still log error to normal error log.
 				 */
 				 
-				$this->model_extension_payment_pp_express->log('Unable to create Paypal session' . json_encode($result));
+				$this->model_extension_payment_pp_express->log('Unable to create Paypal session: ' . json_encode($result));
+			} elseif (isset($result['TOKEN']) && $result['TOKEN'] != '') {
+				$this->session->data['paypal']['token'] = $result['TOKEN'];
 			}
-
-			$this->session->data['paypal']['token'] = $result['TOKEN'];
 			
 			$this->response->redirect($this->url->link('checkout/checkout', '', true));
 		} else {
