@@ -386,6 +386,8 @@ class ModelCatalogProduct extends Model {
 						
 						$tmp_popular_products = array();
 						
+						$tmp_rating_products = array();
+						
 						$tmp_rating_products[0] = 0;
 						
 					    foreach ($query as $result) {
