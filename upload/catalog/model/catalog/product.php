@@ -321,9 +321,8 @@ class ModelCatalogProduct extends Model {
 					$sql .= " AND `o`.`payment_zone_id` = '" . (int)$this->config->get('config_zone_id') . "'";
 					$sql .= " AND `o`.`language_id` = '" . (int)$this->config->get('config_language_id') . "'";
 					$sql .= " AND `o`.`customer_group_id` = '" . (int)$this->config->get('config_customer_group_id') . "'";
-					$sql .= " AND `o`.`payment_code` NOT LIKE '%free%'";
-					$sql .= " AND `o`.`shipping_code` NOT LIKE '%free%'";
-					$sql .= " AND `o`.`total` >= '1.00'";
+					$sql .= " AND `o`.`payment_code` NOT LIKE '%free%'";					
+					$sql .= " AND `o`.`total` > '0.10'";
 					
 					if ($category_id) {
 						$sql .= " AND `cs`.`category_id` = '" . (int)$category_id . "'";
@@ -390,14 +389,14 @@ class ModelCatalogProduct extends Model {
 						
 						$tmp_rating_products[0] = 0;
 						
+						$tmp_profiles = array();
+						
 					    foreach ($query as $result) {
 							$tmp_products[$result['product_id']] = $this->getProduct($result['product_id']);
 							
 							if ($setting['rating'] && !empty($tmp_products[$result['product_id']]['rating'])) {
 								$tmp_rating_products[$result['product_id']] = $tmp_products[$result['product_id']]['rating'];
 							}
-							
-							$tmp_products_related[$result['product_id']] = $this->getProductRelated($result['product_id']);
 							
 							if (!empty($latest_products[$result['product_id']])) {
 								$tmp_latest_products[$result['product_id']] = $latest_products[$result['product_id']];	
@@ -406,9 +405,13 @@ class ModelCatalogProduct extends Model {
 							if (!empty($popular_products[$result['product_id']])) {
 								$tmp_popular_products[$result['product_id']] = $popular_products[$result['product_id']];	
 							}
+							
+							$tmp_products_related[$result['product_id']] = $this->getProductRelated($result['product_id']);
+							
+							$tmp_profiles[$result['product_id']] = $this->getProfiles($result['product_id']);
 					    }
 						
-					    $product_data = array_merge($tmp_products, $tmp_products_related, $tmp_latest_products, $tmp_popular_products, $tmp_rating_products);
+					    $product_data = array_merge($tmp_products, $tmp_products_related, $tmp_latest_products, $tmp_popular_products, $tmp_rating_products, $tmp_profiles);
 					    
 					    $this->cache->set('product.bestseller.' . (int)$this->config->get('config_language_id') . '.' . (int)$this->config->get('config_store_id') . '.' . $this->config->get('config_customer_group_id') . '.' . (int)$setting['limit'], $product_data);
 					    
@@ -636,9 +639,15 @@ class ModelCatalogProduct extends Model {
 	}
 
 	public function getProfiles($product_id) {
+		$product_data = array();
+		
 		$query = $this->db->query("SELECT rd.* FROM " . DB_PREFIX . "product_recurring pr JOIN " . DB_PREFIX . "recurring_description rd ON (rd.language_id = " . (int)$this->config->get('config_language_id') . " AND rd.recurring_id = pr.recurring_id) JOIN " . DB_PREFIX . "recurring r ON r.recurring_id = rd.recurring_id WHERE pr.product_id = " . (int)$product_id . " AND status = '1' AND pr.customer_group_id = '" . (int)$this->config->get('config_customer_group_id') . "' ORDER BY sort_order ASC");
+		
+		foreach ($query->rows as $result) {
+			$product_data[$result['product_id']] = $this->getProduct($result['product_id']);
+		}
 
-		return $query->rows;
+		return $product_data;
 	}
 
 	public function getTotalProductSpecials() {
