@@ -288,10 +288,12 @@ class ModelCatalogProduct extends Model {
 		return $product_data;
 	}
 
-	public function getBestSellerProducts($setting, $category_id = 0, $sub_categories = array(), $product_id = 0, $filter = 'product') {
+	public function getBestSellerProducts($setting, $filter_data) {
                 $product_data = $this->cache->get('product.bestseller.' . (int)$this->config->get('config_language_id') . '.' . (int)$this->config->get('config_store_id') . '.' . $this->config->get('config_customer_group_id') . '.' . (int)$setting['limit']);
                 
                 if (!$product_data) {
+					$product_data = array();
+				
 					$sql = "SELECT MIN(`cs`.`date_added`) AS `date_start`, MAX(`cs`.`date_added`) AS `date_end`, `op`.`product_id` AS `product_id`, `cs`.`category_id`, `cs`.`sub_category`, `o`.`payment_country_id`, `o`.`payment_zone_id`, COUNT(*) AS `searches`, SUM((SELECT SUM(`op1`.`quantity`) FROM `" . DB_PREFIX . "order_product` `op1` WHERE `op1`.`product_id` = `p2c`.`product_id` GROUP BY `op1`.`product_id`)) AS `products`, SUM((SELECT SUM(`or`.`product_quantity`) FROM `" . DB_PREFIX . "order_recurring` `or` WHERE `or`.`product_id` = `op`.`product_id` AND `p2c`.`product_id` = `or`.`product_id` AND `or`.`order_id` = `op`.`order_id` AND `or`.`status` = '1' GROUP BY `or`.`product_id`)) AS `recurring_status`, SUM((SELECT SUM(`ot`.`value`) FROM `" . DB_PREFIX . "order_total` `ot` WHERE `ot`.`order_id` = `o`.`order_id` AND `ot`.`code` = 'tax' GROUP BY `ot`.`order_id`)) AS `tax`, SUM(`o`.`total`) AS `total` FROM `" . DB_PREFIX . "customer_search` `cs` INNER JOIN `" . DB_PREFIX . "product_to_category` `p2c` ON (`p2c`.`category_id` = `cs`.`category_id`) INNER JOIN `" . DB_PREFIX . "order_product` `op` ON (`op`.`product_id` = `p2c`.`product_id`) INNER JOIN `" . DB_PREFIX . "order` `o` ON (`o`.`order_id` = `op`.`order_id`)";
 					
 					$complete_implode = array();
@@ -324,15 +326,15 @@ class ModelCatalogProduct extends Model {
 					$sql .= " AND `o`.`payment_code` NOT LIKE '%free%'";					
 					$sql .= " AND `o`.`total` > '0.10'";
 					
-					if ($category_id) {
-						$sql .= " AND `cs`.`category_id` = '" . (int)$category_id . "'";
+					if (!empty($filter_data['category_id'])) {
+						$sql .= " AND `cs`.`category_id` = '" . (int)$filter_data['category_id'] . "'";
 					}
 			
-					if ($sub_categories) {
+					if (!empty($filter_data['sub_categories'])) {
 						$sub_categories_implode = array();
 						
 						foreach ($sub_categories as $sub_category) {
-							$sub_categories_implode[] = "`cs`.`sub_category` = '" . (int)$sub_category . "'";	
+							$sub_categories_implode[] = "`cs`.`sub_category` = '" . (int)$filter_data['sub_category'] . "'";	
 						}
 						
 						if ($sub_categories_implode) {
@@ -340,8 +342,8 @@ class ModelCatalogProduct extends Model {
 						}
 					}
 			
-					if ($product_id) {
-						$sql .= " AND `op`.`product_id` = '" . (int)$product_id . "'";	
+					if (!empty($filter_data['product_id'])) {
+						$sql .= " AND `op`.`product_id` = '" . (int)$filter_data['product_id'] . "'";	
 					}
 					
 					if (!empty($setting['group'])) {
@@ -372,51 +374,17 @@ class ModelCatalogProduct extends Model {
 
 					$query = $this->db->query($sql)->rows;
 					
-					if ($filter == 'product') {
-					    $tmp_products = array();
-						
-					    $tmp_products_related = array();
-						
-						$latest_products = $this->getLatestProducts($setting['limit']);
-						
-						$tmp_latest_products = array();
-						
-						$popular_products = $this->getPopularProducts($setting['limit']);
-						
-						$tmp_popular_products = array();
-						
-						$tmp_rating_products = array();
-						
-						$tmp_rating_products[0] = 0;
-						
-						$tmp_profiles = array();
-						
-					    foreach ($query as $result) {
-							$tmp_products[$result['product_id']] = $this->getProduct($result['product_id']);
-							
-							if ($setting['rating'] && !empty($tmp_products[$result['product_id']]['rating'])) {
-								$tmp_rating_products[$result['product_id']] = $tmp_products[$result['product_id']]['rating'];
+					if (!empty($filter_data['filter'])) {
+						if ($filter_data['filter'] == 'product') {
+							foreach ($query as $result) {
+								$product_data[$result['product_id']] = $this->getProduct($result['product_id']);
 							}
-							
-							if (!empty($latest_products[$result['product_id']])) {
-								$tmp_latest_products[$result['product_id']] = $latest_products[$result['product_id']];	
-							}
-							
-							if (!empty($popular_products[$result['product_id']])) {
-								$tmp_popular_products[$result['product_id']] = $popular_products[$result['product_id']];	
-							}
-							
-							$tmp_products_related[$result['product_id']] = $this->getProductRelated($result['product_id']);
-							
-							$tmp_profiles[$result['product_id']] = $this->getProfiles($result['product_id']);
-					    }
-						
-					    $product_data = array_merge($tmp_products, $tmp_products_related, $tmp_latest_products, $tmp_popular_products, $tmp_rating_products, $tmp_profiles);
 					    
-					    $this->cache->set('product.bestseller.' . (int)$this->config->get('config_language_id') . '.' . (int)$this->config->get('config_store_id') . '.' . $this->config->get('config_customer_group_id') . '.' . (int)$setting['limit'], $product_data);
+							$this->cache->set('product.bestseller.' . (int)$this->config->get('config_language_id') . '.' . (int)$this->config->get('config_store_id') . '.' . $this->config->get('config_customer_group_id') . '.' . (int)$setting['limit'], $product_data);
 					    
-					} elseif ($filter == 'customer_search') {
-					       $product_data = $query;
+						} elseif ($filter_data['filter'] == 'customer_search') {
+							$product_data = $query;
+						}
 					}
 				}
 		
