@@ -28,10 +28,22 @@ class ControllerExtensionModuleBestSeller extends Controller {
 		} else {
 			$product_id = 0;
 		}
-
-		$results = $this->model_catalog_product->getBestSellerProducts($setting, $category_id, $sub_categories, $product_id);
 		
-		$search_results = $this->model_catalog_product->getBestSellerProducts($setting, $category_id, $sub_categories, $product_id, 'customer_search');
+		$filter_data = array('category_id'			=> $category_id,
+							 'sub_categories'		=> $sub_categories,
+							 'product_id'			=> $product_id,
+							 'filter'				=> 'product',
+							);
+
+		$results = $this->model_catalog_product->getBestSellerProducts($setting, $filter_data);
+		
+		$filter_data = array('category_id'			=> $category_id,
+							 'sub_categories'		=> $sub_categories,
+							 'product_id'			=> $product_id,
+							 'filter'				=> 'customer_search',
+							);
+		
+		$search_results = $this->model_catalog_product->getBestSellerProducts($setting, $filter_data);
 		
 		if ($search_results) {
 		    $this->load->model('account/search');
