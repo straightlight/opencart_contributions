@@ -333,8 +333,8 @@ class ModelCatalogProduct extends Model {
 					if (!empty($filter_data['sub_categories'])) {
 						$sub_categories_implode = array();
 						
-						foreach ($sub_categories as $sub_category) {
-							$sub_categories_implode[] = "`cs`.`sub_category` = '" . (int)$filter_data['sub_category'] . "'";	
+						foreach ($filter_data['sub_categories'] as $sub_category) {
+							$sub_categories_implode[] = "`cs`.`sub_category` = '" . (int)$sub_category . "'";
 						}
 						
 						if ($sub_categories_implode) {
