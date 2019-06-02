@@ -12,7 +12,7 @@ class ControllerExtensionReportCustomerSearch extends Controller {
 
 			$this->session->data['success'] = $this->language->get('text_success');
 
-			$this->response->redirect($this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=report', true));
+			$this->response->redirect($this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=report&language=' . $this->config->get('config_language')));
 		}
 
 		if (isset($this->error['warning'])) {
@@ -25,22 +25,22 @@ class ControllerExtensionReportCustomerSearch extends Controller {
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
+			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'))
 		);
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_extension'),
-			'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=report', true)
+			'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=report'. '&language=' . $this->config->get('config_language'))
 		);
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('extension/report/customer_search', 'user_token=' . $this->session->data['user_token'], true)
+			'href' => $this->url->link('extension/report/customer_search', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'))
 		);
 
-		$data['action'] = $this->url->link('extension/report/customer_search', 'user_token=' . $this->session->data['user_token'], true);
+		$data['action'] = $this->url->link('extension/report/customer_search', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'));
 
-		$data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=report', true);
+		$data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=report'. '&language=' . $this->config->get('config_language'));
 
 		if (isset($this->request->post['report_customer_search_status'])) {
 			$data['report_customer_search_status'] = $this->request->post['report_customer_search_status'];
@@ -71,6 +71,28 @@ class ControllerExtensionReportCustomerSearch extends Controller {
 	
 	public function report() {
 		$this->load->language('extension/report/customer_search');
+		
+		$data['groups'] = array();
+
+		$data['groups'][] = array(
+			'text'  => $this->language->get('text_year'),
+			'value' => 'year',
+		);
+
+		$data['groups'][] = array(
+			'text'  => $this->language->get('text_month'),
+			'value' => 'month',
+		);
+
+		$data['groups'][] = array(
+			'text'  => $this->language->get('text_week'),
+			'value' => 'week',
+		);
+
+		$data['groups'][] = array(
+			'text'  => $this->language->get('text_day'),
+			'value' => 'day',
+		);
 
 		if (isset($this->request->get['filter_date_start'])) {
 			$filter_date_start = $this->request->get['filter_date_start'];
@@ -101,6 +123,30 @@ class ControllerExtensionReportCustomerSearch extends Controller {
 		} else {
 			$filter_ip = '';
 		}
+		
+		if (isset($this->request->get['filter_country_id'])) {
+			$filter_country_id = $this->request->get['filter_country_id'];
+		} else {
+			$filter_country_id = 0;
+		}
+		
+		if (isset($this->request->get['filter_zone_id'])) {
+			$filter_zone_id = $this->request->get['filter_zone_id'];
+		} else {
+			$filter_zone_id = 0;
+		}
+		
+		if (isset($this->request->get['filter_product'])) {
+			$filter_product = $this->request->get['filter_product'];
+		} else {
+			$filter_product = '';
+		}
+		
+		if (isset($this->request->get['filter_group'])) {
+			$filter_group = $this->request->get['filter_group'];
+		} else {
+			$filter_group = 'week';
+		}
 
 		if (isset($this->request->get['page'])) {
 			$page = $this->request->get['page'];
@@ -109,7 +155,16 @@ class ControllerExtensionReportCustomerSearch extends Controller {
 		}
 
 		$this->load->model('extension/report/customer');
+		
 		$this->load->model('catalog/category');
+		
+		$this->load->model('setting/setting');
+		
+		$this->load->model('localisation/country');
+		
+		$this->load->model('localisation/zone');
+		
+		$data['countries'] = $this->model_localisation_country->getCountries();
 
 		$data['searches'] = array();
 
@@ -119,6 +174,10 @@ class ControllerExtensionReportCustomerSearch extends Controller {
 			'filter_keyword'    => $filter_keyword,
 			'filter_customer'   => $filter_customer,
 			'filter_ip'         => $filter_ip,
+			'filter_product'	=> $filter_product,
+			'filter_country_id'	=> $filter_country_id,
+			'filter_zone_id'	=> $filter_zone_id,
+			'filter_group'		=> $filter_group,
 			'start'             => ($page - 1) * 20,
 			'limit'             => 20
 		);
@@ -128,27 +187,42 @@ class ControllerExtensionReportCustomerSearch extends Controller {
 		$results = $this->model_extension_report_customer->getCustomerSearches($filter_data);
 
 		foreach ($results as $result) {
-			$category_info = $this->model_catalog_category->getCategory($result['category_id']);
-
-			if ($category_info) {
-				$category = ($category_info['path']) ? $category_info['path'] . ' &gt; ' . $category_info['name'] : $category_info['name'];
+			$store_info = $this->model_setting_setting->getSetting('config', $result['store_id']);
+			
+			if ($store_info) {
+				$store_id = $store_info['config_store_id'];
+				
+				$store_name = $store_info['config_name'];
+				
+				$country_info = $this->model_localisation_country->getCountry($store_info['config_country_id']);
+				
+				$zone_info = $this->model_localisation_zone->getZone($store_info['config_zone_id']);
 			} else {
-				$category = '';
+				$store_id = $this->config->get('config_store_id');
+				
+				$store_name = $this->config->get('config_name');
+				
+				$country_info = $this->model_localisation_country->getCountry($result['payment_country_id']);
+				
+				$zone_info = $this->model_localisation_zone->getZone($result['payment_zone_id']);
 			}
-
-			if ($result['customer_id'] > 0) {
-				$customer = sprintf($this->language->get('text_customer'), $this->url->link('customer/customer/edit', 'user_token=' . $this->session->data['user_token'] . '&customer_id=' . $result['customer_id'], true), $result['customer']);
-			} else {
-				$customer = $this->language->get('text_guest');
-			}
-
+			
 			$data['searches'][] = array(
-				'keyword'     => $result['keyword'],
-				'products'    => $result['products'],
-				'category'    => $category,
-				'customer'    => $customer,
-				'ip'          => $result['ip'],
-				'date_added'  => date($this->language->get('datetime_format'), strtotime($result['date_added']))
+				'keyword'     		=> $result['keyword'],
+				'products'    		=> $result['products'],				
+				'recurring_status'	=> $result['recurring_status'],
+				'categories'    	=> $result['categories'],
+				'searches'			=> $result['searches'],
+				'country'			=> $country_info,
+				'zone'				=> $zone_info,
+				'payment_method'	=> $result['payment_method'],
+				'shipping_method'	=> $result['shipping_method'],
+				'store_name'		=> $store_name,
+				'store_href'		=> $this->url->link('setting/setting', 'user_token=' . $this->session->data['user_token'] . '&store_id=' . (int)$store_id . '&language=' . $this->config->get('config_language')),
+				'tax'        		=> $this->currency->format($result['tax'], $this->config->get('config_currency')),
+				'total'      		=> $this->currency->format($result['total'], $this->config->get('config_currency')),
+				'date_start' 		=> date($this->language->get('date_format_short'), strtotime($result['date_start'])),
+				'date_end'   		=> date($this->language->get('date_format_short'), strtotime($result['date_end'])),
 			);
 		}
 
@@ -175,6 +249,22 @@ class ControllerExtensionReportCustomerSearch extends Controller {
 		if (isset($this->request->get['filter_ip'])) {
 			$url .= '&filter_ip=' . $this->request->get['filter_ip'];
 		}
+		
+		if (isset($this->request->get['filter_product'])) {
+			$url .= '&filter_product=' . $this->request->get['filter_product'];
+		}
+		
+		if (isset($this->request->get['filter_country_id'])) {
+			$url .= '&filter_country_id=' . $this->request->get['filter_country_id'];
+		}
+		
+		if (isset($this->request->get['filter_zone_id'])) {
+			$url .= '&filter_zone_id=' . $this->request->get['filter_zone_id'];
+		}
+		
+		if (isset($this->request->get['filter_group'])) {
+			$url .= '&filter_group=' . $this->request->get['filter_group'];
+		}
 
 		if (isset($this->request->get['page'])) {
 			$url .= '&page=' . $this->request->get['page'];
@@ -184,7 +274,7 @@ class ControllerExtensionReportCustomerSearch extends Controller {
 		$pagination->total = $search_total;
 		$pagination->page = $page;
 		$pagination->limit = $this->config->get('config_limit_admin');
-		$pagination->url = $this->url->link('report/report', 'user_token=' . $this->session->data['user_token'] . '&code=customer_search' . $url . '&page={page}', true);
+		$pagination->url = $this->url->link('report/report', 'user_token=' . $this->session->data['user_token'] . '&code=customer_search' . $url . '&page={page}'. '&language=' . $this->config->get('config_language'));
 
 		$data['pagination'] = $pagination->render();
 
@@ -195,6 +285,10 @@ class ControllerExtensionReportCustomerSearch extends Controller {
 		$data['filter_keyword'] = $filter_keyword;
 		$data['filter_customer'] = $filter_customer;
 		$data['filter_ip'] = $filter_ip;
+		$data['filter_product'] = $filter_product;
+		$data['filter_country_id'] = $filter_country_id;
+		$data['filter_zone_id'] = $filter_zone_id;
+		$data['filter_group'] = $filter_group;
 
 		return $this->load->view('extension/report/customer_search_info', $data);
 	}
