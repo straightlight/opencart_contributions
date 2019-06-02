@@ -297,35 +297,92 @@ class ModelExtensionReportCustomer extends Model {
 	}
 
 	public function getCustomerSearches($data = array()) {
-		$sql = "SELECT cs.customer_id, cs.keyword, cs.category_id, cs.products, cs.ip, cs.date_added, CONCAT(c.firstname, ' ', c.lastname) AS customer FROM " . DB_PREFIX . "customer_search cs LEFT JOIN " . DB_PREFIX . "customer c ON (cs.customer_id = c.customer_id)";
-
+		$sql = "SELECT MIN(`cs`.`date_added`) AS `date_start`, MAX(`cs`.`date_added`) AS `date_end`, COUNT(`cs`.`category_id`) AS `categories`, `o`.`payment_country_id`, `o`.`payment_zone_id`, `o`.`payment_method` AS `payment_method`, `o`.`shipping_method` AS `shipping_method`, `o`.`store_id` AS `store_id`, COUNT(*) AS `searches`, SUM((SELECT SUM(`op1`.`quantity`) FROM `" . DB_PREFIX . "order_product` `op1` WHERE `op1`.`product_id` = `p2c`.`product_id` GROUP BY `op1`.`product_id`)) AS `products`, SUM((SELECT SUM(`or`.`product_quantity`) FROM `" . DB_PREFIX . "order_recurring` `or` WHERE `or`.`product_id` = `op`.`product_id` AND `p2c`.`product_id` = `or`.`product_id` AND `or`.`order_id` = `op`.`order_id` AND `or`.`status` = '1' GROUP BY `or`.`product_id`)) AS `recurring_status`, SUM((SELECT SUM(`ot`.`value`) FROM `" . DB_PREFIX . "order_total` `ot` WHERE `ot`.`order_id` = `o`.`order_id` AND `ot`.`code` = 'tax' GROUP BY `ot`.`order_id`)) AS `tax`, SUM(`o`.`total`) AS `total` FROM `" . DB_PREFIX . "customer_search` `cs` INNER JOIN `" . DB_PREFIX . "product_to_category` `p2c` ON (`p2c`.`category_id` = `cs`.`category_id`) INNER JOIN `" . DB_PREFIX . "order_product` `op` ON (`op`.`product_id` = `p2c`.`product_id`) INNER JOIN `" . DB_PREFIX . "order` `o` ON (`o`.`order_id` = `op`.`order_id`) INNER JOIN `" . DB_PREFIX . "language` `l` ON (`l`.`language_id` = `o`.`language_id`)";
+					
+		$complete_implode = array();
+				
+		$order_statuses = $this->config->get('config_complete_status');
+				
+		foreach ($order_statuses as $order_status_id) {
+			$complete_implode[] = "`o`.`order_status_id` = '" . (int)$order_status_id . "'";
+		}
+					
+		$processing_implode = array();
+					
+		$order_statuses = $this->config->get('config_processing_status');
+				
+		foreach ($order_statuses as $order_status_id) {
+			$processing_implode[] = "`o`.`order_status_id` = '" . (int)$order_status_id . "'";
+		}
+				
+		$sql .= " WHERE (" . implode(" OR ", $complete_implode) . ")";
+		$sql .= " OR (" . implode(" OR ", $processing_implode) . ")";
+					
+		$sql .= " AND `cs`.`customer_id` = `o`.`customer_id`";					
+		$sql .= " AND `cs`.`language_id` = `o`.`language_id`";
+		$sql .= " AND `cs`.`store_id` = `o`.`store_id`";
+				
+		$sql .= " AND `o`.`language_id` = '" . (int)$this->config->get('config_language_id') . "'";
+				
+		if (!empty($data['filter_product'])) {
+			$sql .= " AND `op`.`product_id` = '" . (int)$data['filter_product'] . "'";
+		}
+				
+		if (!empty($data['filter_country_id'])) {
+			$sql .= " AND `o`.`payment_country_id` = '" . (int)$data['filter_country_id'] . "'";
+		}
+				
+		if (!empty($data['filter_zone_id'])) {
+			$sql .= " AND `o`.`payment_zone_id` = '" . (int)$data['filter_zone_id'] . "'";
+		}
+				
 		$implode = array();
-
-		if (!empty($data['filter_date_start'])) {
-			$implode[] = "DATE(cs.date_added) >= '" . $this->db->escape($data['filter_date_start']) . "'";
-		}
-
-		if (!empty($data['filter_date_end'])) {
-			$implode[] = "DATE(cs.date_added) <= '" . $this->db->escape($data['filter_date_end']) . "'";
-		}
-
+				
 		if (!empty($data['filter_keyword'])) {
-			$implode[] = "cs.keyword LIKE '" . $this->db->escape($data['filter_keyword']) . "%'";
+			$implode[] = "`cs`.`keyword` LIKE '" . $this->db->escape($data['filter_keyword']) . "%'";
 		}
 
 		if (!empty($data['filter_customer'])) {
-			$implode[] = "CONCAT(c.firstname, ' ', c.lastname) LIKE '" . $this->db->escape($data['filter_customer']) . "'";
-		}
-
-		if (!empty($data['filter_ip'])) {
-			$implode[] = "cs.ip LIKE '" . $this->db->escape($data['filter_ip']) . "'";
+			$implode[] = "CONCAT(`c`.`firstname`, ' ', `c`.`lastname`) LIKE '" . $this->db->escape($data['filter_customer']) . "'";
 		}
 
 		if ($implode) {
-			$sql .= " WHERE " . implode(" AND ", $implode);
+			$sql .= " AND " . implode(" AND ", $implode);
 		}
-
-		$sql .= " ORDER BY cs.date_added DESC";
+				
+		if (!empty($data['filter_ip'])) {
+			$sql .= "AND (`cs`.`ip` LIKE '" . $this->db->escape($data['filter_ip']) . "') OR (`o`.`ip` LIKE '" . $this->db->escape($data['filter_ip']) . "')";
+		}
+				
+		$sql .= " AND `o`.`currency_code` = '" . $this->db->escape($this->config->get('config_currency')) . "'";
+				
+		$sql .= " AND `o`.`payment_code` NOT LIKE '%free%'";
+				
+		$sql .= " AND `o`.`total` > '0.10'";
+					
+		if (!empty($data['filter_group'])) {
+			$group = $data['filter_group'];
+		} else {
+			$group = 'week';	
+		}
+				
+		switch($group) {
+			case 'day';
+				$sql .= " GROUP BY YEAR(`o`.`date_added`), MONTH(`o`.`date_added`), DAY(`o`.`date_added`), `cs`.`store_id`, `o`.`payment_method`, `o`.`shipping_method`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
+				break;
+			default:
+			case 'week':
+				$sql .= " GROUP BY YEAR(`o`.`date_added`), WEEK(`o`.`date_added`), `cs`.`store_id`, `o`.`payment_method`, `o`.`shipping_method`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
+				break;
+			case 'month':
+				$sql .= " GROUP BY YEAR(`o`.`date_added`), MONTH(`o`.`date_added`), `cs`.`store_id`, `o`.`payment_method`, `o`.`shipping_method`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
+				break;
+			case 'year':
+				$sql .= " GROUP BY YEAR(`o`.`date_added`), `cs`.`store_id`, `o`.`payment_method`, `o`.`shipping_method`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
+				break;
+		}
+			
+		$sql .= " ORDER BY `op`.`quantity` DESC";
 
 		if (isset($data['start']) || isset($data['limit'])) {
 			if ($data['start'] < 0) {
@@ -338,9 +395,9 @@ class ModelExtensionReportCustomer extends Model {
 
 			$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
 		}
-
+				
 		$query = $this->db->query($sql);
-
+			
 		return $query->rows;
 	}
 
