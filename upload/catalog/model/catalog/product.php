@@ -318,7 +318,7 @@ class ModelCatalogProduct extends Model {
 					$sql .= " AND `cs`.`customer_id` = `o`.`customer_id`";					
 					$sql .= " AND `cs`.`language_id` = `o`.`language_id`";
 					$sql .= " AND `cs`.`store_id` = `o`.`store_id`"; 
-					$sql .= " AND `cs`.`store_id` = '" . (int)$this->config->get('config_store_id') . "'";					
+					$sql .= " AND `o`.`store_id` = '" . (int)$this->config->get('config_store_id') . "'";					
 					$sql .= " AND `o`.`payment_country_id` = '" . (int)$this->config->get('config_country_id') . "'";
 					$sql .= " AND `o`.`payment_zone_id` = '" . (int)$this->config->get('config_zone_id') . "'";
 					$sql .= " AND `o`.`language_id` = '" . (int)$this->config->get('config_language_id') . "'";
