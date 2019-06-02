@@ -367,6 +367,8 @@ class ModelCatalogProduct extends Model {
 							$sql .= " GROUP BY YEAR(`o`.`date_added`), `op`.`product_id`, `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
 							break;
 					}
+			
+					$sql .= " `o`.`currency_code` = '" . $this->db->escape($this->config->get('config_currency')) . "'";
 
 					$sql .= " ORDER BY `cs`.`date_added` " . $setting['type_order'];
 
