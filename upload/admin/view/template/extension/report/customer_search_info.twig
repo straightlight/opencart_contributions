@@ -12,11 +12,7 @@
             <span class="input-group-btn">
             <button type="button" class="btn btn-default"><i class="fa fa-calendar"></i></button>
             </span></div>
-        </div>
-        <div class="form-group">
-          <label class="control-label" for="input-customer">{{ entry_customer }}</label>
-          <input type="text" name="filter_customer" value="{{ filter_customer }}" placeholder="{{ entry_customer }}" id="input-customer" class="form-control" />
-        </div>
+        </div>        
         <div class="form-group">
           <label class="control-label" for="input-date-end">{{ entry_date_end }}</label>
           <div class="input-group date">
@@ -25,11 +21,48 @@
             <button type="button" class="btn btn-default"><i class="fa fa-calendar"></i></button>
             </span></div>
         </div>
+		<div class="form-group">
+          <label class="control-label" for="input-group">{{ entry_group }}</label>
+          <select name="filter_group" id="input-group" class="form-control">
+                  {% for group in groups %}
+					{% if group.value == filter_group %}
+						<option value="{{ group.value }}" selected="selected">{{ group.text }}</option>
+					{% else %}
+						<option value="{{ group.value }}">{{ group.text }}</option>
+					{% endif %}
+                  {% endfor %}
+          </select>
+        </div>
+		<div class="form-group">
+          <label class="control-label" for="input-customer">{{ entry_customer }}</label>
+          <input type="text" name="filter_customer" value="{{ filter_customer }}" placeholder="{{ entry_customer }}" id="input-customer" class="form-control" />
+        </div>
         <div class="form-group">
           <label class="control-label" for="input-ip">{{ entry_ip }}</label>
           <input type="text" name="filter_ip" value="{{ filter_ip }}" placeholder="{{ entry_ip }}" id="input-ip" class="form-control" />
         </div>
-        <div class="form-group">
+		<div class="form-group">
+			<label class="control-label" for="input-country">{{ entry_country }}</label>
+            <select name="filter_country_id" id="input-country" class="form-control">
+				<option value="">{{ text_select }}</option>
+				{% for country in countries %}
+					{% if country.country_id == filter_country_id %}
+						<option value="{{ country.country_id }}" selected="selected">{{ country.name }}</option>
+					{% else %}
+						<option value="{{ country.country_id }}">{{ country.name }}</option>
+					{% endif %}
+                {% endfor %}
+            </select>
+        </div>
+		<div class="form-group">
+			<label class="control-label" for="input-zone">{{ entry_zone }}</label>
+            <select name="filter_zone_id" id="input-zone" class="form-control"></select>        
+        </div>
+		<div class="form-group">
+              <label class="control-label" for="input-product">{{ entry_product }}</label>
+              <input type="text" name="filter_product" value="{{ filter_product }}" placeholder="{{ entry_product }}" id="input-product" class="form-control" />
+        </div>
+		<div class="form-group">
           <label class="control-label" for="input-keyword">{{ entry_keyword }}</label>
           <input type="text" name="filter_keyword" value="{{ filter_keyword }}" placeholder="{{ entry_keyword }}" id="input-keyword" class="form-control" />
         </div>
@@ -51,9 +84,16 @@
               <tr>
                 <td class="text-left">{{ column_keyword }}</td>
                 <td class="text-left">{{ column_products }}</td>
-                <td class="text-left">{{ column_category }}</td>
-                <td class="text-left">{{ column_customer }}</td>
-                <td class="text-left">{{ column_ip }}</td>
+				<td class="text-left">{{ column_recurring }}</td>
+                <td class="text-left">{{ column_categories }}</td>
+                <td class="text-left">{{ column_searches }}</td>
+				<td class="text-left">{{ column_country }}</td>
+				<td class="text-left">{{ column_zone }}</td>
+				<td class="text-left">{{ column_payment }}</td>
+				<td class="text-left">{{ column_shipping }}</td>
+				<td class="text-left">{{ column_store }}</td>				
+                <td class="text-left">{{ column_total }}</td>
+				<td class="text-left">{{ column_tax }}</td>
                 <td class="text-left">{{ column_date_added }}</td>
               </tr>
             </thead>
@@ -64,15 +104,22 @@
             <tr>
               <td class="text-left">{{ search.keyword }}</td>
               <td class="text-left">{{ search.products }}</td>
-              <td class="text-left">{{ search.category }}</td>
-              <td class="text-left">{{ search.customer }}</td>
-              <td class="text-left">{{ search.ip }}</td>
+			  <td class="text-left">{{ search.recurring_status }}</td>
+              <td class="text-left">{{ search.categories }}</td>
+              <td class="text-left">{{ search.searches }}</td>
+              <td class="text-left">{{ search.country }}</td>
+			  <td class="text-left">{{ search.zone }}</td>
+			  <td class="text-left">{{ search.payment }}</td>
+			  <td class="text-left">{{ search.shipping }}</td>
+			  <td class="text-left"><a href="{{ search.store_href }}">{{ search.store }}</a></td>
+			  <td class="text-left">{{ search.total }}</td>
+			  <td class="text-left">{{ search.tax }}</td>
               <td class="text-left">{{ search.date_added }}</td>
             </tr>
             {% endfor %}
             {% else %}
             <tr>
-              <td class="text-center" colspan="6">{{ text_no_results }}</td>
+              <td class="text-center" colspan="13">{{ text_no_results }}</td>
             </tr>
             {% endif %}
             </tbody>
@@ -121,6 +168,30 @@ $('#button-filter').on('click', function() {
 		url += '&filter_ip=' + encodeURIComponent(filter_ip);
 	}
 	
+	var filter_country_id = $('select[name=\'filter_country_id\']').val();
+	
+	if (filter_country_id) {
+		url += '&filter_country_id=' + encodeURIComponent(filter_country_id);
+	}
+	
+	var filter_zone_id = $('select[name=\'filter_zone_id\']').val();
+	
+	if (filter_zone_id) {
+		url += '&filter_zone_id=' + encodeURIComponent(filter_zone_id);
+	}
+	
+	var filter_group = $('select[name=\'filter_group\']').val();
+	
+	if (filter_group) {
+		url += '&filter_group=' + encodeURIComponent(filter_group);
+	}
+	
+	var filter_product = $('input[name=\'filter_product\']').val();
+	
+	if (filter_product) {
+		url += '&filter_product=' + encodeURIComponent(filter_product);
+	}
+	
 	location = 'index.php?route=report/report&code=customer_search&user_token={{ user_token }}' + url;
 });
 //--></script> 
@@ -150,4 +221,63 @@ $('input[name=\'filter_customer\']').autocomplete({
 		$('input[name=\'filter_customer\']').val(item['label']);
 	}
 });
+//--></script>
+<script type="text/javascript"><!--
+$('select[name=\'filter_country_id\']').on('change', function() {
+	$.ajax({
+		url: 'index.php?route=localisation/country/country&user_token={{ user_token }}&country_id=' + this.value,
+		dataType: 'json',
+		beforeSend: function() {
+			$('select[name=\'filter_country_id\']').prop('disabled', true);
+		},
+		complete: function() {
+			$('select[name=\'filter_country_id\']').prop('disabled', false);
+		},		
+		success: function(json) {
+			html = '<option value="">{{ text_select }}</option>';
+
+			if (json['zone'] && json['zone'] != '') {
+				for (i = 0; i < json['zone'].length; i++) {
+					html += '<option value="' + json['zone'][i]['zone_id'] + '"';
+
+					if (json['zone'][i]['zone_id'] == '{{ filter_zone_id }}') {
+						html += ' selected="selected"';
+					}
+
+					html += '>' + json['zone'][i]['name'] + '</option>';
+				}
+			} else {
+				html = '<option value="0" selected="selected">{{ text_none }}</option>';
+			}
+			
+			$('select[name=\'filter_zone_id\']').html(html);
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+});
+
+$('input[name=\'filter_product\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['product_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'filter_product\']').val(item['label']);
+	}
+});
+
+$('select[name=\'filter_country_id\']').trigger('change');
+
 //--></script>
