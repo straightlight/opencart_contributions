@@ -57,11 +57,7 @@
 		<div class="form-group">
 			<label class="control-label" for="input-zone">{{ entry_zone }}</label>
             <select name="filter_zone_id" id="input-zone" class="form-control"></select>        
-        </div>
-		<div class="form-group">
-              <label class="control-label" for="input-product">{{ entry_product }}</label>
-              <input type="text" name="filter_product" value="{{ filter_product }}" placeholder="{{ entry_product }}" id="input-product" class="form-control" />
-        </div>
+        </div>		
 		<div class="form-group">
           <label class="control-label" for="input-keyword">{{ entry_keyword }}</label>
           <input type="text" name="filter_keyword" value="{{ filter_keyword }}" placeholder="{{ entry_keyword }}" id="input-keyword" class="form-control" />
@@ -186,12 +182,6 @@ $('#button-filter').on('click', function() {
 		url += '&filter_group=' + encodeURIComponent(filter_group);
 	}
 	
-	var filter_product = $('input[name=\'filter_product\']').val();
-	
-	if (filter_product) {
-		url += '&filter_product=' + encodeURIComponent(filter_product);
-	}
-	
 	location = 'index.php?route=report/report&code=customer_search&user_token={{ user_token }}' + url;
 });
 //--></script> 
@@ -256,26 +246,6 @@ $('select[name=\'filter_country_id\']').on('change', function() {
 			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
 		}
 	});
-});
-
-$('input[name=\'filter_product\']').autocomplete({
-	'source': function(request, response) {
-		$.ajax({
-			url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
-			dataType: 'json',
-			success: function(json) {
-				response($.map(json, function(item) {
-					return {
-						label: item['name'],
-						value: item['product_id']
-					}
-				}));
-			}
-		});
-	},
-	'select': function(item) {
-		$('input[name=\'filter_product\']').val(item['label']);
-	}
 });
 
 $('select[name=\'filter_country_id\']').trigger('change');
