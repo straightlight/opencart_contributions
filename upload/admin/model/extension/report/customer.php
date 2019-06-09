@@ -351,7 +351,7 @@ class ModelExtensionReportCustomer extends Model {
 		}
 				
 		if (!empty($data['filter_ip'])) {
-			$sql .= "AND (`cs`.`ip` LIKE '" . $this->db->escape($data['filter_ip']) . "') OR (`o`.`ip` LIKE '" . $this->db->escape($data['filter_ip']) . "')";
+			$sql .= " AND (`cs`.`ip` LIKE '" . $this->db->escape($data['filter_ip']) . "') OR (`o`.`ip` LIKE '" . $this->db->escape($data['filter_ip']) . "')";
 		}
 				
 		$sql .= " AND `o`.`currency_code` = '" . $this->db->escape($this->config->get('config_currency')) . "'";
@@ -402,34 +402,85 @@ class ModelExtensionReportCustomer extends Model {
 	}
 
 	public function getTotalCustomerSearches($data = array()) {
-		$sql = "SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "customer_search` cs LEFT JOIN " . DB_PREFIX . "customer c ON (cs.customer_id = c.customer_id)";
+		if (!empty($data['filter_group'])) {
+			$group = $data['filter_group'];
+		} else {
+			$group = 'week';
+		}
 
+		switch($group) {
+			case 'day';
+				$sql = "SELECT COUNT(DISTINCT YEAR(`cs`.`date_added`), MONTH(`cs`.`date_added`), DAY(`cs`.`date_added`)) AS `total` FROM `" . DB_PREFIX . "customer_search` `cs` INNER JOIN `" . DB_PREFIX . "product_to_category` `p2c` ON (`p2c`.`category_id` = `cs`.`category_id`) INNER JOIN `" . DB_PREFIX . "order_product` `op` ON (`op`.`product_id` = `p2c`.`product_id`) INNER JOIN `" . DB_PREFIX . "order` `o` ON (`o`.`order_id` = `op`.`order_id`) INNER JOIN `" . DB_PREFIX . "language` `l` ON (`l`.`language_id` = `o`.`language_id`)";
+				break;
+			default:
+			case 'week':
+				$sql = "SELECT COUNT(DISTINCT YEAR(`cs`.`date_added`), WEEK(`cs`.`date_added`)) AS `total` FROM `" . DB_PREFIX . "customer_search` `cs` INNER JOIN `" . DB_PREFIX . "product_to_category` `p2c` ON (`p2c`.`category_id` = `cs`.`category_id`) INNER JOIN `" . DB_PREFIX . "order_product` `op` ON (`op`.`product_id` = `p2c`.`product_id`) INNER JOIN `" . DB_PREFIX . "order` `o` ON (`o`.`order_id` = `op`.`order_id`) INNER JOIN `" . DB_PREFIX . "language` `l` ON (`l`.`language_id` = `o`.`language_id`)";
+				break;
+			case 'month':
+				$sql = "SELECT COUNT(DISTINCT YEAR(`cs.`.`date_added`), MONTH(`cs`.`date_added`)) AS `total` FROM `" . DB_PREFIX . "customer_search` `cs` INNER JOIN `" . DB_PREFIX . "product_to_category` `p2c` ON (`p2c`.`category_id` = `cs`.`category_id`) INNER JOIN `" . DB_PREFIX . "order_product` `op` ON (`op`.`product_id` = `p2c`.`product_id`) INNER JOIN `" . DB_PREFIX . "order` `o` ON (`o`.`order_id` = `op`.`order_id`) INNER JOIN `" . DB_PREFIX . "language` `l` ON (`l`.`language_id` = `o`.`language_id`)";
+				break;
+			case 'year':
+				$sql = "SELECT COUNT(DISTINCT YEAR(`cs`.`date_added`)) AS `total` FROM `" . DB_PREFIX . "customer_search` `cs` INNER JOIN `" . DB_PREFIX . "product_to_category` `p2c` ON (`p2c`.`category_id` = `cs`.`category_id`) INNER JOIN `" . DB_PREFIX . "order_product` `op` ON (`op`.`product_id` = `p2c`.`product_id`) INNER JOIN `" . DB_PREFIX . "order` `o` ON (`o`.`order_id` = `op`.`order_id`) INNER JOIN `" . DB_PREFIX . "language` `l` ON (`l`.`language_id` = `o`.`language_id`)";
+				break;
+		}
+
+		$complete_implode = array();
+				
+		$order_statuses = $this->config->get('config_complete_status');
+				
+		foreach ($order_statuses as $order_status_id) {
+			$complete_implode[] = "`o`.`order_status_id` = '" . (int)$order_status_id . "'";
+		}
+					
+		$processing_implode = array();
+					
+		$order_statuses = $this->config->get('config_processing_status');
+				
+		foreach ($order_statuses as $order_status_id) {
+			$processing_implode[] = "`o`.`order_status_id` = '" . (int)$order_status_id . "'";
+		}
+				
+		$sql .= " WHERE (" . implode(" OR ", $complete_implode) . ")";
+		$sql .= " OR (" . implode(" OR ", $processing_implode) . ")";
+					
+		$sql .= " AND `cs`.`customer_id` = `o`.`customer_id`";					
+		$sql .= " AND `cs`.`language_id` = `o`.`language_id`";
+		$sql .= " AND `cs`.`store_id` = `o`.`store_id`";
+				
+		$sql .= " AND `o`.`language_id` = '" . (int)$this->config->get('config_language_id') . "'";
+				
+		if (!empty($data['filter_country_id'])) {
+			$sql .= " AND `o`.`payment_country_id` = '" . (int)$data['filter_country_id'] . "'";
+		}
+				
+		if (!empty($data['filter_zone_id'])) {
+			$sql .= " AND `o`.`payment_zone_id` = '" . (int)$data['filter_zone_id'] . "'";
+		}
+		
 		$implode = array();
-
-		if (!empty($data['filter_date_start'])) {
-			$implode[] = "DATE(cs.date_added) >= '" . $this->db->escape($data['filter_date_start']) . "'";
-		}
-
-		if (!empty($data['filter_date_end'])) {
-			$implode[] = "DATE(cs.date_added) <= '" . $this->db->escape($data['filter_date_end']) . "'";
-		}
-
+				
 		if (!empty($data['filter_keyword'])) {
-			$implode[] = "cs.keyword LIKE '" . $this->db->escape($data['filter_keyword']) . "%'";
+			$implode[] = "`cs`.`keyword` LIKE '" . $this->db->escape($data['filter_keyword']) . "%'";
 		}
 
 		if (!empty($data['filter_customer'])) {
-			$implode[] = "CONCAT(c.firstname, ' ', c.lastname) LIKE '" . $this->db->escape($data['filter_customer']) . "'";
-		}
-
-		if (!empty($data['filter_ip'])) {
-			$implode[] = "cs.ip LIKE '" . $this->db->escape($data['filter_ip']) . "'";
+			$implode[] = "CONCAT(`o`.`payment_firstname`, ' ', `o`.`payment_lastname`) LIKE '" . $this->db->escape($data['filter_customer']) . "'";
 		}
 
 		if ($implode) {
-			$sql .= " WHERE " . implode(" AND ", $implode);
+			$sql .= " AND " . implode(" AND ", $implode);
 		}
-
+				
+		if (!empty($data['filter_ip'])) {
+			$sql .= "AND (`cs`.`ip` LIKE '" . $this->db->escape($data['filter_ip']) . "') OR (`o`.`ip` LIKE '" . $this->db->escape($data['filter_ip']) . "')";
+		}
+				
+		$sql .= " AND `o`.`currency_code` = '" . $this->db->escape($this->config->get('config_currency')) . "'";
+				
+		$sql .= " AND `o`.`payment_code` NOT LIKE '%free%'";
+				
+		$sql .= " AND `o`.`total` > '0.10'";
+		
 		$query = $this->db->query($sql);
 
 		return $query->row['total'];
