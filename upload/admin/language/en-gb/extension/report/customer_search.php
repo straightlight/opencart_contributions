@@ -42,7 +42,6 @@ $_['entry_customer']    	= 'Customer';
 $_['entry_customer_group']	= 'Customer Group';
 $_['entry_country']			= 'Country';
 $_['entry_zone']			= 'Zone';
-$_['entry_product']			= 'Product';
 $_['entry_group']			= 'Group By';
 $_['entry_ip']          	= 'IP';
 $_['entry_status']      	= 'Status';
