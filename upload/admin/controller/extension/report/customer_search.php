@@ -136,12 +136,6 @@ class ControllerExtensionReportCustomerSearch extends Controller {
 			$filter_zone_id = 0;
 		}
 		
-		if (isset($this->request->get['filter_product'])) {
-			$filter_product = $this->request->get['filter_product'];
-		} else {
-			$filter_product = '';
-		}
-		
 		if (isset($this->request->get['filter_group'])) {
 			$filter_group = $this->request->get['filter_group'];
 		} else {
@@ -173,8 +167,7 @@ class ControllerExtensionReportCustomerSearch extends Controller {
 			'filter_date_end'	=> $filter_date_end,
 			'filter_keyword'    => $filter_keyword,
 			'filter_customer'   => $filter_customer,
-			'filter_ip'         => $filter_ip,
-			'filter_product'	=> $filter_product,
+			'filter_ip'         => $filter_ip,			
 			'filter_country_id'	=> $filter_country_id,
 			'filter_zone_id'	=> $filter_zone_id,
 			'filter_group'		=> $filter_group,
@@ -250,10 +243,6 @@ class ControllerExtensionReportCustomerSearch extends Controller {
 			$url .= '&filter_ip=' . $this->request->get['filter_ip'];
 		}
 		
-		if (isset($this->request->get['filter_product'])) {
-			$url .= '&filter_product=' . $this->request->get['filter_product'];
-		}
-		
 		if (isset($this->request->get['filter_country_id'])) {
 			$url .= '&filter_country_id=' . $this->request->get['filter_country_id'];
 		}
@@ -284,8 +273,7 @@ class ControllerExtensionReportCustomerSearch extends Controller {
 		$data['filter_date_end'] = $filter_date_end;
 		$data['filter_keyword'] = $filter_keyword;
 		$data['filter_customer'] = $filter_customer;
-		$data['filter_ip'] = $filter_ip;
-		$data['filter_product'] = $filter_product;
+		$data['filter_ip'] = $filter_ip;		
 		$data['filter_country_id'] = $filter_country_id;
 		$data['filter_zone_id'] = $filter_zone_id;
 		$data['filter_group'] = $filter_group;
