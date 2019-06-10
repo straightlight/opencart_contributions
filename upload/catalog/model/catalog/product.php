@@ -323,7 +323,6 @@ class ModelCatalogProduct extends Model {
 					$sql .= " AND `o`.`payment_zone_id` = '" . (int)$this->config->get('config_zone_id') . "'";
 					$sql .= " AND `o`.`language_id` = '" . (int)$this->config->get('config_language_id') . "'";
 					$sql .= " AND `o`.`customer_group_id` = '" . (int)$this->config->get('config_customer_group_id') . "'";
-					$sql .= " AND `o`.`payment_code` NOT LIKE '%free%'";					
 					$sql .= " AND `o`.`total` > '0.10'";
 					
 					if (!empty($filter_data['category_id'])) {
