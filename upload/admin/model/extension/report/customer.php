@@ -297,7 +297,7 @@ class ModelExtensionReportCustomer extends Model {
 	}
 
 	public function getCustomerSearches($data = array()) {
-		$sql = "SELECT MIN(`cs`.`date_added`) AS `date_start`, MAX(`cs`.`date_added`) AS `date_end`, COUNT(`cs`.`category_id`) AS `categories`, `o`.`payment_country_id`, `o`.`payment_zone_id`, `o`.`payment_method` AS `payment_method`, `o`.`shipping_method` AS `shipping_method`, `o`.`store_id` AS `store_id`, COUNT(*) AS `searches`, SUM((SELECT SUM(`op1`.`quantity`) FROM `" . DB_PREFIX . "order_product` `op1` WHERE `op1`.`product_id` = `p2c`.`product_id` GROUP BY `op1`.`product_id`)) AS `products`, SUM((SELECT SUM(`or`.`product_quantity`) FROM `" . DB_PREFIX . "order_recurring` `or` WHERE `or`.`product_id` = `op`.`product_id` AND `p2c`.`product_id` = `or`.`product_id` AND `or`.`order_id` = `op`.`order_id` AND `or`.`status` = '1' GROUP BY `or`.`product_id`)) AS `recurring_status`, SUM((SELECT SUM(`ot`.`value`) FROM `" . DB_PREFIX . "order_total` `ot` WHERE `ot`.`order_id` = `o`.`order_id` AND `ot`.`code` = 'tax' GROUP BY `ot`.`order_id`)) AS `tax`, SUM(`o`.`total`) AS `total` FROM `" . DB_PREFIX . "customer_search` `cs` INNER JOIN `" . DB_PREFIX . "product_to_category` `p2c` ON (`p2c`.`category_id` = `cs`.`category_id`) INNER JOIN `" . DB_PREFIX . "order_product` `op` ON (`op`.`product_id` = `p2c`.`product_id`) INNER JOIN `" . DB_PREFIX . "order` `o` ON (`o`.`order_id` = `op`.`order_id`) INNER JOIN `" . DB_PREFIX . "language` `l` ON (`l`.`language_id` = `o`.`language_id`)";
+		$sql = "SELECT MIN(`cs`.`date_added`) AS `date_start`, MAX(`cs`.`date_added`) AS `date_end`, COUNT(`cs`.`category_id`) AS `categories`, `o`.`payment_country_id`, `o`.`payment_zone_id`, `o`.`payment_method` AS `payment_method`, `o`.`shipping_method` AS `shipping_method`, `o`.`store_id` AS `store_id`" . (!empty($data['filter_customer_event']) ? ", `o`.`customer_id`, `o`.`order_id`" : "") . ", COUNT(*) AS `searches`, SUM((SELECT SUM(`op1`.`quantity`) FROM `" . DB_PREFIX . "order_product` `op1` WHERE `op1`.`product_id` = `p2c`.`product_id` GROUP BY `op1`.`product_id`)) AS `products`, SUM((SELECT SUM(`or`.`product_quantity`) FROM `" . DB_PREFIX . "order_recurring` `or` WHERE `or`.`product_id` = `op`.`product_id` AND `p2c`.`product_id` = `or`.`product_id` AND `or`.`order_id` = `op`.`order_id` AND `or`.`status` = '1' GROUP BY `or`.`product_id`)) AS `recurring_status`, SUM((SELECT SUM(`ot`.`value`) FROM `" . DB_PREFIX . "order_total` `ot` WHERE `ot`.`order_id` = `o`.`order_id` AND `ot`.`code` = 'tax' GROUP BY `ot`.`order_id`)) AS `tax`, SUM(`o`.`total`) AS `total` FROM `" . DB_PREFIX . "customer_search` `cs` INNER JOIN `" . DB_PREFIX . "product_to_category` `p2c` ON (`p2c`.`category_id` = `cs`.`category_id`) INNER JOIN `" . DB_PREFIX . "order_product` `op` ON (`op`.`product_id` = `p2c`.`product_id`) INNER JOIN `" . DB_PREFIX . "order` `o` ON (`o`.`order_id` = `op`.`order_id`) INNER JOIN `" . DB_PREFIX . "language` `l` ON (`l`.`language_id` = `o`.`language_id`)";
 					
 		$complete_implode = array();
 				
@@ -324,10 +324,6 @@ class ModelExtensionReportCustomer extends Model {
 				
 		$sql .= " AND `o`.`language_id` = '" . (int)$this->config->get('config_language_id') . "'";
 				
-		if (!empty($data['filter_product'])) {
-			$sql .= " AND `op`.`product_id` = '" . (int)$data['filter_product'] . "'";
-		}
-				
 		if (!empty($data['filter_country_id'])) {
 			$sql .= " AND `o`.`payment_country_id` = '" . (int)$data['filter_country_id'] . "'";
 		}
@@ -343,9 +339,9 @@ class ModelExtensionReportCustomer extends Model {
 		}
 
 		if (!empty($data['filter_customer'])) {
-			$implode[] = "CONCAT(`c`.`firstname`, ' ', `c`.`lastname`) LIKE '" . $this->db->escape($data['filter_customer']) . "'";
+			$implode[] = "CONCAT(`o`.`payment_firstname`, ' ', `o`.`payment_lastname`) LIKE '" . $this->db->escape($data['filter_customer']) . "'";
 		}
-
+		
 		if ($implode) {
 			$sql .= " AND " . implode(" AND ", $implode);
 		}
@@ -353,10 +349,12 @@ class ModelExtensionReportCustomer extends Model {
 		if (!empty($data['filter_ip'])) {
 			$sql .= " AND (`cs`.`ip` LIKE '" . $this->db->escape($data['filter_ip']) . "') OR (`o`.`ip` LIKE '" . $this->db->escape($data['filter_ip']) . "')";
 		}
+		
+		if (!empty($data['filter_customer_id'])) {
+			$sql .= " AND `cs`.`customer_id` = '" . int)$data['filter_customer_id'] . "'";
+		}
 				
 		$sql .= " AND `o`.`currency_code` = '" . $this->db->escape($this->config->get('config_currency')) . "'";
-				
-		$sql .= " AND `o`.`payment_code` NOT LIKE '%free%'";
 				
 		$sql .= " AND `o`.`total` > '0.10'";
 					
@@ -368,17 +366,17 @@ class ModelExtensionReportCustomer extends Model {
 				
 		switch($group) {
 			case 'day';
-				$sql .= " GROUP BY YEAR(`o`.`date_added`), MONTH(`o`.`date_added`), DAY(`o`.`date_added`), `cs`.`store_id`, `o`.`payment_method`, `o`.`shipping_method`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
+				$sql .= " GROUP BY YEAR(`cs`.`date_added`), MONTH(`cs`.`date_added`), DAY(`cs`.`date_added`)" . (!empty($data['filter_customer_event'] && $data['filter_customer_event']) ? ", `o`.`customer_id`, `op`.`order_id`" : "");
 				break;
 			default:
 			case 'week':
-				$sql .= " GROUP BY YEAR(`o`.`date_added`), WEEK(`o`.`date_added`), `cs`.`store_id`, `o`.`payment_method`, `o`.`shipping_method`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
+				$sql .= " GROUP BY YEAR(`cs`.`date_added`), WEEK(`cs`.`date_added`)" . (!empty($data['filter_customer_event'] && $data['filter_customer_event']) ? ", `o`.`customer_id`, `op`.`order_id`" : "");
 				break;
 			case 'month':
-				$sql .= " GROUP BY YEAR(`o`.`date_added`), MONTH(`o`.`date_added`), `cs`.`store_id`, `o`.`payment_method`, `o`.`shipping_method`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
+				$sql .= " GROUP BY YEAR(`cs`.`date_added`), MONTH(`cs`.`date_added`)" . (!empty($data['filter_customer_event'] && $data['filter_customer_event']) ? ", `o`.`customer_id`, `op`.`order_id`" : "");
 				break;
 			case 'year':
-				$sql .= " GROUP BY YEAR(`o`.`date_added`), `cs`.`store_id`, `o`.`payment_method`, `o`.`shipping_method`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
+				$sql .= " GROUP BY YEAR(`cs`.`date_added`)" . (!empty($data['filter_customer_event'] && $data['filter_customer_event']) ? ", `o`.`customer_id`, `op`.`order_id`" : "");
 				break;
 		}
 			
@@ -476,8 +474,6 @@ class ModelExtensionReportCustomer extends Model {
 		}
 				
 		$sql .= " AND `o`.`currency_code` = '" . $this->db->escape($this->config->get('config_currency')) . "'";
-				
-		$sql .= " AND `o`.`payment_code` NOT LIKE '%free%'";
 				
 		$sql .= " AND `o`.`total` > '0.10'";
 		
