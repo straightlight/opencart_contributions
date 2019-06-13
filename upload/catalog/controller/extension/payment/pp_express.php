@@ -1615,40 +1615,41 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 			 * If a failed PayPal setup happens, handle it.
 			 */
 			 
-		if (!isset($result['TOKEN'])) {
-			$this->session->data['error'] = "PayPal request failed, please contact the store owner";
+			if (!isset($result['TOKEN'])) {
+				$this->session->data['error'] = "PayPal request failed, please contact the store owner";
 
-			if (isset($result['L_ERRORCODE0'])) {
-				$this->session->data['error'] = "[Error code: " . (string)$result['L_ERRORCODE0'] . "]";
-			}
+				if (isset($result['L_ERRORCODE0'])) {
+					$this->session->data['error'] = "[Error code: " . (string)$result['L_ERRORCODE0'] . "]";
+				}
 
-			if (isset($result['L_SHORTMESSAGE0'])) {
-				$this->session->data['error'] .= " " . (string)$result['L_SHORTMESSAGE0'] . "\r\n";
-			}
+				if (isset($result['L_SHORTMESSAGE0'])) {
+					$this->session->data['error'] .= " " . (string)$result['L_SHORTMESSAGE0'] . "\r\n";
+				}
 
-			if (isset($result['L_LONGMESSAGE0'])) {
-				$this->session->data['error'] .= (string)$result['L_LONGMESSAGE0'];
-			}
+				if (isset($result['L_LONGMESSAGE0'])) {
+					$this->session->data['error'] .= (string)$result['L_LONGMESSAGE0'];
+				}
 
-			/**
-			 * Unable to add error message to user as the session errors/success are not
-			 * used on the cart or checkout pages - need to be added?
-			 * If PayPal debug log is off then still log error to normal error log.
-			 */
+				/**
+				 * Unable to add error message to user as the session errors/success are not
+				 * used on the cart or checkout pages - need to be added?
+				 * If PayPal debug log is off then still log error to normal error log.
+				 */
 
-			$this->log->write('Unable to create Paypal session' . json_encode($result));
+				$this->log->write('Unable to create Paypal session' . json_encode($result));
 
-			$json['redirect'] = $this->url->link('checkout/checkout', '', true);
+				$json['redirect'] = $this->url->link('checkout/checkout', '', true);
 
-		} elseif (isset($result['TOKEN']) && $result['TOKEN'] != '') {
-			$this->session->data['paypal']['token'] = $result['TOKEN'];
-			
-			$json = array('token' => $result['TOKEN']);
+			} elseif (isset($result['TOKEN']) && $result['TOKEN'] != '') {
+				$this->session->data['paypal']['token'] = $result['TOKEN'];
 
-			if ($this->config->get('payment_pp_express_test')) {
-				$json['redirect'] = 'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=' . $result['TOKEN'];
-			} else {
-				$json['redirect'] = 'https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=' . $result['TOKEN'];
+				$json = array('token' => $result['TOKEN']);
+
+				if ($this->config->get('payment_pp_express_test')) {
+					$json['redirect'] = 'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=' . $result['TOKEN'];
+				} else {
+					$json['redirect'] = 'https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=' . $result['TOKEN'];
+				}
 			}
 		}
 
