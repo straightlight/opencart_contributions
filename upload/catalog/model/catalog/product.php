@@ -289,109 +289,113 @@ class ModelCatalogProduct extends Model {
 	}
 
 	public function getBestSellerProducts($setting, $filter_data) {
-                $product_data = $this->cache->get('product.bestseller.' . (int)$this->config->get('config_language_id') . '.' . (int)$this->config->get('config_store_id') . '.' . $this->config->get('config_customer_group_id') . '.' . (int)$setting['limit']);
+		$product_data = $this->cache->get('product.bestseller.' . (int)$this->config->get('config_language_id') . '.' . (int)$this->config->get('config_store_id') . '.' . $this->config->get('config_customer_group_id') . '.' . (int)$setting['limit']);
                 
-                if (!$product_data) {
-					$product_data = array();
+        if (!$product_data) {
+			$product_data = array();
 				
-					$sql = "SELECT MIN(`cs`.`date_added`) AS `date_start`, MAX(`cs`.`date_added`) AS `date_end`, `op`.`product_id` AS `product_id`, `cs`.`category_id`, `cs`.`sub_category`, `o`.`payment_country_id`, `o`.`payment_zone_id`, COUNT(*) AS `searches`, SUM((SELECT SUM(`op1`.`quantity`) FROM `" . DB_PREFIX . "order_product` `op1` WHERE `op1`.`product_id` = `p2c`.`product_id` GROUP BY `op1`.`product_id`)) AS `products`, SUM((SELECT SUM(`or`.`product_quantity`) FROM `" . DB_PREFIX . "order_recurring` `or` WHERE `or`.`product_id` = `op`.`product_id` AND `p2c`.`product_id` = `or`.`product_id` AND `or`.`order_id` = `op`.`order_id` AND `or`.`status` = '1' GROUP BY `or`.`product_id`)) AS `recurring_status`, SUM((SELECT SUM(`ot`.`value`) FROM `" . DB_PREFIX . "order_total` `ot` WHERE `ot`.`order_id` = `o`.`order_id` AND `ot`.`code` = 'tax' GROUP BY `ot`.`order_id`)) AS `tax`, SUM(`o`.`total`) AS `total` FROM `" . DB_PREFIX . "customer_search` `cs` INNER JOIN `" . DB_PREFIX . "product_to_category` `p2c` ON (`p2c`.`category_id` = `cs`.`category_id`) INNER JOIN `" . DB_PREFIX . "order_product` `op` ON (`op`.`product_id` = `p2c`.`product_id`) INNER JOIN `" . DB_PREFIX . "order` `o` ON (`o`.`order_id` = `op`.`order_id`)";
+			$sql = "SELECT MIN(`cs`.`date_added`) AS `date_start`, MAX(`cs`.`date_added`) AS `date_end`, `op`.`product_id` AS `product_id`, `op`.`order_id` AS `order_product_order_id`, `op`.`name` AS `order_product_name`, `cs`.`category_id`, `cs`.`sub_category`, `o`.`payment_country_id`, `o`.`payment_zone_id`, COUNT(*) AS `searches`, SUM((SELECT SUM(`op1`.`quantity`) FROM `" . DB_PREFIX . "order_product` `op1` WHERE `op1`.`product_id` = `p2c`.`product_id` GROUP BY `op1`.`product_id`)) AS `products`, SUM((SELECT SUM(`or`.`product_quantity`) FROM `" . DB_PREFIX . "order_recurring` `or` WHERE `or`.`product_id` = `op`.`product_id` AND `p2c`.`product_id` = `or`.`product_id` AND `or`.`order_id` = `op`.`order_id` AND `or`.`status` = '1' GROUP BY `or`.`product_id`)) AS `recurring_status`, SUM((SELECT SUM(`ot`.`value`) FROM `" . DB_PREFIX . "order_total` `ot` WHERE `ot`.`order_id` = `o`.`order_id` AND `ot`.`code` = 'tax' GROUP BY `ot`.`order_id`)) AS `tax`, SUM(`o`.`total`) AS `total` FROM `" . DB_PREFIX . "customer_search` `cs` INNER JOIN `" . DB_PREFIX . "product_to_category` `p2c` ON (`p2c`.`category_id` = `cs`.`category_id`) INNER JOIN `" . DB_PREFIX . "order_product` `op` ON (`op`.`product_id` = `p2c`.`product_id`) INNER JOIN `" . DB_PREFIX . "order` `o` ON (`o`.`order_id` = `op`.`order_id`)";
 					
-					$complete_implode = array();
+			$complete_implode = array();
 
-					$order_statuses = $this->config->get('config_complete_status');
+			$order_statuses = $this->config->get('config_complete_status');
 
-					foreach ($order_statuses as $order_status_id) {
-						$complete_implode[] = "`o`.`order_status_id` = '" . (int)$order_status_id . "'";
-					}
+			foreach ($order_statuses as $order_status_id) {
+				$complete_implode[] = "`o`.`order_status_id` = '" . (int)$order_status_id . "'";
+			}
 					
-					$processing_implode = array();
+			$processing_implode = array();
 					
-					$order_statuses = $this->config->get('config_processing_status');
+			$order_statuses = $this->config->get('config_processing_status');
 
-					foreach ($order_statuses as $order_status_id) {
-						$processing_implode[] = "`o`.`order_status_id` = '" . (int)$order_status_id . "'";
-					}
+			foreach ($order_statuses as $order_status_id) {
+				$processing_implode[] = "`o`.`order_status_id` = '" . (int)$order_status_id . "'";
+			}
 
-					$sql .= " WHERE (" . implode(" OR ", $complete_implode) . ")";
-					$sql .= " OR (" . implode(" OR ", $processing_implode) . ")";
+			$sql .= " WHERE (" . implode(" OR ", $complete_implode) . ")";
+			$sql .= " OR (" . implode(" OR ", $processing_implode) . ")";
 					
-					$sql .= " AND `cs`.`customer_id` = `o`.`customer_id`";					
-					$sql .= " AND `cs`.`language_id` = `o`.`language_id`";
-					$sql .= " AND `cs`.`store_id` = `o`.`store_id`"; 
-					$sql .= " AND `o`.`store_id` = '" . (int)$this->config->get('config_store_id') . "'";					
-					$sql .= " AND `o`.`payment_country_id` = '" . (int)$this->config->get('config_country_id') . "'";
-					$sql .= " AND `o`.`payment_zone_id` = '" . (int)$this->config->get('config_zone_id') . "'";
-					$sql .= " AND `o`.`language_id` = '" . (int)$this->config->get('config_language_id') . "'";
-					$sql .= " AND `o`.`customer_group_id` = '" . (int)$this->config->get('config_customer_group_id') . "'";
-					$sql .= " AND `o`.`total` > '0.10'";
+			$sql .= " AND `cs`.`customer_id` = `o`.`customer_id`";					
+			$sql .= " AND `cs`.`language_id` = `o`.`language_id`";
+			$sql .= " AND `cs`.`store_id` = `o`.`store_id`"; 
+			$sql .= " AND `o`.`store_id` = '" . (int)$this->config->get('config_store_id') . "'";					
+			$sql .= " AND `o`.`payment_country_id` = '" . (int)$this->config->get('config_country_id') . "'";
+			$sql .= " AND `o`.`payment_zone_id` = '" . (int)$this->config->get('config_zone_id') . "'";
+			$sql .= " AND `o`.`language_id` = '" . (int)$this->config->get('config_language_id') . "'";
+			$sql .= " AND `o`.`customer_group_id` = '" . (int)$this->config->get('config_customer_group_id') . "'";
+			$sql .= " AND `o`.`total` > '0.10'";
 					
-					if (!empty($filter_data['category_id'])) {
-						$sql .= " AND `cs`.`category_id` = '" . (int)$filter_data['category_id'] . "'";
-					}
+			if (!empty($filter_data['category_id'])) {
+				$sql .= " AND `cs`.`category_id` = '" . (int)$filter_data['category_id'] . "'";
+			}
 			
-					if (!empty($filter_data['sub_categories'])) {
-						$sub_categories_implode = array();
+			if (!empty($filter_data['sub_categories'])) {
+				$sub_categories_implode = array();
 						
-						foreach ($filter_data['sub_categories'] as $sub_category) {
-							$sub_categories_implode[] = "`cs`.`sub_category` = '" . (int)$sub_category . "'";
-						}
-						
-						if ($sub_categories_implode) {
-							$sql .= " AND (" . implode(" OR ", $sub_categories_implode) . ")";	
-						}
-					}
-			
-					if (!empty($filter_data['product_id'])) {
-						$sql .= " AND `op`.`product_id` = '" . (int)$filter_data['product_id'] . "'";	
-					}
-					
-					if (!empty($setting['group'])) {
-						$group = $setting['group'];
-					} else {
-						$group = 'week';	
-					}
-
-					switch($group) {
-						case 'day';
-							$sql .= " GROUP BY YEAR(`o`.`date_added`), MONTH(`o`.`date_added`), DAY(`o`.`date_added`), `op`.`product_id`, `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
-							break;
-						default:
-						case 'week':
-							$sql .= " GROUP BY YEAR(`o`.`date_added`), WEEK(`o`.`date_added`), `op`.`product_id`, `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
-							break;
-						case 'month':
-							$sql .= " GROUP BY YEAR(`o`.`date_added`), MONTH(`o`.`date_added`), `op`.`product_id`, `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
-							break;
-						case 'year':
-							$sql .= " GROUP BY YEAR(`o`.`date_added`), `op`.`product_id`, `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`payment_country_id`, `o`.`payment_zone_id` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
-							break;
-					}
-			
-					$sql .= " `o`.`currency_code` = '" . $this->db->escape($this->config->get('config_currency')) . "'";
-
-					$sql .= " ORDER BY `cs`.`date_added` " . $setting['type_order'];
-
-					$sql .= " LIMIT " . (int)$setting['limit'];
-
-					$query = $this->db->query($sql)->rows;
-					
-					if (!empty($filter_data['filter'])) {
-						if ($filter_data['filter'] == 'product') {
-							foreach ($query as $result) {
-								$product_data[$result['product_id']] = $this->getProduct($result['product_id']);
-							}
-					    
-							$this->cache->set('product.bestseller.' . (int)$this->config->get('config_language_id') . '.' . (int)$this->config->get('config_store_id') . '.' . $this->config->get('config_customer_group_id') . '.' . (int)$setting['limit'], $product_data);
-					    
-						} elseif ($filter_data['filter'] == 'customer_search') {
-							$product_data = $query;
-						}
-					}
+				foreach ($filter_data['sub_categories'] as $sub_category) {
+					$sub_categories_implode[] = "`cs`.`sub_category` = '" . (int)$sub_category . "'";
 				}
+						
+				if ($sub_categories_implode) {
+					$sql .= " AND (" . implode(" OR ", $sub_categories_implode) . ")";	
+				}
+			}
+			
+			if (!empty($filter_data['product_id'])) {
+				$sql .= " AND `op`.`product_id` = '" . (int)$filter_data['product_id'] . "'";	
+			}
+			
+			$sql .= " AND `o`.`currency_code` = '" . $this->db->escape($this->config->get('config_currency')) . "'";
+			
+			if (!empty($filter_data['privilege']) && $filter_data['privilege']) {
+				$sql .= " AND `op`.`privilege` = '0'";
+			}
+					
+			if (!empty($setting['group'])) {
+				$group = $setting['group'];
+			} else {
+				$group = 'week';	
+			}
+
+			switch($group) {
+				case 'day';
+					$sql .= " GROUP BY YEAR(`o`.`date_added`), MONTH(`o`.`date_added`), DAY(`o`.`date_added`), `op`.`product_id`, `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `o`.`customer_group_id`, `op`.`quantity` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
+					break;
+				default:
+				case 'week':
+					$sql .= " GROUP BY YEAR(`o`.`date_added`), WEEK(`o`.`date_added`), `op`.`product_id`, `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `o`.`customer_group_id`, `op`.`quantity` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
+					break;
+				case 'month':
+					$sql .= " GROUP BY YEAR(`o`.`date_added`), MONTH(`o`.`date_added`), `op`.`product_id`, `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `o`.`customer_group_id`, `op`.`quantity` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
+					break;
+				case 'year':
+					$sql .= " GROUP BY YEAR(`o`.`date_added`), `op`.`product_id`, `cs`.`category_id`, `cs`.`sub_category`, `cs`.`store_id`, `cs`.`language_id`, `o`.`customer_group_id`, `op`.`quantity` HAVING COUNT(`op`.`quantity`) = MAX(`op`.`quantity`)";
+					break;
+			}
+			
+			$sql .= " ORDER BY `cs`.`date_added` " . $setting['type_order'];
+
+			$sql .= " LIMIT " . (int)$setting['limit'];
+
+			$query = $this->db->query($sql)->rows;
+					
+			if (!empty($filter_data['filter'])) {
+				if ($filter_data['filter'] == 'product') {
+					foreach ($query as $result) {
+						$product_data[$result['product_id']] = $this->getProduct($result['product_id']);
+					}
+			    
+					$this->cache->set('product.bestseller.' . (int)$this->config->get('config_language_id') . '.' . (int)$this->config->get('config_store_id') . '.' . $this->config->get('config_customer_group_id') . '.' . (int)$setting['limit'], $product_data);
+					    
+				} elseif ($filter_data['filter'] == 'customer_search') {
+					$product_data = $query;
+				}
+			}
+		}
 		
 		return $product_data;
-	}	
-
+	}
+	
 	public function getProductAttributes($product_id) {
 		$product_attribute_group_data = array();
 
@@ -608,15 +612,9 @@ class ModelCatalogProduct extends Model {
 	}
 
 	public function getProfiles($product_id) {
-		$product_data = array();
-		
 		$query = $this->db->query("SELECT rd.* FROM " . DB_PREFIX . "product_recurring pr JOIN " . DB_PREFIX . "recurring_description rd ON (rd.language_id = " . (int)$this->config->get('config_language_id') . " AND rd.recurring_id = pr.recurring_id) JOIN " . DB_PREFIX . "recurring r ON r.recurring_id = rd.recurring_id WHERE pr.product_id = " . (int)$product_id . " AND status = '1' AND pr.customer_group_id = '" . (int)$this->config->get('config_customer_group_id') . "' ORDER BY sort_order ASC");
-		
-		foreach ($query->rows as $result) {
-			$product_data[$result['product_id']] = $this->getProduct($result['product_id']);
-		}
 
-		return $product_data;
+		return $query->rows;
 	}
 
 	public function getTotalProductSpecials() {
