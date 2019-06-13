@@ -103,7 +103,6 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 		 
 		if (!isset($result['TOKEN'])) {
 			$this->session->data['error'] = $result['L_LONGMESSAGE0'];
-			
 			/**
 			 * Unable to add error message to user as the session errors/success are not
 			 * used on the cart or checkout pages - need to be added?
@@ -111,17 +110,22 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 			 */
 
 			$this->model_extension_payment_pp_express->log('Unable to create PayPal call: ' . json_encode($result));
-
-			$this->response->redirect($this->url->link('checkout/checkout', '', true));
+			
+			$json['redirect'] = $this->url->link('checkout/checkout', '', true);
 		} elseif (isset($result['TOKEN']) && $result['TOKEN'] != '') {
 			$this->session->data['paypal']['token'] = $result['TOKEN'];
+			
+			$json = array('token' => $result['TOKEN']);
 
 			if ($this->config->get('payment_pp_express_test')) {
-				$this->response->redirect('https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=' . $result['TOKEN']);
+				$json['redirect'] = 'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=' . $result['TOKEN'];
 			} else {
-				$this->response->redirect('https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=' . $result['TOKEN']);
+				$json['redirect'] = 'https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=' . $result['TOKEN'];
 			}
 		}
+
+		$this->response->addHeader('Content-Type: application/json');
+		$this->response->setOutput(json_encode($json));
 	}
 
 	public function expressReturn() {
