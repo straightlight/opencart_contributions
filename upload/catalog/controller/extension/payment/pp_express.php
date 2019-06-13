@@ -1638,11 +1638,11 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 
 				$this->log->write('Unable to create Paypal session' . json_encode($result));
 
-				$json['redirect'] = $this->url->link('checkout/checkout', '', true);
+				$this->response->redirect($this->url->link('checkout/checkout', '', true));
 
 			} elseif (isset($result['TOKEN']) && $result['TOKEN'] != '') {
 				$this->session->data['paypal']['token'] = $result['TOKEN'];
-
+				
 				$json = array('token' => $result['TOKEN']);
 
 				if ($this->config->get('payment_pp_express_test')) {
@@ -1650,11 +1650,11 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 				} else {
 					$json['redirect'] = 'https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=' . $result['TOKEN'];
 				}
+				
+				$this->response->addHeader('Content-Type: application/json');
+				$this->response->setOutput(json_encode($json));
 			}
 		}
-
-		$this->response->addHeader('Content-Type: application/json');
-		$this->response->setOutput(json_encode($json));
 	}
 
 	public function checkoutReturn() {
