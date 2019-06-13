@@ -315,12 +315,19 @@ class ModelCatalogProduct extends Model {
 			$sql .= " WHERE (" . implode(" OR ", $complete_implode) . ")";
 			$sql .= " OR (" . implode(" OR ", $processing_implode) . ")";
 					
-			$sql .= " AND `cs`.`customer_id` = `o`.`customer_id`";					
+			$sql .= " AND `cs`.`customer_id` = `o`.`customer_id`";
 			$sql .= " AND `cs`.`language_id` = `o`.`language_id`";
-			$sql .= " AND `cs`.`store_id` = `o`.`store_id`"; 
-			$sql .= " AND `o`.`store_id` = '" . (int)$this->config->get('config_store_id') . "'";					
-			$sql .= " AND `o`.`payment_country_id` = '" . (int)$this->config->get('config_country_id') . "'";
-			$sql .= " AND `o`.`payment_zone_id` = '" . (int)$this->config->get('config_zone_id') . "'";
+			$sql .= " AND `cs`.`store_id` = `o`.`store_id`";
+			$sql .= " AND `o`.`store_id` = '" . (int)$this->config->get('config_store_id') . "'";
+		
+			if (!empty($filter_data['filter_country']) && $filter_data['filter_country']) {
+				$sql .= " AND UCASE(TRIM(`o`.`payment_country`)) = '" . $this->db->escape(trim(strtoupper($filter_data['filter_country']))) . "'";
+			}
+			
+			if (!empty($filter_data['filter_zone']) && $filter_data['filter_zone']) {				
+				$sql .= " AND UCASE(TRIM(`o`.`payment_zone`)) = '" . $this->db->escape(trim(strtoupper($filter_data['filter_zone']))) . "'";
+			}
+		
 			$sql .= " AND `o`.`language_id` = '" . (int)$this->config->get('config_language_id') . "'";
 			$sql .= " AND `o`.`customer_group_id` = '" . (int)$this->config->get('config_customer_group_id') . "'";
 			$sql .= " AND `o`.`total` > '0.10'";
