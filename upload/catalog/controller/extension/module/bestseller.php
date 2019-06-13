@@ -146,9 +146,9 @@ class ControllerExtensionModuleBestSeller extends Controller {
 			$this->load->model('checkout/order');
 			
 			foreach ($bestsellers as $bestseller) {
-				$product_recurring = $this->db->query("SELECT * FROM `" . DB_PREFIX . "order_recurring` WHERE `product_id` = '" . (int)$product_id . "'");
+				$order_recurring = $this->db->query("SELECT * FROM `" . DB_PREFIX . "order_recurring` WHERE `product_id` = '" . (int)$bestseller['product_id'] . "'");
 				
-				if (!$product_recurring || $product_recurring['status']) {
+				if (!$order_recurring || $order_recurring['status']) {
 					$order_info = $this->model_checkout_order->getOrder($bestseller['order_product_order_id']);
 					
 					if ($order_info) {
