@@ -918,7 +918,7 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 			}
 
 			if (empty($shipping_address)) {
-				$redirect = $this->url->link('checkout/checkout', 'language=' . $this->config->get('config_language');
+				$redirect = $this->url->link('checkout/checkout', 'language=' . $this->config->get('config_language'));
 			}
 
 			// Validate if shipping method has been set.
