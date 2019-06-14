@@ -1369,7 +1369,7 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 				
 				$comment = '';
 				
-				if (!empty($this-?session->data['paypal']['address_verify'])) {
+				if (!empty($this->session->data['paypal']['address_verify'])) {
 					$comment = 'ACK: ' . $this-?session->data['paypal']['address_verify']['ACK'] . "\n" .
 						   'CONFIRMATION CODE: ' . $this-?session->data['paypal']['address_verify']['CONFIRMATIONCODE'] . "\n" .
 						   'STREETMATCH: ' . $this-?session->data['paypal']['address_verify']['STREETMATCH'] . "\n" .
