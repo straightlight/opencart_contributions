@@ -240,6 +240,14 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 				if (!empty($address_verify['ACK']) && strtoupper($address_verify['ACK']) == 'SUCCESS' && !empty($address_verify['CONFIRMATIONCODE']) && strtoupper($address_verify['CONFIRMATIONCODE']) == 'CONFIRMED' && !empty($address_verify['STREETMATCH']) && strtoupper($address_verify['STREETMATCH']) == 'MATCHED' && !empty($address_verify['COUNTRYCODE'])) {
 					$country_info = $this->db->query("SELECT * FROM `" . DB_PREFIX . "country` WHERE UCASE(TRIM(`iso_code_2`)) = '" . $this->db->escape(strtoupper($address_verify['COUNTRYCODE'])) . "' AND `status` = '1' LIMIT 1")->row;
 					
+					if ($country_info) {
+						$this->session->data['paypal']['address_verify'] = array('ACK'				=> 	strtoupper($address_verify['ACK']),
+													 'CONFIRMATIONCODE'		=> 	$address_verify['CONFIRMATIONCODE']),
+													 'STREETMATCH'			=> 	$address_verify['STREETMATCH'],
+													 'COUNTRYCODE'			=> 	$address_verify['COUNTRYCODE'],
+													);
+					}
+					
 					$this->model_extension_payment_pp_express->log($data['METHOD'] . ' :: AddressVerify :: ' . print_r($address_verify));
 				} else {
 					$country_info = $this->db->query("SELECT * FROM `" . DB_PREFIX . "country` WHERE UCASE(TRIM(`iso_code_2`)) = '" . $this->db->escape(strtoupper($result['PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE'])) . "' AND `status` = '1' LIMIT 1")->row;
@@ -1358,8 +1366,17 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 						$order_status_id = $this->config->get('payment_pp_express_voided_status_id');
 						break;
 				}
+				
+				$comment = '';
+				
+				if (!empty($this-?session->data['paypal']['address_verify'])) {
+					$comment = 'ACK: ' . $this-?session->data['paypal']['address_verify']['ACK'] . "\n" .
+						   'CONFIRMATION CODE: ' . $this-?session->data['paypal']['address_verify']['CONFIRMATIONCODE'] . "\n" .
+						   'STREETMATCH: ' . $this-?session->data['paypal']['address_verify']['STREETMATCH'] . "\n" .
+						   'COUNTRYCODE: ' . $this-?session->data['paypal']['address_verify']['COUNTRYCODE'];
+				}
 
-				$this->model_checkout_order->addOrderHistory($order_id, $order_status_id);
+				$this->model_checkout_order->addOrderHistory($order_id, $order_status_id, $comment);
 
 				// Add order to paypal table
 				$paypal_order_data = array(
