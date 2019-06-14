@@ -1370,10 +1370,10 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 				$comment = '';
 				
 				if (!empty($this->session->data['paypal']['address_verify'])) {
-					$comment = 'ACK: ' . $this-?session->data['paypal']['address_verify']['ACK'] . "\n" .
-						   'CONFIRMATION CODE: ' . $this-?session->data['paypal']['address_verify']['CONFIRMATIONCODE'] . "\n" .
-						   'STREETMATCH: ' . $this-?session->data['paypal']['address_verify']['STREETMATCH'] . "\n" .
-						   'COUNTRYCODE: ' . $this-?session->data['paypal']['address_verify']['COUNTRYCODE'];
+					$comment = 'ACK: ' . $this->session->data['paypal']['address_verify']['ACK'] . "\n" .
+						   'CONFIRMATION CODE: ' . $this->session->data['paypal']['address_verify']['CONFIRMATIONCODE'] . "\n" .
+						   'STREETMATCH: ' . $this->session->data['paypal']['address_verify']['STREETMATCH'] . "\n" .
+						   'COUNTRYCODE: ' . $this->session->data['paypal']['address_verify']['COUNTRYCODE'];
 				}
 
 				$this->model_checkout_order->addOrderHistory($order_id, $order_status_id, $comment);
