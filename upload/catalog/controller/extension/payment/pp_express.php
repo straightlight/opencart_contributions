@@ -241,11 +241,11 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 					$country_info = $this->db->query("SELECT * FROM `" . DB_PREFIX . "country` WHERE UCASE(TRIM(`iso_code_2`)) = '" . $this->db->escape(strtoupper($address_verify['COUNTRYCODE'])) . "' AND `status` = '1' LIMIT 1")->row;
 					
 					if ($country_info) {
-						$this->session->data['paypal']['address_verify'] = array('ACK'				=> 	strtoupper($address_verify['ACK']),
-													 'CONFIRMATIONCODE'		=> 	$address_verify['CONFIRMATIONCODE']),
-													 'STREETMATCH'			=> 	$address_verify['STREETMATCH'],
-													 'COUNTRYCODE'			=> 	$address_verify['COUNTRYCODE'],
-													);
+						$this->session->data['paypal']['address_verify'] = array('ACK'					=> 	strtoupper($address_verify['ACK']),
+																				 'CONFIRMATIONCODE'		=> 	$address_verify['CONFIRMATIONCODE']),
+																				 'STREETMATCH'			=> 	$address_verify['STREETMATCH'],
+																				 'COUNTRYCODE'			=> 	$address_verify['COUNTRYCODE'],
+																				);
 					}
 					
 					$this->model_extension_payment_pp_express->log($data['METHOD'] . ' :: AddressVerify :: ' . print_r($address_verify));
@@ -768,37 +768,30 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 		}
 
 		// Totals
-		$this->load->model('setting/extension');
+	$this->load->model('setting/extension');
 
-		$totals = array();
-		$taxes = $this->cart->getTaxes();
-		$total = 0;
+	$totals = array();
+	$taxes = $this->cart->getTaxes();
+	$total = 0;
 
-		// Because __call can not keep var references so we put them into an array.
-		$total_data = array(
-			'totals' => &$totals,
-			'taxes'  => &$taxes,
-			'total'  => &$total
-		);
+	// Display prices
+	if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
+		$sort_order = array();
 
-		// Display prices
-		if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
-			$sort_order = array();
+		$results = $this->model_setting_extension->getExtensions('total');
 
-			$results = $this->model_setting_extension->getExtensions('total');
+		foreach ($results as $key => $value) {
+			$sort_order[$key] = $this->config->get('total_' . $value['code'] . '_sort_order');
+		}
 
-			foreach ($results as $key => $value) {
-				$sort_order[$key] = $this->config->get('total_' . $value['code'] . '_sort_order');
-			}
+		array_multisort($sort_order, SORT_ASC, $results);
 
-			array_multisort($sort_order, SORT_ASC, $results);
-
-			foreach ($results as $result) {
-				if ($this->config->get('total_' . $result['code'] . '_status')) {
-					$this->load->model('extension/total/' . $result['code']);
-
-					// We have to put the totals in an array so that they pass by reference.
-					$this->{'model_extension_total_' . $result['code']}->getTotal($total_data);
+		foreach ($results as $result) {
+			if ($this->config->get('total_' . $result['code'] . '_status')) {
+				$this->load->model('extension/total/' . $result['code']);
+					// __call can not pass-by-reference so we get PHP to call it as an anonymous function.
+					
+					($this->{'model_extension_total_' . $result['code']}->getTotal)($totals, $taxes, $total);
 				}
 			}
 
@@ -1371,9 +1364,9 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 				
 				if (!empty($this->session->data['paypal']['address_verify'])) {
 					$comment = 'ACK: ' . $this->session->data['paypal']['address_verify']['ACK'] . "\n" .
-						   'CONFIRMATION CODE: ' . $this->session->data['paypal']['address_verify']['CONFIRMATIONCODE'] . "\n" .
-						   'STREETMATCH: ' . $this->session->data['paypal']['address_verify']['STREETMATCH'] . "\n" .
-						   'COUNTRYCODE: ' . $this->session->data['paypal']['address_verify']['COUNTRYCODE'];
+							   'CONFIRMATION CODE: ' . $this->session->data['paypal']['address_verify']['CONFIRMATIONCODE'] . "\n" .
+							   'STREETMATCH: ' . $this->session->data['paypal']['address_verify']['STREETMATCH'] . "\n" .
+							   'COUNTRYCODE: ' . $this->session->data['paypal']['address_verify']['COUNTRYCODE'];
 				}
 
 				$this->model_checkout_order->addOrderHistory($order_id, $order_status_id, $comment);
