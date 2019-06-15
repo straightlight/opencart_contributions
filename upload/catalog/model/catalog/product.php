@@ -402,7 +402,9 @@ class ModelCatalogProduct extends Model {
 					$this->cache->set('product.bestseller.' . (int)$this->config->get('config_language_id') . '.' . (int)$this->config->get('config_store_id') . '.' . $this->config->get('config_customer_group_id') . '.' . (int)$setting['limit'], $product_data);
 					    
 				} elseif ($filter_data['filter'] == 'customer_search') {
-					$product_data = $query;
+					foreach ($query as $result) {
+						$product_data[$result['product_id']] = $result;
+					}
 				}
 			}
 		}
