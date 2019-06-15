@@ -52,6 +52,8 @@ class ControllerExtensionModuleBestSeller extends Controller {
 		}
 
 		if ($results) {
+			$this->session->data['bestseller_setting'] = $setting;
+			
 			foreach ($results as $result) {
 				if ($result['image']) {
 					$image = $this->model_tool_image->resize($result['image'], $setting['width'], $setting['height']);
@@ -100,72 +102,102 @@ class ControllerExtensionModuleBestSeller extends Controller {
 		}
 	}
 	
-	// catalog/model/account/search/addSearch/before
-	public function getBestSellersEvent(&$route, &$args) {
-		$this->load->language('mail/bestsellers');
-		
-		$data['bestsellers'] = array();
-
-		$category_id = 0;
-		
-		$sub_categories = array();
-		
-		if (isset($this->request->get['path'])) {
-			$parts = explode('_', (string)$this->request->get['path']);
-
-			$category_id = (int)array_pop($parts);
-
-			foreach ($parts as $path_id) {
-				$sub_categories[] = $path_id;
-			}
-		}
-		
-		if (isset($this->request->get['product_id'])) {
-			$product_id = $this->request->get['product_id'];
-		} else {
-			$product_id = 0;
-		}
-		
-		$setting_data = array('group'				=> $this->config->get('module_bestsellers_group'),
-							  'type_order'			=> $this->config->get('module_bestsellers_type_order'),
-							  'limit'				=> $this->config->get('module_bestsellers_limit'),
-							 );
-		
-		$filter_data = array('category_id'			=> $category_id,
-							 'sub_categories'		=> $sub_categories,
-							 'product_id'			=> $product_id,
-							 'privilege'			=> true,
-							 'filter'				=> 'product',
-							);
-
-		$this->load->model('catalog/product');
-		
-		$bestsellers = $this->model_catalog_product->getBestSellerProducts($setting_data, $filter_data);
-		
-		if ($bestsellers) {
+	// catalog/model/checkout/order/addOrder/before
+	public function getBestSellerByOrders(&$route, &$args, &$output) {
+		if ($this->config->get('config_customer_search') && !empty($this->session->data['bestseller_setting']) && $this->session->data['bestseller_setting']['order_period_notify'] && !empty($this->session->data['bestseller_setting']['order_period']) && (int)$this->session->data['bestseller_setting']['order_period_value'] > 0) {
+			$this->load->language('mail/bestseller');
+			
 			$this->load->model('checkout/order');
 			
+			$bestsellers = $this->model_checkout_order->getBestSellerByOrders();
+			
+			$tmp_bestsellers_data = array();
+			
 			foreach ($bestsellers as $bestseller) {
-				$order_recurring = $this->db->query("SELECT * FROM `" . DB_PREFIX . "order_recurring` WHERE `product_id` = '" . (int)$bestseller['product_id'] . "'");
-				
-				if (!$order_recurring || $order_recurring['status']) {
-					$order_info = $this->model_checkout_order->getOrder($bestseller['order_product_order_id']);
+				if ($bestseller['search_date_end']) {
+					$datetime1 = new DateTime($bestseller['date_end']);
+
+					$datetime2 = new DateTime($bestseller['search_date_end']);
+
+					$difference = $datetime1->diff($datetime2);
+					
+					if ($this->session->data['bestseller_setting']['order_period'] == 'day') {
+						$notify = ($difference->d > 1 ? sprintf($this->language->get('text_order_period_days'), $difference->d) : sprintf($this->language->get('text_order_period_day'), $difference->d));
+					} elseif ($this->session->data['bestseller_setting']['order_period'] == 'week') {
+						$notify = ($difference->d % 7 > 1 ? sprintf($this->language->get('text_order_period_weeks'), $difference->d % 7) : sprintf($this->language->get('text_order_period_week'), $difference->d % 7));
+					} elseif ($this->session->data['bestseller_setting']['order_period'] == 'month') {
+						$notify = ($difference->m > 1 ? sprintf($this->language->get('text_order_period_months'), $difference->m) : sprintf($this->language->get('text_order_period_month'), $difference->m));
+					} elseif ($this->session->data['bestseller_setting']['order_period'] == 'year') {
+						$notify = ($difference->y > 1 ? sprintf($this->language->get('text_order_period_years'), $difference->y) : sprintf($this->language->get('text_order_period_year'), $difference->y));
+					}
+						
+					if ($notify) {
+						$tmp_bestsellers_data[$bestseller['order_id'] . '|' . $bestseller['search_date_end'] . '|' . $bestseller['searches'] . '|' . $notify][] = $bestseller['products'];
+					}					
+				}
+			}
+			
+			$bestsellers_data = array();
+			
+			foreach ($tmp_bestsellers_data as $order => $results) {
+				if (!empty($results) && is_array($results) && min($results)) {
+					$bestsellers_data['minimum'][$order] = min($results);
+				} elseif (!empty($results) && is_array($results) && max($results)) {
+					$bestsellers_data['maximum'][$order] = max($results);
+				}
+			}
+			
+			$bestsellers = $bestsellers_data;
+			
+			$data['bestsellers'] = array();
+			
+			// Minimum products ordered for worst level of sales.
+			if (!empty($bestsellers['minimum'])) {
+				foreach ($bestsellers['minimum'] as $order => $value) {
+					$order_exploded = explode('|', trim($order));
+					
+					$order_info = $this->model_checkout_order->getOrder($order_exploded[0]);
 					
 					if ($order_info) {
-						$data['bestsellers'][] = array('firstname'				=> $order_info['firstname'],
-													   'lastname'				=> $order_info['lastname'],
-													   'email'					=> $order_info['email'],
-													   'date_added'				=> date($this->language->get('date_format'), $order_info['date_added']),
-													   'date_modified'			=> date($this->language->get('date_format'), $order_info['date_modified']),
-													   'order_product_name'		=> $bestseller['order_product_name'],
-													   'products'				=> $bestseller['products'],
-													   'searches'				=> $bestseller['searches'],
-													  );
-						
-						$this->model_checkout_order->setOrderProductPrivileges($bestseller['order_product_order_id']);
+						$data['bestsellers']['minimum'][$order_exploded[3]][] = array('payment_firstname'			=> $order_info['payment_firstname'],
+																					  'payment_lastname'			=> $order_info['payment_lastname'],
+																					  'email'						=> $order_info['email'],
+																					  'total'						=> $this->currency->format($order_info['total'], $order_info['currency_code']),
+																					  'products'					=> $value,
+																					  'searches'					=> $order_exploded[2],																  
+																					  'date_added'					=> date($this->language->get('datetime_format'), $order_info['date_added']),
+																					  'search_date_end'				=> date($this->language->get('datetime_format'), $order_exploded[1]),																  
+																					 );
+																 
+						$this->model_checkout_order->setSalesRepMin($order_info['order_id']);
 					}
 				}
 			}
+			
+			// Maximum products ordered for best level of sales.
+			if (!empty($bestsellers['maximum'])) {
+				foreach ($bestsellers['maximum'] as $order => $value) {
+					$order_exploded = explode('|', trim($order));
+					
+					$order_info = $this->model_checkout_order->getOrder($order_exploded[0]);
+					
+					if ($order_info) {
+						$data['bestsellers']['maximum'][$order_exploded[3]][] = array('payment_firstname'			=> $order_info['payment_firstname'],
+																					  'payment_lastname'			=> $order_info['payment_lastname'],
+																					  'email'						=> $order_info['email'],
+																					  'total'						=> $this->currency->format($order_info['total'], $order_info['currency_code']),
+																					  'products'					=> $value,
+																					  'searches'					=> $order_exploded[2],																  
+																					  'date_added'					=> date($this->language->get('datetime_format'), $order_info['date_added']),
+																					  'search_date_end'				=> date($this->language->get('datetime_format'), $order_exploded[1]),																  
+																					 );
+																 
+						$this->model_checkout_order->setSalesRepMax($order_info['order_id']);
+					}
+				}
+			}
+			
+			unset ($this->session->data['bestseller_setting']);
 			
 			// Mail
 			$mail = new Mail($this->config->get('config_mail_engine'));
@@ -180,8 +212,8 @@ class ControllerExtensionModuleBestSeller extends Controller {
 			$mail->setTo($this->config->get('config_email'));
 			$mail->setFrom($this->config->get('config_email'));
 			$mail->setSender(html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8'));
-			$mail->setSubject(html_entity_decode(sprintf($this->language->get('text_subject'), $this->config->get('config_name')), ENT_QUOTES, 'UTF-8'));
-			$mail->setText($this->load->view('mail/bestsellers', $data));
+			$mail->setSubject(html_entity_decode(sprintf($language->get('text_subject'), $this->config->get('config_name')), ENT_QUOTES, 'UTF-8'));
+			$mail->setHtml($this->load->view('mail/bestseller', $data));
 			
 			$mail->send();
 		}
