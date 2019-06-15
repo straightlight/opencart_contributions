@@ -261,6 +261,88 @@ class ModelCheckoutOrder extends Model {
 		return $query->rows;
 	}
 	
+	public function getCustomerSearchesByOrders($data = array()) {
+		$sql = "SELECT MIN(`o`.`date_added`) AS `date_start`, MAX(`o`.`date_added`) AS `date_end`, MIN(`cs`.`date_added`) AS `search_date_start`, MAX(`cs`.`date_added`) AS `search_date_end`, `o`.`order_id` AS `order_id`, `o`.`customer_id` AS `customer_id`, SUM(`o`.`total`) AS `total`, SUM((SELECT SUM(`op`.`quantity`) FROM `" . DB_PREFIX . "order_product` `op` WHERE `op`.`order_id` = `o`.`order_id`)) AS `products`, SUM((SELECT SUM(`cs`.`products`) FROM `" . DB_PREFIX . "customer_search` `cs` GROUP BY `cs`.`ip`)) AS `searches` FROM `" . DB_PREFIX . "order` `o` LEFT JOIN `" . DB_PREFIX . "order_product` `op` ON (`op`.`order_id` = `o`.`order_id`) LEFT JOIN `" . DB_PREFIX . "customer_search` `cs` ON (`cs`.`customer_id` = `o`.`customer_id`)";
+		
+		$processing_implode = array();
+		
+		$order_statuses = $this->config->get('config_processing_status');
+
+		foreach ($order_statuses as $order_status_id) {
+			$processing_implode[] = "o.order_status_id = '" . (int)$order_status_id . "'";
+		}
+		
+		$complete_implode = array();
+
+		$order_statuses = $this->config->get('config_complete_status');
+
+		foreach ($order_statuses as $order_status_id) {
+			$complete_implode[] = "o.order_status_id = '" . (int)$order_status_id . "'";
+		}
+		
+		if ($processing_implode) {
+			$sql .= " WHERE (" . implode(" OR ", $processing_implode) . ")";
+		}
+
+		if ($complete_implode) {
+			$sql .= (!$processing_implode ? " WHERE " : " AND ") . "(" . implode(" OR ", $complete_implode) . ")";
+		}
+		
+		if (!empty($data['filter_salesrep'])) {
+			$sql .= " AND `o`.`salesrep_" . strtolower($data['filter_salesrep']) . "` = '1'";
+		}
+
+		$sql .= " AND `o`.`language_id` = '" . (int)$this->config->get('config_language_id') . "'";
+		
+		if (!empty($data['filter_group'])) {
+			$group = $data['filter_group'];
+		} else {
+			$group = 'week';
+		}
+
+		switch($group) {
+			case 'day';
+				$sql .= " GROUP BY YEAR(`o`.`date_added`), MONTH(`o`.`date_added`), DAY(`o`.`date_added`)";
+				break;
+			default:
+			case 'week':
+				$sql .= " GROUP BY YEAR(`o`.`date_added`), WEEK(`o`.`date_added`)";
+				break;
+			case 'month':
+				$sql .= " GROUP BY YEAR(`o`.`date_added`), MONTH(`o`.`date_added`)";
+				break;
+			case 'year':
+				$sql .= " GROUP BY YEAR(`o`.`date_added`)";
+				break;
+		}
+
+		$sql .= " ORDER BY o.date_added DESC";
+
+		if (isset($data['start']) || isset($data['limit'])) {
+			if ($data['start'] < 0) {
+				$data['start'] = 0;
+			}
+
+			if ($data['limit'] < 1) {
+				$data['limit'] = 20;
+			}
+
+			$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
+		}
+
+		$query = $this->db->query($sql);
+
+		return $query->rows;
+	}
+	
+	public function setSalesRepMin($order_id) {
+		$this->db->query("UPDATE `" . DB_PREFIX . "order` SET `salesrep_min` = 1 WHERE `order_id` = '" . (int)$order_id . "'");
+	}
+	
+	public function setSalesRepMax($order_id) {
+		$this->db->query("UPDATE `" . DB_PREFIX . "order` SET `salesrep_max` = 1 WHERE `order_id` = '" . (int)$order_id . "'");
+	}
+	
 	public function addOrderHistory($order_id, $order_status_id, $comment = '', $notify = false, $override = false) {
 		$order_info = $this->getOrder($order_id);
 		
