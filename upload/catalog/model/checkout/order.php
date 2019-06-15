@@ -288,10 +288,11 @@ class ModelCheckoutOrder extends Model {
 			$sql .= (!$processing_implode ? " WHERE " : " AND ") . "(" . implode(" OR ", $complete_implode) . ")";
 		}
 		
-		$sql .= " AND `o`.`language_id` = '" . (int)$this->config->get('config_language_id') . "'";
-		$sql .= " AND `o`.`store_id` = '" . (int)$this->config->get('config_store_id') . "'";
+		$sql .= " AND `o`.`language_id` = `cs`.`language_id`"; 
+		$sql .= " AND `o`.`store_id` = `cs`.`store_id`";
+		$sql .= " AND `cs`.`language_id` = '" . (int)$this->config->get('config_language_id') . "'";
+		$sql .= " AND `cs`.`store_id` = '" . (int)$this->config->get('config_store_id') . "'";
 		$sql .= " AND `o`.`currency_id` = '" . (int)$this->config->get('config_currency_id') . "'";
-		$sql .= " AND `o`.`customer_group_id` = '" . (int)$this->config->get('config_customer_group_id') . "'";
 		
 		if (!empty($data['filter_group'])) {
 			$group = $data['filter_group'];
