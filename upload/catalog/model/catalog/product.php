@@ -301,7 +301,7 @@ class ModelCatalogProduct extends Model {
 			$order_statuses = $this->config->get('config_processing_status');
 
 			foreach ($order_statuses as $order_status_id) {
-				$processing_implode[] = "o.order_status_id = '" . (int)$order_status_id . "'";
+				$processing_implode[] = "`o`.`order_status_id` = '" . (int)$order_status_id . "'";
 			}
 			
 			$complete_implode = array();
@@ -309,7 +309,7 @@ class ModelCatalogProduct extends Model {
 			$order_statuses = $this->config->get('config_complete_status');
 
 			foreach ($order_statuses as $order_status_id) {
-				$complete_implode[] = "o.order_status_id = '" . (int)$order_status_id . "'";
+				$complete_implode[] = "`o`.`order_status_id` = '" . (int)$order_status_id . "'";
 			}
 			
 			if ($processing_implode) {
