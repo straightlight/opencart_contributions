@@ -128,6 +128,37 @@
               </select>
             </div>
           </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-order-period-notify">{{ entry_order_period_notify }}</label>
+            <div class="col-sm-10">
+              <select name="order_period_notify" id="input-order-period-notify" class="form-control">
+				{% if order_period_notify == 1 %}
+					<option value="1" selected="selected">{{ text_yes }}</option>
+					<option value="0">{{ text_no }}</option>
+				{% else %}
+					<option value="1">{{ text_yes }}</option>
+					<option value="0" selected="selected">{{ text_no }}</option>
+				{% endif %}
+              </select>
+            </div>
+          </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-order-period-value">{{ entry_order_period_value }}</label>
+            <div class="col-sm-10">
+              <select name="order_period_value" id="input-order-period-value" class="form-control">
+				{% for i in 1..365 %}
+					{% if i == order_period_value %}
+						<option value="{{ i }}" selected="selected">{{ i }}</option>
+					{% else %}
+						<option value="{{ i }}">{{ i }}</option>
+					{% endif %}
+				{% endfor %}				
+              </select>
+			  {% if error_order_period_value %}
+				<div class="text-danger">{{ error_order_period_value }}</div>
+              {% endif %}
+            </div>
+          </div>
           <div class="form-group">
             <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
             <div class="col-sm-10">
