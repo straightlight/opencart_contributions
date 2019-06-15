@@ -57,7 +57,7 @@ class ControllerExtensionModuleBestSeller extends Controller {
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
+			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'] . '&language=' . $this->config->get('config_language'))
 		);
 
 		$data['breadcrumbs'][] = array(
@@ -68,19 +68,19 @@ class ControllerExtensionModuleBestSeller extends Controller {
 		if (!isset($this->request->get['module_id'])) {
 			$data['breadcrumbs'][] = array(
 				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/module/bestseller', 'user_token=' . $this->session->data['user_token'], true)
+				'href' => $this->url->link('extension/module/bestseller', 'user_token=' . $this->session->data['user_token'] . '&language=' . $this->config->get('config_language'))
 			);
 		} else {
 			$data['breadcrumbs'][] = array(
 				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/module/bestseller', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'], true)
+				'href' => $this->url->link('extension/module/bestseller', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'] . '&language=' . $this->config->get('config_language'))
 			);
 		}
 
 		if (!isset($this->request->get['module_id'])) {
-			$data['action'] = $this->url->link('extension/module/bestseller', 'user_token=' . $this->session->data['user_token'], true);
+			$data['action'] = $this->url->link('extension/module/bestseller', 'user_token=' . $this->session->data['user_token'] . '&language=' . $this->config->get('config_language'));
 		} else {
-			$data['action'] = $this->url->link('extension/module/bestseller', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'], true);
+			$data['action'] = $this->url->link('extension/module/bestseller', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'] . '&language=' . $this->config->get('config_language'));
 		}
 
 		$data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true);
