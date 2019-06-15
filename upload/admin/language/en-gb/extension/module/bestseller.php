@@ -29,6 +29,8 @@ $_['entry_type_order'] = 'Type Order';
 $_['entry_database_transaction'] = 'Database Transaction';
 $_['entry_group']      = 'Group By';
 $_['entry_rating']     = 'Rating';
+$_['entry_order_period_notify'] = 'Event Notify';
+$_['entry_order_period_value'] = 'Period value';
 $_['entry_status']     = 'Status';
 
 // Error
