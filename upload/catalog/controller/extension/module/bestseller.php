@@ -105,7 +105,7 @@ class ControllerExtensionModuleBestSeller extends Controller {
 	}
 	
 	// catalog/model/checkout/order/addOrder/before
-	public function getBestSellerByOrders(&$route, &$args, &$output) {
+	public function getBestSellerByOrders(&$route, &$args) {
 		if ($this->config->get('config_customer_search') && !empty($this->session->data['bestseller_setting']) && $this->session->data['bestseller_setting']['order_period_notify'] && !empty($this->session->data['bestseller_setting']['order_period_value']) && $this->session->data['bestseller_setting']['order_period_value'] > 0) {
 			$this->load->language('mail/bestseller');
 			
