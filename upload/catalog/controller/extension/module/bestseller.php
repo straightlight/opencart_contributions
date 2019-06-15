@@ -106,7 +106,7 @@ class ControllerExtensionModuleBestSeller extends Controller {
 	
 	// catalog/model/checkout/order/addOrder/before
 	public function getBestSellerByOrders(&$route, &$args, &$output) {
-		if ($this->config->get('config_customer_search') && !empty($this->session->data['bestseller_setting']) && $this->session->data['bestseller_setting']['order_period_notify'] && !empty($this->session->data['bestseller_setting']['order_period']) && (int)$this->session->data['bestseller_setting']['order_period_value'] > 0) {
+		if ($this->config->get('config_customer_search') && !empty($this->session->data['bestseller_setting']) && $this->session->data['bestseller_setting']['order_period_notify'] && !empty($this->session->data['bestseller_setting']['order_period_value']) && $this->session->data['bestseller_setting']['order_period_value'] > 0) {
 			$this->load->language('mail/bestseller');
 			
 			$this->load->model('checkout/order');
@@ -128,13 +128,13 @@ class ControllerExtensionModuleBestSeller extends Controller {
 					$difference = $datetime1->diff($datetime2);
 					
 					if (($difference->d >= $this->session->data['bestseller_setting']['order_period_value']) || ($difference->d % 7 >= $this->session->data['bestseller_setting']['order_period_value']) || ($difference->w >= $this->session->data['bestseller_setting']['order_period_value']) || ($difference->y >= $this->session->data['bestseller_setting']['order_period_value'])) {
-						if ($this->session->data['bestseller_setting']['order_period'] == 'day') {
+						if ($this->session->data['bestseller_setting']['group'] == 'day') {
 							$notify = ($difference->d > 1 ? sprintf($this->language->get('text_order_period_days'), $difference->d) : sprintf($this->language->get('text_order_period_day'), $difference->d));
-						} elseif ($this->session->data['bestseller_setting']['order_period'] == 'week') {
+						} elseif ($this->session->data['bestseller_setting']['group'] == 'week') {
 							$notify = ($difference->d % 7 > 1 ? sprintf($this->language->get('text_order_period_weeks'), $difference->d % 7) : sprintf($this->language->get('text_order_period_week'), $difference->d % 7));
-						} elseif ($this->session->data['bestseller_setting']['order_period'] == 'month') {
+						} elseif ($this->session->data['bestseller_setting']['group'] == 'month') {
 							$notify = ($difference->m > 1 ? sprintf($this->language->get('text_order_period_months'), $difference->m) : sprintf($this->language->get('text_order_period_month'), $difference->m));
-						} elseif ($this->session->data['bestseller_setting']['order_period'] == 'year') {
+						} elseif ($this->session->data['bestseller_setting']['group'] == 'year') {
 							$notify = ($difference->y > 1 ? sprintf($this->language->get('text_order_period_years'), $difference->y) : sprintf($this->language->get('text_order_period_year'), $difference->y));
 						}
 					}
