@@ -109,7 +109,7 @@ class ControllerExtensionModuleBestSeller extends Controller {
 			
 			$this->load->model('checkout/order');
 			
-			$bestsellers = $this->model_checkout_order->getBestSellerByOrders();
+			$bestsellers = $this->model_checkout_order->getBestSellerByOrders($this->session->data['bestseller_setting']);
 			
 			$tmp_bestsellers_data = array();
 			
