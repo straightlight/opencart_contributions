@@ -167,8 +167,6 @@ class ControllerExtensionModuleBestSeller extends Controller {
 						
 						$affiliate_name = '';
 						
-						$affiliate_href = '';
-						
 						if ($affiliate) {
 							$affiliate_info = $this->model_account_customer->getCustomer($affiliate['customer_id']);
 							
@@ -210,8 +208,6 @@ class ControllerExtensionModuleBestSeller extends Controller {
 						$affiliate = $this->model_account_customer->getAffiliateByTracking($order_info['tracking']);
 						
 						$affiliate_name = '';
-						
-						$affiliate_href = '';
 						
 						if ($affiliate) {
 							$affiliate_info = $this->model_account_customer->getCustomer($affiliate['customer_id']);
