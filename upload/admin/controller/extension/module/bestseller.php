@@ -1,221 +1,152 @@
 <?php
 class ControllerExtensionModuleBestSeller extends Controller {
-	public function index($setting) {
+	private $error = array();
+
+	public function index() {
 		$this->load->language('extension/module/bestseller');
 
-		$this->load->model('catalog/product');
+		$this->document->setTitle($this->language->get('heading_title'));
 
-		$this->load->model('tool/image');
+		$this->load->model('setting/module');
 
-		$data['products'] = array();
-
-		$category_id = 0;
-		
-		$sub_categories = array();
-		
-		if (isset($this->request->get['path'])) {
-			$parts = explode('_', (string)$this->request->get['path']);
-
-			$category_id = (int)array_pop($parts);
-
-			foreach ($parts as $path_id) {
-				$sub_categories[] = $path_id;
+		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
+			if (!isset($this->request->get['module_id'])) {
+				$this->model_setting_module->addModule('bestseller', $this->request->post);
+			} else {
+				$this->model_setting_module->editModule($this->request->get['module_id'], $this->request->post);
 			}
+
+			$this->cache->delete('product');
+
+			$this->session->data['success'] = $this->language->get('text_success');
+
+			$this->response->redirect($this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true));
 		}
-		
-		if (isset($this->request->get['product_id'])) {
-			$product_id = $this->request->get['product_id'];
+
+		if (isset($this->error['warning'])) {
+			$data['error_warning'] = $this->error['warning'];
 		} else {
-			$product_id = 0;
-		}
-		
-		$filter_data = array('category_id'			=> $category_id,
-							 'sub_categories'		=> $sub_categories,
-							 'product_id'			=> $product_id,
-							 'filter'				=> 'product',
-							);
-
-		$results = $this->model_catalog_product->getBestSellerProducts($setting, $filter_data);
-		
-		$filter_data = array('category_id'			=> $category_id,
-							 'sub_categories'		=> $sub_categories,
-							 'product_id'			=> $product_id,
-							 'filter'				=> 'customer_search',
-							);
-		
-		$search_results = $this->model_catalog_product->getBestSellerProducts($setting, $filter_data);
-		
-		if ($search_results) {
-		    $this->load->model('account/search');
-		    
-		    $this->model_account_search->deleteSearch($search_results, $setting);
+			$data['error_warning'] = '';
 		}
 
-		if ($results) {
-			$this->session->data['bestseller_setting'] = $setting;
-			
-			foreach ($results as $result) {
-				if ($result['image']) {
-					$image = $this->model_tool_image->resize($result['image'], $setting['width'], $setting['height']);
-				} else {
-					$image = $this->model_tool_image->resize('placeholder.png', $setting['width'], $setting['height']);
-				}
-
-				if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
-					$price = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
-				} else {
-					$price = false;
-				}
-
-				if ((float)$result['special']) {
-					$special = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
-				} else {
-					$special = false;
-				}
-
-				if ($this->config->get('config_tax')) {
-					$tax = $this->currency->format((float)$result['special'] ? $result['special'] : $result['price'], $this->session->data['currency']);
-				} else {
-					$tax = false;
-				}
-
-				if ($this->config->get('config_review_status')) {
-					$rating = $result['rating'];
-				} else {
-					$rating = false;
-				}
-
-				$data['products'][] = array(
-					'product_id'  => $result['product_id'],
-					'thumb'       => $image,
-					'name'        => $result['name'],
-					'description' => utf8_substr(trim(strip_tags(html_entity_decode($result['description'], ENT_QUOTES, 'UTF-8'))), 0, $this->config->get('theme_' . $this->config->get('config_theme') . '_product_description_length')) . '..',
-					'price'       => $price,
-					'special'     => $special,
-					'tax'         => $tax,
-					'rating'      => $rating,
-					'href'        => $this->url->link('product/product', 'product_id=' . $result['product_id'])
-				);
-			}
-
-			return $this->load->view('extension/module/bestseller', $data);
+		if (isset($this->error['name'])) {
+			$data['error_name'] = $this->error['name'];
+		} else {
+			$data['error_name'] = '';
 		}
+
+		if (isset($this->error['width'])) {
+			$data['error_width'] = $this->error['width'];
+		} else {
+			$data['error_width'] = '';
+		}
+
+		if (isset($this->error['height'])) {
+			$data['error_height'] = $this->error['height'];
+		} else {
+			$data['error_height'] = '';
+		}
+
+		$data['breadcrumbs'] = array();
+
+		$data['breadcrumbs'][] = array(
+			'text' => $this->language->get('text_home'),
+			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
+		);
+
+		$data['breadcrumbs'][] = array(
+			'text' => $this->language->get('text_extension'),
+			'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true)
+		);
+
+		if (!isset($this->request->get['module_id'])) {
+			$data['breadcrumbs'][] = array(
+				'text' => $this->language->get('heading_title'),
+				'href' => $this->url->link('extension/module/bestseller', 'user_token=' . $this->session->data['user_token'], true)
+			);
+		} else {
+			$data['breadcrumbs'][] = array(
+				'text' => $this->language->get('heading_title'),
+				'href' => $this->url->link('extension/module/bestseller', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'], true)
+			);
+		}
+
+		if (!isset($this->request->get['module_id'])) {
+			$data['action'] = $this->url->link('extension/module/bestseller', 'user_token=' . $this->session->data['user_token'], true);
+		} else {
+			$data['action'] = $this->url->link('extension/module/bestseller', 'user_token=' . $this->session->data['user_token'] . '&module_id=' . $this->request->get['module_id'], true);
+		}
+
+		$data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true);
+
+		if (isset($this->request->get['module_id']) && ($this->request->server['REQUEST_METHOD'] != 'POST')) {
+			$module_info = $this->model_setting_module->getModule($this->request->get['module_id']);
+		}
+
+		if (isset($this->request->post['name'])) {
+			$data['name'] = $this->request->post['name'];
+		} elseif (!empty($module_info)) {
+			$data['name'] = $module_info['name'];
+		} else {
+			$data['name'] = '';
+		}
+
+		if (isset($this->request->post['limit'])) {
+			$data['limit'] = $this->request->post['limit'];
+		} elseif (!empty($module_info)) {
+			$data['limit'] = $module_info['limit'];
+		} else {
+			$data['limit'] = 5;
+		}
+
+		if (isset($this->request->post['width'])) {
+			$data['width'] = $this->request->post['width'];
+		} elseif (!empty($module_info)) {
+			$data['width'] = $module_info['width'];
+		} else {
+			$data['width'] = 200;
+		}
+
+		if (isset($this->request->post['height'])) {
+			$data['height'] = $this->request->post['height'];
+		} elseif (!empty($module_info)) {
+			$data['height'] = $module_info['height'];
+		} else {
+			$data['height'] = 200;
+		}
+
+		if (isset($this->request->post['status'])) {
+			$data['status'] = $this->request->post['status'];
+		} elseif (!empty($module_info)) {
+			$data['status'] = $module_info['status'];
+		} else {
+			$data['status'] = '';
+		}
+
+		$data['header'] = $this->load->controller('common/header');
+		$data['column_left'] = $this->load->controller('common/column_left');
+		$data['footer'] = $this->load->controller('common/footer');
+
+		$this->response->setOutput($this->load->view('extension/module/bestseller', $data));
 	}
-	
-	// catalog/model/checkout/order/addOrder/before
-	public function getBestSellerByOrders(&$route, &$args, &$output) {
-		if ($this->config->get('config_customer_search') && !empty($this->session->data['bestseller_setting']) && $this->session->data['bestseller_setting']['order_period_notify'] && !empty($this->session->data['bestseller_setting']['order_period']) && (int)$this->session->data['bestseller_setting']['order_period_value'] > 0) {
-			$this->load->language('mail/bestseller');
-			
-			$this->load->model('checkout/order');
-			
-			$bestsellers = $this->model_checkout_order->getBestSellerByOrders();
-			
-			$tmp_bestsellers_data = array();
-			
-			foreach ($bestsellers as $bestseller) {
-				if ($bestseller['search_date_end']) {
-					$datetime1 = new DateTime($bestseller['date_end']);
 
-					$datetime2 = new DateTime($bestseller['search_date_end']);
-
-					$difference = $datetime1->diff($datetime2);
-					
-					if ($this->session->data['bestseller_setting']['order_period'] == 'day') {
-						$notify = ($difference->d > 1 ? sprintf($this->language->get('text_order_period_days'), $difference->d) : sprintf($this->language->get('text_order_period_day'), $difference->d));
-					} elseif ($this->session->data['bestseller_setting']['order_period'] == 'week') {
-						$notify = ($difference->d % 7 > 1 ? sprintf($this->language->get('text_order_period_weeks'), $difference->d % 7) : sprintf($this->language->get('text_order_period_week'), $difference->d % 7));
-					} elseif ($this->session->data['bestseller_setting']['order_period'] == 'month') {
-						$notify = ($difference->m > 1 ? sprintf($this->language->get('text_order_period_months'), $difference->m) : sprintf($this->language->get('text_order_period_month'), $difference->m));
-					} elseif ($this->session->data['bestseller_setting']['order_period'] == 'year') {
-						$notify = ($difference->y > 1 ? sprintf($this->language->get('text_order_period_years'), $difference->y) : sprintf($this->language->get('text_order_period_year'), $difference->y));
-					}
-						
-					if ($notify) {
-						$tmp_bestsellers_data[$bestseller['order_id'] . '|' . $bestseller['search_date_end'] . '|' . $bestseller['searches'] . '|' . $notify][] = $bestseller['products'];
-					}					
-				}
-			}
-			
-			$bestsellers_data = array();
-			
-			foreach ($tmp_bestsellers_data as $order => $results) {
-				if (!empty($results) && is_array($results) && min($results)) {
-					$bestsellers_data['minimum'][$order] = min($results);
-				} elseif (!empty($results) && is_array($results) && max($results)) {
-					$bestsellers_data['maximum'][$order] = max($results);
-				}
-			}
-			
-			$bestsellers = $bestsellers_data;
-			
-			$data['bestsellers'] = array();
-			
-			// Minimum products ordered for worst level of sales.
-			if (!empty($bestsellers['minimum'])) {
-				foreach ($bestsellers['minimum'] as $order => $value) {
-					$order_exploded = explode('|', trim($order));
-					
-					$order_info = $this->model_checkout_order->getOrder($order_exploded[0]);
-					
-					if ($order_info) {
-						$data['bestsellers']['minimum'][$order_exploded[3]][] = array('payment_firstname'			=> $order_info['payment_firstname'],
-																					  'payment_lastname'			=> $order_info['payment_lastname'],
-																					  'email'						=> $order_info['email'],
-																					  'total'						=> $this->currency->format($order_info['total'], $order_info['currency_code']),
-																					  'products'					=> $value,
-																					  'searches'					=> $order_exploded[2],																  
-																					  'date_added'					=> date($this->language->get('datetime_format'), $order_info['date_added']),
-																					  'search_date_end'				=> date($this->language->get('datetime_format'), $order_exploded[1]),																  
-																					 );
-																 
-						$this->model_checkout_order->setSalesRepMin($order_info['order_id']);
-					}
-				}
-			}
-			
-			// Maximum products ordered for best level of sales.
-			if (!empty($bestsellers['maximum'])) {
-				foreach ($bestsellers['maximum'] as $order => $value) {
-					$order_exploded = explode('|', trim($order));
-					
-					$order_info = $this->model_checkout_order->getOrder($order_exploded[0]);
-					
-					if ($order_info) {
-						$data['bestsellers']['maximum'][$order_exploded[3]][] = array('payment_firstname'			=> $order_info['payment_firstname'],
-																					  'payment_lastname'			=> $order_info['payment_lastname'],
-																					  'email'						=> $order_info['email'],
-																					  'total'						=> $this->currency->format($order_info['total'], $order_info['currency_code']),
-																					  'products'					=> $value,
-																					  'searches'					=> $order_exploded[2],																  
-																					  'date_added'					=> date($this->language->get('datetime_format'), $order_info['date_added']),
-																					  'search_date_end'				=> date($this->language->get('datetime_format'), $order_exploded[1]),																  
-																					 );
-																 
-						$this->model_checkout_order->setSalesRepMax($order_info['order_id']);
-					}
-				}
-			}
-			
-			unset ($this->session->data['bestseller_setting']);
-			
-			// Mail
-			$mail = new Mail($this->config->get('config_mail_engine'));
-			
-			$mail->parameter = $this->config->get('config_mail_parameter');
-			$mail->smtp_hostname = $this->config->get('config_mail_smtp_hostname');
-			$mail->smtp_username = $this->config->get('config_mail_smtp_username');
-			$mail->smtp_password = html_entity_decode($this->config->get('config_mail_smtp_password'), ENT_QUOTES, 'UTF-8');
-			$mail->smtp_port = $this->config->get('config_mail_smtp_port');
-			$mail->smtp_timeout = $this->config->get('config_mail_smtp_timeout');
-
-			$mail->setTo($this->config->get('config_email'));
-			$mail->setFrom($this->config->get('config_email'));
-			$mail->setSender(html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8'));
-			$mail->setSubject(html_entity_decode(sprintf($language->get('text_subject'), $this->config->get('config_name')), ENT_QUOTES, 'UTF-8'));
-			$mail->setHtml($this->load->view('mail/bestseller', $data));
-			
-			$mail->send();
+	protected function validate() {
+		if (!$this->user->hasPermission('modify', 'extension/module/bestseller')) {
+			$this->error['warning'] = $this->language->get('error_permission');
 		}
+
+		if ((utf8_strlen($this->request->post['name']) < 3) || (utf8_strlen($this->request->post['name']) > 64)) {
+			$this->error['name'] = $this->language->get('error_name');
+		}
+
+		if (!$this->request->post['width']) {
+			$this->error['width'] = $this->language->get('error_width');
+		}
+
+		if (!$this->request->post['height']) {
+			$this->error['height'] = $this->language->get('error_height');
+		}
+
+		return !$this->error;
 	}
 }
