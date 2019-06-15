@@ -86,6 +86,12 @@ class ControllerExtensionModuleBestSeller extends Controller {
 				} else {
 					$rating = false;
 				}
+				
+				$searches = 0;
+				
+				if (!empty($search_results[$result['product_id']])) {
+					$searches = sprintf($this->language->get('text_customer_search'), $search_results[$result['product_id']]['searches']);
+				}
 
 				$data['products'][] = array(
 					'product_id'  => $result['product_id'],
@@ -96,6 +102,7 @@ class ControllerExtensionModuleBestSeller extends Controller {
 					'special'     => $special,
 					'tax'         => $tax,
 					'rating'      => $rating,
+					'searches'	  => $searches,
 					'href'        => $this->url->link('product/product', 'product_id=' . $result['product_id'])
 				);
 			}
@@ -246,7 +253,7 @@ class ControllerExtensionModuleBestSeller extends Controller {
 																							   );
 						}
 																 
-						$this->model_checkout_order->setSalesRepMax($order_info['order_id']);
+						$this->model_checkout_order->setSalesRepMin($order_info['order_id']);
 					}
 				}
 			}
