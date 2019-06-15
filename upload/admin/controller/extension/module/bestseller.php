@@ -46,6 +46,12 @@ class ControllerExtensionModuleBestSeller extends Controller {
 		} else {
 			$data['error_height'] = '';
 		}
+		
+		if (isset($this->error['order_period_value'])) {
+			$data['error_order_period_value'] = $this->error['order_period_value'];
+		} else {
+			$data['error_order_period_value'] = '';
+		}
 
 		$data['breadcrumbs'] = array();
 
@@ -201,6 +207,18 @@ class ControllerExtensionModuleBestSeller extends Controller {
 
 		if (!$this->request->post['height']) {
 			$this->error['height'] = $this->language->get('error_height');
+		}
+		
+		if (!empty($this->request->post['group'])) {
+			if ($this->request->post['group'] == 'day' && ((int)$this->request->post['order_period_value'] < 1 || (int)$this->request->post['order_period_value'] > 365)) {
+				$this->error['order_period_value'] = $this->language->get('error_order_period_value_day');
+			} elseif ($this->request->post['group'] == 'week' && ((int)$this->request->post['order_period_value'] < 1 || (int)$this->request->post['order_period_value'] > 52)) {
+				$this->error['order_period_value'] = $this->language->get('error_order_period_value_week');
+			} elseif ($this->request->post['group'] == 'month' && ((int)$this->request->post['order_period_value'] < 1 || (int)$this->request->post['order_period_value'] > 12)) {
+				$this->error['order_period_value'] = $this->language->get('error_order_period_value_month');
+			} elseif ($this->request->post['group'] == 'month' && ((int)$this->request->post['order_period_value'] < 1 || (int)$this->request->post['order_period_value'] > 1)) {
+				$this->error['order_period_value'] = $this->language->get('error_order_period_value_year');
+			}
 		}
 
 		return !$this->error;
