@@ -289,6 +289,9 @@ class ModelCheckoutOrder extends Model {
 		}
 		
 		$sql .= " AND `o`.`language_id` = '" . (int)$this->config->get('config_language_id') . "'";
+		$sql .= " AND `o`.`store_id` = '" . (int)$this->config->get('config_store_id') . "'";
+		$sql .= " AND `o`.`currency_id` = '" . (int)$this->config->get('config_currency_id') . "'";
+		$sql .= " AND `o`.`customer_group_id` = '" . (int)$this->config->get('config_customer_group_id') . "'";
 		
 		if (!empty($data['filter_group'])) {
 			$group = $data['filter_group'];
