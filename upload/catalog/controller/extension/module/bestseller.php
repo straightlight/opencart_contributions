@@ -140,7 +140,15 @@ class ControllerExtensionModuleBestSeller extends Controller {
 					}
 						
 					if ($notify) {
-						$tmp_bestsellers_data[$bestseller['order_id'] . '|' . $bestseller['search_date_end'] . '|' . $bestseller['searches'] . '|' . $notify][] = $bestseller['products'];
+						$notify_data = array('order_id'				=> $bestseller['order_id'],
+											 'search_date_end'		=> $bestseller['search_date_end'],
+											 'searches'				=> $bestseller['searches'],
+											 'notify'				=> $notify,
+											);
+											
+						$notify_encode = json_encode($notify_data);
+						
+						$tmp_bestsellers_data[$notify_encode][] = $bestseller['products'];
 					}					
 				}
 			}
@@ -162,9 +170,9 @@ class ControllerExtensionModuleBestSeller extends Controller {
 			// Minimum products ordered for worst level of sales.
 			if (!empty($bestsellers['minimum'])) {
 				foreach ($bestsellers['minimum'] as $order => $value) {
-					$order_exploded = explode('|', trim($order));
+					$order_decoded = json_decode($order, true);
 					
-					$order_info = $this->model_checkout_order->getOrder($order_exploded[0]);
+					$order_info = $this->model_checkout_order->getOrder($order_decoded['order_id']);
 					
 					if ($order_info) {
 						$affiliate = $this->model_account_customer->getAffiliateByTracking($order_info['tracking']);
@@ -182,18 +190,18 @@ class ControllerExtensionModuleBestSeller extends Controller {
 						$order_products = $this->model_sale_order->getOrderProducts($order_info['order_id']);
 						
 						if ($order_products) {
-							$data['bestsellers']['minimum'][$order_exploded[3]][] = array('customer_id'					=> $order_info['customer_id'],
-																						  'payment_firstname'			=> $order_info['payment_firstname'],
-																						  'payment_lastname'			=> $order_info['payment_lastname'],																						  
-																						  'email'						=> $order_info['email'],
-																						  'total'						=> $this->currency->format($order_info['total'], $this->config->get('config_currency')),
-																						  'products'					=> $value,
-																						  'searches'					=> $order_exploded[2],
-																						  'order_products'				=> $order_products,
-																						  'affiliate_name'				=> $affiliate_name,
-																						  'date_added'					=> date($this->language->get('datetime_format'), $order_info['date_added']),
-																						  'search_date_end'				=> date($this->language->get('datetime_format'), $order_exploded[1]),																  
-																						 );
+							$data['bestsellers']['minimum'][$order_decoded['notify']][] = array('customer_id'					=> $order_info['customer_id'],
+																								'payment_firstname'				=> $order_info['payment_firstname'],
+																								'payment_lastname'				=> $order_info['payment_lastname'],
+																								'email'							=> $order_info['email'],
+																								'total'							=> $this->currency->format($order_info['total'], $this->config->get('config_currency')),
+																								'products'						=> $value,
+																								'searches'						=> $order_decoded['searches'],
+																								'order_products'				=> $order_products,
+																								'affiliate_name'				=> $affiliate_name,
+																								'date_added'					=> date($this->language->get('datetime_format'), $order_info['date_added']),
+																								'search_date_end'				=> date($this->language->get('datetime_format'), $order_decoded['search_date_end']),																  
+																							   );
 						}
 																 
 						$this->model_checkout_order->setSalesRepMin($order_info['order_id']);
@@ -204,9 +212,9 @@ class ControllerExtensionModuleBestSeller extends Controller {
 			// Maximum products ordered for best level of sales.
 			if (!empty($bestsellers['maximum'])) {
 				foreach ($bestsellers['maximum'] as $order => $value) {
-					$order_exploded = explode('|', trim($order));
+					$order_decoded = json_decode($order, true);
 					
-					$order_info = $this->model_checkout_order->getOrder($order_exploded[0]);
+					$order_info = $this->model_checkout_order->getOrder($order_decoded['order_id']);
 					
 					if ($order_info) {
 						$affiliate = $this->model_account_customer->getAffiliateByTracking($order_info['tracking']);
@@ -224,21 +232,21 @@ class ControllerExtensionModuleBestSeller extends Controller {
 						$order_products = $this->model_sale_order->getOrderProducts($order_info['order_id']);
 						
 						if ($order_products) {
-							$data['bestsellers']['maximum'][$order_exploded[3]][] = array('customer_id'					=> $order_info['customer_id'],
-																						  'payment_firstname'			=> $order_info['payment_firstname'],
-																						  'payment_lastname'			=> $order_info['payment_lastname'],																						  
-																						  'email'						=> $order_info['email'],
-																						  'total'						=> $this->currency->format($order_info['total'], $this->config->get('config_currency')),
-																						  'products'					=> $value,
-																						  'searches'					=> $order_exploded[2],
-																						  'order_products'				=> $order_products,
-																						  'affiliate_name'				=> $affiliate_name,
-																						  'date_added'					=> date($this->language->get('datetime_format'), $order_info['date_added']),
-																						  'search_date_end'				=> date($this->language->get('datetime_format'), $order_exploded[1]),																  
-																						 );
+							$data['bestsellers']['maximum'][$order_decoded['notify']][] = array('customer_id'					=> $order_info['customer_id'],
+																								'payment_firstname'				=> $order_info['payment_firstname'],
+																								'payment_lastname'				=> $order_info['payment_lastname'],
+																								'email'							=> $order_info['email'],
+																								'total'							=> $this->currency->format($order_info['total'], $this->config->get('config_currency')),
+																								'products'						=> $value,
+																								'searches'						=> $order_decoded['searches'],
+																								'order_products'				=> $order_products,
+																								'affiliate_name'				=> $affiliate_name,
+																								'date_added'					=> date($this->language->get('datetime_format'), $order_info['date_added']),
+																								'search_date_end'				=> date($this->language->get('datetime_format'), $order_decoded['search_date_end']),																  
+																							   );
 						}
-							
-						$this->model_checkout_order->setSalesRepMax($order_info['order_id']);					
+																 
+						$this->model_checkout_order->setSalesRepMin($order_info['order_id']);
 					}
 				}
 			}
