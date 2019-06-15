@@ -327,6 +327,7 @@ class ModelCatalogProduct extends Model {
 			$sql .= " AND `cs`.`language_id` = '" . (int)$this->config->get('config_language_id') . "'";
 			$sql .= " AND `cs`.`store_id` = '" . (int)$this->config->get('config_store_id') . "'";
 			$sql .= " AND `o`.`currency_id` = '" . (int)$this->config->get('config_currency_id') . "'";
+			$sql .= " AND `o`.`customer_group_id` = '" . (int)$this->config->get('config_customer_group_id') . "'";
 			
 			if (!empty($filter_data['filter_country']) && $filter_data['filter_country']) {				
 				$sql .= " AND UCASE(TRIM(`o`.`payment_country`)) = '" . $this->db->escape(trim(strtoupper($filter_data['filter_country']))) . "'";
