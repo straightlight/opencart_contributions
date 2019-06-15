@@ -154,6 +154,22 @@ class ControllerExtensionModuleBestSeller extends Controller {
 		} else {
 			$data['rating'] = '';
 		}
+		
+		if (isset($this->request->post['order_period_notify'])) {
+			$data['order_period_notify'] = $this->request->post['order_period_notify'];
+		} elseif (!empty($module_info)) {
+			$data['order_period_notify'] = $module_info['order_period_notify'];
+		} else {
+			$data['order_period_notify'] = '';
+		}
+		
+		if (isset($this->request->post['order_period_value'])) {
+			$data['order_period_value'] = $this->request->post['order_period_value'];
+		} elseif (!empty($module_info)) {
+			$data['order_period_value'] = $module_info['order_period_value'];
+		} else {
+			$data['order_period_value'] = '';
+		}
 
 		if (isset($this->request->post['status'])) {
 			$data['status'] = $this->request->post['status'];
