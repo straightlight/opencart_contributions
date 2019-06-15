@@ -52,7 +52,9 @@ class ControllerExtensionModuleBestSeller extends Controller {
 		}
 
 		if ($results) {
-			$this->session->data['bestseller_setting'] = $setting;
+			if (empty($this->session->data['bestseller_setting'])) {
+				$this->session->data['bestseller_setting'] = $setting;
+			}
 			
 			foreach ($results as $result) {
 				if ($result['image']) {
