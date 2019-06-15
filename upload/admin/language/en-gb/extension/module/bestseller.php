@@ -38,3 +38,7 @@ $_['error_permission'] = 'Warning: You do not have permission to modify bestsell
 $_['error_name']       = 'Module Name must be between 3 and 64 characters!';
 $_['error_width']      = 'Width required!';
 $_['error_height']     = 'Height required!';
+$_['error_order_period_value_day'] = 'Error: The selected day must be between 1 and 365 days!';
+$_['error_order_period_value_week'] = 'Error: The selected week must be between 1 and 52 weeks!';
+$_['error_order_period_value_month'] = 'Error: The selected month must be between 1 and 12 months!';
+$_['error_order_period_value_year'] = 'Error: The selected year must be 1 year!';
