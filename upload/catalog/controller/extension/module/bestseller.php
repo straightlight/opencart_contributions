@@ -125,7 +125,7 @@ class ControllerExtensionModuleBestSeller extends Controller {
 
 					$difference = $datetime1->diff($datetime2);
 					
-					if ($difference->d >= $this->session->data['bestseller_setting']['order_period_value']) {
+					if (($difference->d >= $this->session->data['bestseller_setting']['order_period_value']) || ($difference->d % 7 >= $this->session->data['bestseller_setting']['order_period_value']) || ($difference->w >= $this->session->data['bestseller_setting']['order_period_value']) || ($difference->y >= $this->session->data['bestseller_setting']['order_period_value'])) {
 						if ($this->session->data['bestseller_setting']['order_period'] == 'day') {
 							$notify = ($difference->d > 1 ? sprintf($this->language->get('text_order_period_days'), $difference->d) : sprintf($this->language->get('text_order_period_day'), $difference->d));
 						} elseif ($this->session->data['bestseller_setting']['order_period'] == 'week') {
