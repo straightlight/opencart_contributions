@@ -109,6 +109,10 @@ class ControllerExtensionModuleBestSeller extends Controller {
 			
 			$this->load->model('checkout/order');
 			
+			$data['store_url'] = HTTP_CATALOG . 'index.php?route=common/home';
+			
+			$data['store_name'] = $this->config->get('config_name');
+			
 			$bestsellers = $this->model_checkout_order->getBestSellerByOrders($this->session->data['bestseller_setting']);
 			
 			$tmp_bestsellers_data = array();
@@ -140,7 +144,7 @@ class ControllerExtensionModuleBestSeller extends Controller {
 			$bestsellers_data = array();
 			
 			foreach ($tmp_bestsellers_data as $order => $results) {
-				if (!empty($results) && is_array($results) && min($results)) {
+				if (!empty($results) && is_array($results) && min($results) > 1) {
 					$bestsellers_data['minimum'][$order] = min($results);
 				} elseif (!empty($results) && is_array($results) && max($results)) {
 					$bestsellers_data['maximum'][$order] = max($results);
