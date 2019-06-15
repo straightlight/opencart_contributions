@@ -320,8 +320,6 @@ class ModelCatalogProduct extends Model {
 				$sql .= (!$processing_implode ? " WHERE " : " AND ") . "(" . implode(" OR ", $complete_implode) . ")";
 			}
 			
-			$sql .= " AND `o`.`language_id` = '" . (int)$this->config->get('config_language_id') . "'";
-			
 			$sql .= " AND `o`.`language_id` = `cs`.`language_id`"; 
 			$sql .= " AND `o`.`store_id` = `cs`.`store_id`";
 			$sql .= " AND `cs`.`language_id` = '" . (int)$this->config->get('config_language_id') . "'";
