@@ -125,14 +125,16 @@ class ControllerExtensionModuleBestSeller extends Controller {
 
 					$difference = $datetime1->diff($datetime2);
 					
-					if ($this->session->data['bestseller_setting']['order_period'] == 'day') {
-						$notify = ($difference->d > 1 ? sprintf($this->language->get('text_order_period_days'), $difference->d) : sprintf($this->language->get('text_order_period_day'), $difference->d));
-					} elseif ($this->session->data['bestseller_setting']['order_period'] == 'week') {
-						$notify = ($difference->d % 7 > 1 ? sprintf($this->language->get('text_order_period_weeks'), $difference->d % 7) : sprintf($this->language->get('text_order_period_week'), $difference->d % 7));
-					} elseif ($this->session->data['bestseller_setting']['order_period'] == 'month') {
-						$notify = ($difference->m > 1 ? sprintf($this->language->get('text_order_period_months'), $difference->m) : sprintf($this->language->get('text_order_period_month'), $difference->m));
-					} elseif ($this->session->data['bestseller_setting']['order_period'] == 'year') {
-						$notify = ($difference->y > 1 ? sprintf($this->language->get('text_order_period_years'), $difference->y) : sprintf($this->language->get('text_order_period_year'), $difference->y));
+					if ($difference->d >= $this->session->data['bestseller_setting']['order_period_value']) {
+						if ($this->session->data['bestseller_setting']['order_period'] == 'day') {
+							$notify = ($difference->d > 1 ? sprintf($this->language->get('text_order_period_days'), $difference->d) : sprintf($this->language->get('text_order_period_day'), $difference->d));
+						} elseif ($this->session->data['bestseller_setting']['order_period'] == 'week') {
+							$notify = ($difference->d % 7 > 1 ? sprintf($this->language->get('text_order_period_weeks'), $difference->d % 7) : sprintf($this->language->get('text_order_period_week'), $difference->d % 7));
+						} elseif ($this->session->data['bestseller_setting']['order_period'] == 'month') {
+							$notify = ($difference->m > 1 ? sprintf($this->language->get('text_order_period_months'), $difference->m) : sprintf($this->language->get('text_order_period_month'), $difference->m));
+						} elseif ($this->session->data['bestseller_setting']['order_period'] == 'year') {
+							$notify = ($difference->y > 1 ? sprintf($this->language->get('text_order_period_years'), $difference->y) : sprintf($this->language->get('text_order_period_year'), $difference->y));
+						}
 					}
 						
 					if ($notify) {
