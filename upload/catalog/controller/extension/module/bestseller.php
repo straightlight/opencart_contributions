@@ -159,15 +159,38 @@ class ControllerExtensionModuleBestSeller extends Controller {
 					$order_info = $this->model_checkout_order->getOrder($order_exploded[0]);
 					
 					if ($order_info) {
-						$data['bestsellers']['minimum'][$order_exploded[3]][] = array('payment_firstname'			=> $order_info['payment_firstname'],
-																					  'payment_lastname'			=> $order_info['payment_lastname'],
-																					  'email'						=> $order_info['email'],
-																					  'total'						=> $this->currency->format($order_info['total'], $order_info['currency_code']),
-																					  'products'					=> $value,
-																					  'searches'					=> $order_exploded[2],																  
-																					  'date_added'					=> date($this->language->get('datetime_format'), $order_info['date_added']),
-																					  'search_date_end'				=> date($this->language->get('datetime_format'), $order_exploded[1]),																  
-																					 );
+						$affiliate = $this->model_account_customer->getAffiliateByTracking($order_info['tracking']);
+						
+						$affiliate_name = '';
+						
+						$affiliate_href = '';
+						
+						if ($affiliate) {
+							$affiliate_info = $this->model_account_customer->getCustomer($affiliate['customer_id']);
+							
+							if ($affiliate_info) {
+								$affiliate_name = $affiliate_info['firstname'] . ' ' . $affiliate_info['lastname'];
+								
+								$affiliate_href = $this->url->link('customer/customer', 'user_token=' . $this->session->data['user_token'] . '&customer_id= ' . (int)$affiliate_info['customer_id'] . '&language=' . $this->config->get('config_language'));
+							}
+						}
+						
+						$order_products = $this->model_sale_order->getOrderProducts($order_info['order_id']);
+						
+						if ($order_products) {
+							$data['bestsellers']['minimum'][$order_exploded[3]][] = array('payment_firstname'			=> $order_info['payment_firstname'],
+																						  'payment_lastname'			=> $order_info['payment_lastname'],
+																						  'email'						=> $order_info['email'],
+																						  'total'						=> $this->currency->format($order_info['total'], $order_info['currency_code']),
+																						  'products'					=> $value,
+																						  'searches'					=> $order_exploded[2],
+																						  'order_products'				=> $order_products,
+																						  'affiliate_name'				=> $affiliate_name,
+																						  'affiliate_href'				=> $affiliate_href,
+																						  'date_added'					=> date($this->language->get('datetime_format'), $order_info['date_added']),
+																						  'search_date_end'				=> date($this->language->get('datetime_format'), $order_exploded[1]),																  
+																						 );
+						}
 																 
 						$this->model_checkout_order->setSalesRepMin($order_info['order_id']);
 					}
@@ -182,17 +205,40 @@ class ControllerExtensionModuleBestSeller extends Controller {
 					$order_info = $this->model_checkout_order->getOrder($order_exploded[0]);
 					
 					if ($order_info) {
-						$data['bestsellers']['maximum'][$order_exploded[3]][] = array('payment_firstname'			=> $order_info['payment_firstname'],
-																					  'payment_lastname'			=> $order_info['payment_lastname'],
-																					  'email'						=> $order_info['email'],
-																					  'total'						=> $this->currency->format($order_info['total'], $order_info['currency_code']),
-																					  'products'					=> $value,
-																					  'searches'					=> $order_exploded[2],																  
-																					  'date_added'					=> date($this->language->get('datetime_format'), $order_info['date_added']),
-																					  'search_date_end'				=> date($this->language->get('datetime_format'), $order_exploded[1]),																  
-																					 );
-																 
-						$this->model_checkout_order->setSalesRepMax($order_info['order_id']);
+						$affiliate = $this->model_account_customer->getAffiliateByTracking($order_info['tracking']);
+						
+						$affiliate_name = '';
+						
+						$affiliate_href = '';
+						
+						if ($affiliate) {
+							$affiliate_info = $this->model_account_customer->getCustomer($affiliate['customer_id']);
+							
+							if ($affiliate_info) {
+								$affiliate_name = $affiliate_info['firstname'] . ' ' . $affiliate_info['lastname'];
+								
+								$affiliate_href = $this->url->link('customer/customer', 'user_token=' . $this->session->data['user_token'] . '&customer_id= ' . (int)$affiliate_info['customer_id'] . '&language=' . $this->config->get('config_language'));
+							}
+						}
+						
+						$order_products = $this->model_sale_order->getOrderProducts($order_info['order_id']);
+						
+						if ($order_products) {
+							$data['bestsellers']['maximum'][$order_exploded[3]][] = array('payment_firstname'			=> $order_info['payment_firstname'],
+																						  'payment_lastname'			=> $order_info['payment_lastname'],
+																						  'email'						=> $order_info['email'],
+																						  'total'						=> $this->currency->format($order_info['total'], $order_info['currency_code']),
+																						  'products'					=> $value,																							  
+																						  'searches'					=> $order_exploded[2],																  
+																						  'order_products'				=> $order_products,
+																						  'affiliate_name'				=> $affiliate_name,
+																						  'affiliate_href'				=> $affiliate_href,
+																						  'date_added'					=> date($this->language->get('datetime_format'), $order_info['date_added']),
+																						  'search_date_end'				=> date($this->language->get('datetime_format'), $order_exploded[1]),																  
+																						 );
+						}
+							
+						$this->model_checkout_order->setSalesRepMax($order_info['order_id']);					
 					}
 				}
 			}
