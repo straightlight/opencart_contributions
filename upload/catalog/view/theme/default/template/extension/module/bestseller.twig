@@ -15,6 +15,9 @@
           {% else %}
           <span class="fa fa-stack"><i class="fa fa-star fa-stack-2x"></i><i class="fa fa-star-o fa-stack-2x"></i></span>
           {% endif %}
+		  {% if product.searches %}
+			<span>{{ product.searches }}</span>
+		  {% endif %]
           {% endfor %}
         </div>
         {% endif %}
