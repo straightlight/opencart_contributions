@@ -392,7 +392,7 @@ class ModelCatalogProduct extends Model {
 				$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
 			}
 
-			$query = $this->db->query($sql);
+			$query = $this->db->query($sql)->rows;
 					
 			if (!empty($filter_data['filter'])) {
 				if ($filter_data['filter'] == 'product') {
