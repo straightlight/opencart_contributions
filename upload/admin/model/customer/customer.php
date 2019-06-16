@@ -228,6 +228,12 @@ class ModelCustomerCustomer extends Model {
 
 		return $address_data;
 	}
+	
+	public function getSearchKeywords($data = array()) {
+		$query = $this->db->query("SELECT `keyword` FROM `" . DB_PREFIX . "customer_search` WHERE `keyword` LIKE '%" . $this->db->escape($data['keyword']) . "%'");
+
+		return $query->rows;
+	}
 
 	public function getTotalCustomers($data = array()) {
 		$sql = "SELECT COUNT(*) AS total FROM " . DB_PREFIX . "customer";
@@ -271,11 +277,11 @@ class ModelCustomerCustomer extends Model {
 		return $query->row['total'];
 	}
         
-        public function getAffliateByTracking($tracking) {
-                $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "customer_affiliate WHERE tracking = '" . $this->db->escape($tracking) . "'");
+    public function getAffiliateByTracking($tracking) {
+		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "customer_affiliate WHERE tracking = '" . $this->db->escape($tracking) . "'");
                 
-                return $query->row;
-        }
+        return $query->row;
+    }
 	
 	public function getAffiliate($customer_id) {
 		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "customer_affiliate WHERE customer_id = '" . (int)$customer_id . "'");
