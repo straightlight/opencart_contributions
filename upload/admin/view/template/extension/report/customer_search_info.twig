@@ -37,26 +37,17 @@
           <label class="control-label" for="input-customer">{{ entry_customer }}</label>
           <input type="text" name="filter_customer" value="{{ filter_customer }}" placeholder="{{ entry_customer }}" id="input-customer" class="form-control" />
         </div>
+		<div class="form-group">
+          <label class="control-label" for="input-category">{{ entry_category }}</label>
+          <input type="text" name="filter_category" value="{{ filter_category }}" placeholder="{{ entry_category }}" id="input-category" class="form-control" />
+        </div>
+		<div class="form-group">
+          <label class="control-label" for="input-product">{{ entry_product }}</label>
+          <input type="text" name="filter_product" value="{{ filter_product }}" placeholder="{{ entry_product }}" id="input-product" class="form-control" />
+        </div>
         <div class="form-group">
           <label class="control-label" for="input-ip">{{ entry_ip }}</label>
           <input type="text" name="filter_ip" value="{{ filter_ip }}" placeholder="{{ entry_ip }}" id="input-ip" class="form-control" />
-        </div>
-		<div class="form-group">
-			<label class="control-label" for="input-country">{{ entry_country }}</label>
-            <select name="filter_country_id" id="input-country" class="form-control">
-				<option value="">{{ text_select }}</option>
-				{% for country in countries %}
-					{% if country.country_id == filter_country_id %}
-						<option value="{{ country.country_id }}" selected="selected">{{ country.name }}</option>
-					{% else %}
-						<option value="{{ country.country_id }}">{{ country.name }}</option>
-					{% endif %}
-                {% endfor %}
-            </select>
-        </div>
-		<div class="form-group">
-			<label class="control-label" for="input-zone">{{ entry_zone }}</label>
-            <select name="filter_zone_id" id="input-zone" class="form-control"></select>        
         </div>		
 		<div class="form-group">
           <label class="control-label" for="input-keyword">{{ entry_keyword }}</label>
@@ -78,44 +69,41 @@
           <table class="table table-bordered">
             <thead>
               <tr>
+			    <td class="text-left">{{ column_date_start }}</td>
+				<td class="text-left">{{ column_date_end }}</td>
+				<td class="text-left">{{ column_order }}</td>
                 <td class="text-left">{{ column_keyword }}</td>
-                <td class="text-left">{{ column_products }}</td>
-				<td class="text-left">{{ column_recurring }}</td>
+                <td class="text-left">{{ column_products }}</td>				
                 <td class="text-left">{{ column_categories }}</td>
-                <td class="text-left">{{ column_searches }}</td>
-				<td class="text-left">{{ column_country }}</td>
-				<td class="text-left">{{ column_zone }}</td>
-				<td class="text-left">{{ column_payment }}</td>
-				<td class="text-left">{{ column_shipping }}</td>
-				<td class="text-left">{{ column_store }}</td>				
-                <td class="text-left">{{ column_total }}</td>
-				<td class="text-left">{{ column_tax }}</td>
-                <td class="text-left">{{ column_date_added }}</td>
+                <td class="text-right">{{ column_searches }}</td>
+				<td class="text-right">{{ column_product }}</td>
+				<td class="text-right">{{ column_store }}</td>				
+                <td class="text-right">{{ column_total }}</td>
+				<td class="text-right">{{ column_tax }}</td>
+                <td class="text-right">{{ column_date_added }}</td>
               </tr>
             </thead>
             <tbody>
             
             {% if searches %}
-            {% for search in searches %}
-            <tr>
-              <td class="text-left">{{ search.keyword }}</td>
-              <td class="text-left">{{ search.products }}</td>
-			  <td class="text-left">{{ search.recurring_status }}</td>
-              <td class="text-left">{{ search.categories }}</td>
-              <td class="text-left">{{ search.searches }}</td>
-              <td class="text-left">{{ search.country }}</td>
-			  <td class="text-left">{{ search.zone }}</td>
-			  <td class="text-left">{{ search.payment }}</td>
-			  <td class="text-left">{{ search.shipping }}</td>
-			  <td class="text-left"><a href="{{ search.store_href }}">{{ search.store }}</a></td>
-			  <td class="text-left">{{ search.total }}</td>
-			  <td class="text-left">{{ search.tax }}</td>
-              <td class="text-left">{{ search.date_added }}</td>
-            </tr>
-            {% endfor %}
+				{% for search in searches %}
+				<tr>
+				  <td class="text-left">{{ search.date_start }}</td>
+				  <td class="text-left">{{ search.date_end }}</td>
+				  <td class="text-left"><a href="{{ search.order_href }}">{{ order_id }}</a></td>
+				  <td class="text-left">{{ search.keyword }}</td>
+				  <td class="text-left">{{ search.products }}</td>			  
+				  <td class="text-right">{{ search.categories }}</td>
+				  <td class="text-right">{{ search.searches }}</td>
+				  <td class="text-right"><a href="{{ search.product_href }}">{{ search.order_product_name }}</a></td>
+				  <td class="text-right"><a href="{{ search.store_href }}">{{ search.store_name }}</a></td>
+				  <td class="text-right">{{ search.total }}</td>
+				  <td class="text-right">{{ search.tax }}</td>              
+				</tr>
+				{% endfor %}
             {% else %}
             <tr>
-              <td class="text-center" colspan="13">{{ text_no_results }}</td>
+              <td class="text-center" colspan="11">{{ text_no_results }}</td>
             </tr>
             {% endif %}
             </tbody>
@@ -158,22 +146,22 @@ $('#button-filter').on('click', function() {
 		url += '&filter_customer=' + encodeURIComponent(filter_customer);
 	}
 	
+	var filter_category = $('input[name=\'filter_category\']').val();
+	
+	if (filter_category) {
+		url += '&filter_category=' + encodeURIComponent(filter_category);
+	}
+	
+	var filter_product = $('input[name=\'filter_product\']').val();
+	
+	if (filter_product) {
+		url += '&filter_product=' + encodeURIComponent(filter_product);
+	}
+	
 	var filter_ip = $('input[name=\'filter_ip\']').val();
 	
 	if (filter_ip) {
 		url += '&filter_ip=' + encodeURIComponent(filter_ip);
-	}
-	
-	var filter_country_id = $('select[name=\'filter_country_id\']').val();
-	
-	if (filter_country_id) {
-		url += '&filter_country_id=' + encodeURIComponent(filter_country_id);
-	}
-	
-	var filter_zone_id = $('select[name=\'filter_zone_id\']').val();
-	
-	if (filter_zone_id) {
-		url += '&filter_zone_id=' + encodeURIComponent(filter_zone_id);
 	}
 	
 	var filter_group = $('select[name=\'filter_group\']').val();
@@ -211,43 +199,64 @@ $('input[name=\'filter_customer\']').autocomplete({
 		$('input[name=\'filter_customer\']').val(item['label']);
 	}
 });
-//--></script>
-<script type="text/javascript"><!--
-$('select[name=\'filter_country_id\']').on('change', function() {
-	$.ajax({
-		url: 'index.php?route=localisation/country/country&user_token={{ user_token }}&country_id=' + this.value,
-		dataType: 'json',
-		beforeSend: function() {
-			$('select[name=\'filter_country_id\']').prop('disabled', true);
-		},
-		complete: function() {
-			$('select[name=\'filter_country_id\']').prop('disabled', false);
-		},		
-		success: function(json) {
-			html = '<option value="">{{ text_select }}</option>';
 
-			if (json['zone'] && json['zone'] != '') {
-				for (i = 0; i < json['zone'].length; i++) {
-					html += '<option value="' + json['zone'][i]['zone_id'] + '"';
-
-					if (json['zone'][i]['zone_id'] == '{{ filter_zone_id }}') {
-						html += ' selected="selected"';
+$('input[name=\'filter_category\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=catalog/category/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['category_id']
 					}
-
-					html += '>' + json['zone'][i]['name'] + '</option>';
-				}
-			} else {
-				html = '<option value="0" selected="selected">{{ text_none }}</option>';
+				}));
 			}
-			
-			$('select[name=\'filter_zone_id\']').html(html);
-		},
-		error: function(xhr, ajaxOptions, thrownError) {
-			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
-		}
-	});
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'filter_category\']').val(item['label']);
+	}
 });
 
-$('select[name=\'filter_country_id\']').trigger('change');
+$('input[name=\'filter_product\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['product_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'filter_product\']').val(item['label']);
+	}
+});
 
+$('input[name=\'filter_keyword\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=customer/customer/searchKeyword&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['keyword'],
+						value: item['keyword']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'filter_product\']').val(item['label']);
+	}
+});
 //--></script>
