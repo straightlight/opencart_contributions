@@ -1,280 +1,181 @@
-<div class="row">
-  <div id="filter-report" class="col-md-3 col-md-push-9 col-sm-12 hidden-sm hidden-xs">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3 class="panel-title"><i class="fa fa-filter"></i> {{ text_filter }}</h3>
-      </div>
-      <div class="panel-body">
-        <div class="form-group">
-          <label class="control-label" for="input-date-start">{{ entry_date_start }}</label>
-          <div class="input-group date">
-            <input type="text" name="filter_date_start" value="{{ filter_date_start }}" placeholder="{{ entry_date_start }}" data-date-format="YYYY-MM-DD" id="input-date-start" class="form-control" />
-            <span class="input-group-btn">
-            <button type="button" class="btn btn-default"><i class="fa fa-calendar"></i></button>
-            </span></div>
-        </div>        
-        <div class="form-group">
-          <label class="control-label" for="input-date-end">{{ entry_date_end }}</label>
-          <div class="input-group date">
-            <input type="text" name="filter_date_end" value="{{ filter_date_end }}" placeholder="{{ entry_date_end }}" data-date-format="YYYY-MM-DD" id="input-date-end" class="form-control" />
-            <span class="input-group-btn">
-            <button type="button" class="btn btn-default"><i class="fa fa-calendar"></i></button>
-            </span></div>
-        </div>
-		<div class="form-group">
-          <label class="control-label" for="input-group">{{ entry_group }}</label>
-          <select name="filter_group" id="input-group" class="form-control">
-                  {% for group in groups %}
-					{% if group.value == filter_group %}
-						<option value="{{ group.value }}" selected="selected">{{ group.text }}</option>
-					{% else %}
-						<option value="{{ group.value }}">{{ group.text }}</option>
-					{% endif %}
-                  {% endfor %}
-          </select>
-        </div>
-		<div class="form-group">
-          <label class="control-label" for="input-customer">{{ entry_customer }}</label>
-          <input type="text" name="filter_customer" value="{{ filter_customer }}" placeholder="{{ entry_customer }}" id="input-customer" class="form-control" />
-        </div>
-		<div class="form-group">
-          <label class="control-label" for="input-category">{{ entry_category }}</label>
-          <input type="text" name="filter_category" value="{{ filter_category }}" placeholder="{{ entry_category }}" id="input-category" class="form-control" />
-        </div>
-		<div class="form-group">
-          <label class="control-label" for="input-product">{{ entry_product }}</label>
-          <input type="text" name="filter_product" value="{{ filter_product }}" placeholder="{{ entry_product }}" id="input-product" class="form-control" />
-        </div>
-        <div class="form-group">
-          <label class="control-label" for="input-ip">{{ entry_ip }}</label>
-          <input type="text" name="filter_ip" value="{{ filter_ip }}" placeholder="{{ entry_ip }}" id="input-ip" class="form-control" />
-        </div>
-		<div class="form-group">
-          <label class="control-label" for="input-salesrep">{{ entry_salesrep }}</label>
-          <select name="filter_salesrep" id="input-salesrep" class="form-control">
-			{% if filter_salesrep == 'max' %}
-				<option value="max" selected="selected">{{ text_salesrep_max }}</option>
-				<option value="min">{{ text_salesrep_min }}</option>
-			{% else %}
-				<option value="max">{{ text_salesrep_max }}</option>
-				<option value="min" selected="selected">{{ text_salesrep_min }}</option>
-			{% endif %}
-          </select>
-        </div>
-		<div class="form-group">
-          <label class="control-label" for="input-keyword">{{ entry_keyword }}</label>
-          <input type="text" name="filter_keyword" value="{{ filter_keyword }}" placeholder="{{ entry_keyword }}" id="input-keyword" class="form-control" />
-        </div>
-        <div class="form-group text-right">
-          <button type="button" id="button-filter" class="btn btn-default"><i class="fa fa-filter"></i> {{ button_filter }}</button>
-        </div>
-      </div>
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-module" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
     </div>
   </div>
-  <div class="col-md-9 col-md-pull-3 col-sm-12">
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
     <div class="panel panel-default">
       <div class="panel-heading">
-        <h3 class="panel-title"><i class="fa fa-bar-chart"></i> {{ heading_title }}</h3>
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
       </div>
       <div class="panel-body">
-        <div class="table-responsive">
-          <table class="table table-bordered">
-            <thead>
-              <tr>
-			    <td class="text-left">{{ column_date_start }}</td>
-				<td class="text-left">{{ column_date_end }}</td>
-				<td class="text-left">{{ column_order }}</td>
-                <td class="text-left">{{ column_keyword }}</td>
-                <td class="text-left">{{ column_products }}</td>				
-                <td class="text-left">{{ column_categories }}</td>
-                <td class="text-right">{{ column_searches }}</td>
-				<td class="text-right">{{ column_product }}</td>
-				<td class="text-right">{{ column_store }}</td>				
-                <td class="text-right">{{ column_total }}</td>
-				<td class="text-right">{{ column_tax }}</td>
-                <td class="text-right">{{ column_date_added }}</td>
-              </tr>
-            </thead>
-            <tbody>
-            
-            {% if searches %}
-				{% for search in searches %}
-				<tr>
-				  <td class="text-left">{{ search.date_start }}</td>
-				  <td class="text-left">{{ search.date_end }}</td>
-				  <td class="text-left"><a href="{{ search.order_href }}">{{ order_id }}</a></td>
-				  <td class="text-left">{{ search.keyword }}</td>
-				  <td class="text-left">{{ search.products }}</td>			  
-				  <td class="text-right">{{ search.categories }}</td>
-				  <td class="text-right">{{ search.searches }}</td>
-				  <td class="text-right"><a href="{{ search.product_href }}">{{ search.order_product_name }}</a></td>
-				  <td class="text-right"><a href="{{ search.store_href }}">{{ search.store_name }}</a></td>
-				  <td class="text-right">{{ search.total }}</td>
-				  <td class="text-right">{{ search.tax }}</td>              
-				</tr>
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-name">{{ entry_name }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="name" value="{{ name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control" />
+              {% if error_name %}
+              <div class="text-danger">{{ error_name }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-limit">{{ entry_limit }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="limit" value="{{ limit }}" placeholder="{{ entry_limit }}" id="input-limit" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-width">{{ entry_width }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="width" value="{{ width }}" placeholder="{{ entry_width }}" id="input-width" class="form-control" />
+              {% if error_width %}
+              <div class="text-danger">{{ error_width }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-height">{{ entry_height }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="height" value="{{ height }}" placeholder="{{ entry_height }}" id="input-height" class="form-control" />
+              {% if error_height %}
+              <div class="text-danger">{{ error_height }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-database-transaction">{{ entry_database_transaction }}</label>
+            <div class="col-sm-10">
+              <select name="database_transaction" id="input-database-transaction" class="form-control">
+                {% if database_transaction == 'delete' %}
+                <option value="delete" selected="selected">{{ text_database_transaction_delete }}</option>
+                <option value="update">{{ text_database_transaction_update }}</option>
+                {% else %}
+                <option value="delete">{{ text_database_transaction_delete }}</option>
+                <option value="update" selected="selected">{{ text_database_transaction_update }}</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-type">{{ entry_type }}</label>
+            <div class="col-sm-10">
+              <select name="type" id="input-type" class="form-control">
+                {% if type == 'search' %}
+                <option value="search" selected="selected">{{ text_type_search }}</option>
+                <option value="total">{{ text_type_total }}</option>
+                {% else %}
+                <option value="search">{{ text_type_search }}</option>
+                <option value="total" selected="selected">{{ text_type_total }}</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-type-order">{{ entry_type_order }}</label>
+            <div class="col-sm-10">
+              <select name="type_order" id="input-type-order" class="form-control">
+                {% if type_order == 'desc' %}
+                <option value="asc">{{ text_type_asc }}</option>
+                <option value="desc" selected="selected">{{ text_type_desc }}</option>
+                {% else %}
+                <option value="asc" selected="selected">{{ text_type_asc }}</option>
+                <option value="desc">{{ text_type_desc }}</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-group">{{ entry_group }}</label>
+            <div class="col-sm-10">
+              <select name="group" id="input-group" class="form-control">
+				{% for key, text_group in text_groups %}
+					{% if key == group %}
+						<option value="{{ key }}" selected="selected">{{ text_group }}</option>						
+					{% else %}						
+						<option value="{{ key }}">{{ text_group }}</option>
+					{% endif %}
 				{% endfor %}
-            {% else %}
-            <tr>
-              <td class="text-center" colspan="11">{{ text_no_results }}</td>
-            </tr>
-            {% endif %}
-            </tbody>
-            
-          </table>
-        </div>
-        <div class="row">
-          <div class="col-sm-6 text-left">{{ pagination }}</div>
-          <div class="col-sm-6 text-right">{{ results }}</div>
-        </div>
+              </select>
+            </div>
+          </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-rating">{{ entry_rating }}</label>
+            <div class="col-sm-10">
+              <select name="rating" id="input-rating" class="form-control">
+				{% if rating == 1 %}
+					<option value="1" selected="selected">{{ text_yes }}</option>
+					<option value="0">{{ text_no }}</option>
+				{% else %}
+					<option value="1">{{ text_yes }}</option>
+					<option value="0" selected="selected">{{ text_no }}</option>
+				{% endif %}
+              </select>
+            </div>
+          </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-order-period-notify">{{ entry_order_period_notify }}</label>
+            <div class="col-sm-10">
+              <select name="order_period_notify" id="input-order-period-notify" class="form-control">
+				{% if order_period_notify == 1 %}
+					<option value="1" selected="selected">{{ text_yes }}</option>
+					<option value="0">{{ text_no }}</option>
+				{% else %}
+					<option value="1">{{ text_yes }}</option>
+					<option value="0" selected="selected">{{ text_no }}</option>
+				{% endif %}
+              </select>
+            </div>
+          </div>
+		  <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-order-period-value">{{ entry_order_period_value }}</label>
+            <div class="col-sm-10">
+              <select name="order_period_value" id="input-order-period-value" class="form-control">
+				{% for i in 1..365 %}
+					{% if i == order_period_value %}
+						<option value="{{ i }}" selected="selected">{{ i }}</option>
+					{% else %}
+						<option value="{{ i }}">{{ i }}</option>
+					{% endif %}
+				{% endfor %}				
+              </select>
+			  {% if error_order_period_value %}
+				<div class="text-danger">{{ error_order_period_value }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+            <div class="col-sm-10">
+              <select name="status" id="input-status" class="form-control">
+                {% if status %}
+                <option value="1" selected="selected">{{ text_enabled }}</option>
+                <option value="0">{{ text_disabled }}</option>
+                {% else %}
+                <option value="1">{{ text_enabled }}</option>
+                <option value="0" selected="selected">{{ text_disabled }}</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
   </div>
 </div>
-<script type="text/javascript"><!--
-$('#button-filter').on('click', function() {
-	var url = '';
-	
-	var filter_date_start = $('input[name=\'filter_date_start\']').val();
-	
-	if (filter_date_start) {
-		url += '&filter_date_start=' + encodeURIComponent(filter_date_start);
-	}
-	
-	var filter_date_end = $('input[name=\'filter_date_end\']').val();
-	
-	if (filter_date_end) {
-		url += '&filter_date_end=' + encodeURIComponent(filter_date_end);
-	}
-	
-	var filter_keyword = $('input[name=\'filter_keyword\']').val();
-	
-	if (filter_keyword) {
-		url += '&filter_keyword=' + encodeURIComponent(filter_keyword);
-	}
-	
-	var filter_customer = $('input[name=\'filter_customer\']').val();
-	
-	if (filter_customer) {
-		url += '&filter_customer=' + encodeURIComponent(filter_customer);
-	}
-	
-	var filter_category = $('input[name=\'filter_category\']').val();
-	
-	if (filter_category) {
-		url += '&filter_category=' + encodeURIComponent(filter_category);
-	}
-	
-	var filter_product = $('input[name=\'filter_product\']').val();
-	
-	if (filter_product) {
-		url += '&filter_product=' + encodeURIComponent(filter_product);
-	}
-	
-	var filter_ip = $('input[name=\'filter_ip\']').val();
-	
-	if (filter_ip) {
-		url += '&filter_ip=' + encodeURIComponent(filter_ip);
-	}
-	
-	var filter_salesrep = $('select[name=\'filter_salesrep\']').val();
-	
-	if (filter_salesrep) {
-		url += '&filter_salesrep=' + encodeURIComponent(filter_salesrep);
-	}
-	
-	var filter_group = $('select[name=\'filter_group\']').val();
-	
-	if (filter_group) {
-		url += '&filter_group=' + encodeURIComponent(filter_group);
-	}
-	
-	location = 'index.php?route=report/report&code=customer_search&user_token={{ user_token }}' + url;
-});
-//--></script> 
-<script type="text/javascript"><!--
-$('.date').datetimepicker({
-	language: '{{ datepicker }}',
-	pickTime: false
-});
-//--></script> 
-<script type="text/javascript"><!--
-$('input[name=\'filter_customer\']').autocomplete({
-	'source': function(request, response) {
-		$.ajax({
-			url: 'index.php?route=customer/customer/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
-			dataType: 'json',
-			success: function(json) {
-				response($.map(json, function(item) {
-					return {
-						label: item['name'],
-						value: item['customer_id']
-					}
-				}));
-			}
-		});
-	},
-	'select': function(item) {
-		$('input[name=\'filter_customer\']').val(item['label']);
-	}
-});
-
-$('input[name=\'filter_category\']').autocomplete({
-	'source': function(request, response) {
-		$.ajax({
-			url: 'index.php?route=catalog/category/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
-			dataType: 'json',
-			success: function(json) {
-				response($.map(json, function(item) {
-					return {
-						label: item['name'],
-						value: item['category_id']
-					}
-				}));
-			}
-		});
-	},
-	'select': function(item) {
-		$('input[name=\'filter_category\']').val(item['label']);
-	}
-});
-
-$('input[name=\'filter_product\']').autocomplete({
-	'source': function(request, response) {
-		$.ajax({
-			url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
-			dataType: 'json',
-			success: function(json) {
-				response($.map(json, function(item) {
-					return {
-						label: item['name'],
-						value: item['product_id']
-					}
-				}));
-			}
-		});
-	},
-	'select': function(item) {
-		$('input[name=\'filter_product\']').val(item['label']);
-	}
-});
-
-$('input[name=\'filter_keyword\']').autocomplete({
-	'source': function(request, response) {
-		$.ajax({
-			url: 'index.php?route=customer/customer/searchKeyword&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
-			dataType: 'json',
-			success: function(json) {
-				response($.map(json, function(item) {
-					return {
-						label: item['keyword'],
-						value: item['keyword']
-					}
-				}));
-			}
-		});
-	},
-	'select': function(item) {
-		$('input[name=\'filter_product\']').val(item['label']);
-	}
-});
-//--></script>
+{{ footer }}
