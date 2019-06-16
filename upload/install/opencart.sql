@@ -2251,6 +2251,8 @@ CREATE TABLE `oc_order` (
   `forwarded_ip` varchar(40) NOT NULL,
   `user_agent` varchar(255) NOT NULL,
   `accept_language` varchar(255) NOT NULL,
+  `salesrep_min` int(1) NOT NULL,
+  `salesrep_max` int(1) NOT NULL,
   `date_added` datetime NOT NULL,
   `date_modified` datetime NOT NULL,
   PRIMARY KEY (`order_id`)
