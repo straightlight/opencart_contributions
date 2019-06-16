@@ -235,6 +235,186 @@ class ModelExtensionReportSale extends Model {
 
 		return $query->row['total'];
 	}
+	
+	public function getCustomerSearchesByOrders($data = array()) {
+		$sql = "SELECT MIN(`o`.`date_added`) AS `date_start`, MAX(`o`.`date_added`) AS `date_end`, MIN(`cs`.`date_added`) AS `search_date_start`, MAX(`cs`.`date_added`) AS `search_date_end`, `o`.`customer_id` AS `customer_id`, `o`.`order_id` AS `order_id`, `o`.`tracking` AS `affiliate_tracking`, `op`.`product_id` AS `product_id`, `op`.`name` AS `order_product_name`, SUM(`o`.`total`) AS `total`, SUM((SELECT SUM(`op`.`quantity`) FROM `" . DB_PREFIX . "order_product` `op` WHERE `op`.`order_id` = `o`.`order_id`)) AS `products`, SUM((SELECT SUM(`cs`.`products`) FROM `" . DB_PREFIX . "customer_search` `cs` GROUP BY `cs`.`ip`)) AS `searches` FROM `" . DB_PREFIX . "order` `o` LEFT JOIN `" . DB_PREFIX . "order_product` `op` ON (`op`.`order_id` = `o`.`order_id`) LEFT JOIN `" . DB_PREFIX . "customer_search` `cs` ON (`cs`.`customer_id` = `o`.`customer_id`)";
+		
+		$processing_implode = array();
+		
+		$order_statuses = $this->config->get('config_processing_status');
+
+		foreach ($order_statuses as $order_status_id) {
+			$processing_implode[] = "`o`.`order_status_id` = '" . (int)$order_status_id . "'";
+		}
+		
+		$complete_implode = array();
+
+		$order_statuses = $this->config->get('config_complete_status');
+
+		foreach ($order_statuses as $order_status_id) {
+			$complete_implode[] = "`o`.`order_status_id` = '" . (int)$order_status_id . "'";
+		}
+		
+		if ($processing_implode) {
+			$sql .= " WHERE (" . implode(" OR ", $processing_implode) . ")";
+		}
+
+		if ($complete_implode) {
+			$sql .= (!$processing_implode ? " WHERE " : " AND ") . "(" . implode(" OR ", $complete_implode) . ")";
+		}
+		
+		if (!empty($data['filter_date_start'])) {
+			$sql .= " AND DATE(`o`.`date_added`) >= '" . $this->db->escape($data['filter_date_start']) . "'";
+		}
+
+		if (!empty($data['filter_date_end'])) {
+			$sql .= " AND DATE(`o`.`date_added`) <= '" . $this->db->escape($data['filter_date_end']) . "'";
+		}
+		
+		if (!empty($data['filter_category'])) {
+			$sql .= " AND `cs`.`category_id` = '" . (int)$data['filter_category'] . "'";
+		}
+		
+		if (!empty($data['filter_customer'])) {
+			$sql .= "CONCAT(`o`.`payment_firstname`, ' ', `o`.`payment_lastname`) LIKE '%" . $this->db->escape($data['filter_customer']) . "%'";
+		}
+		
+		if (!empty($data['filter_product'])) {
+			$sql .= " AND `op`.`product_id` = '" . (int)$data['filter_product'] . "'";
+		}
+		
+		if (!empty($data['filter_salesrep'])) {
+			$sql .= " AND `o`.`salesrep_" . strtolower($data['filter_salesrep']) . "` = '1'";
+		}
+		
+		if (!empty($data['filter_keyword'])) {
+			$sql .= " AND `cs`.`keyword` = '" . $this->db->escape($data['filter_keyword']) . "'";
+		}
+
+		$sql .= " AND `o`.`language_id` = '" . (int)$this->config->get('config_language_id') . "'";
+		
+		if (!empty($data['filter_group'])) {
+			$group = $data['filter_group'];
+		} else {
+			$group = 'week';
+		}
+
+		switch($group) {
+			case 'day';
+				$sql .= " GROUP BY YEAR(`o`.`date_added`), MONTH(`o`.`date_added`), DAY(`o`.`date_added`)";
+				break;
+			default:
+			case 'week':
+				$sql .= " GROUP BY YEAR(`o`.`date_added`), WEEK(`o`.`date_added`)";
+				break;
+			case 'month':
+				$sql .= " GROUP BY YEAR(`o`.`date_added`), MONTH(`o`.`date_added`)";
+				break;
+			case 'year':
+				$sql .= " GROUP BY YEAR(`o`.`date_added`)";
+				break;
+		}
+
+		$sql .= " ORDER BY o.date_added DESC";
+
+		if (isset($data['start']) || isset($data['limit'])) {
+			if ($data['start'] < 0) {
+				$data['start'] = 0;
+			}
+
+			if ($data['limit'] < 1) {
+				$data['limit'] = 20;
+			}
+
+			$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
+		}
+
+		$query = $this->db->query($sql);
+
+		return $query->rows;
+	}
+	
+	public function getTotalCustomerSearchesByOrders($data = array()) {
+		if (!empty($data['filter_group'])) {
+			$group = $data['filter_group'];
+		} else {
+			$group = 'week';
+		}
+
+		switch($group) {
+			case 'day';
+				$sql = "SELECT COUNT(DISTINCT YEAR(`o`.`date_added`), MONTH(`o`.`date_added`), DAY(`o`.`date_added`)) AS `total` FROM `" . DB_PREFIX . "order` `o` LEFT JOIN `" . DB_PREFIX . "order_product` `op` ON (`op`.`order_id` = `o`.`order_id`) LEFT JOIN `" . DB_PREFIX . "customer_search` `cs` ON (`cs`.`customer_id` = `o`.`customer_id`)";
+				break;
+			default:
+			case 'week':
+				$sql = "SELECT COUNT(DISTINCT YEAR(`o`.`date_added`), WEEK(`o`.`date_added`)) AS `total` FROM `" . DB_PREFIX . "order` `o` LEFT JOIN `" . DB_PREFIX . "order_product` `op` ON (`op`.`order_id` = `o`.`order_id`) LEFT JOIN `" . DB_PREFIX . "customer_search` `cs` ON (`cs`.`customer_id` = `o`.`customer_id`)";
+				break;
+			case 'month':
+				$sql = "SELECT COUNT(DISTINCT YEAR(`o`.`date_added`), MONTH(`o`.`date_added`)) AS `total` FROM `" . DB_PREFIX . "order` `o` LEFT JOIN `" . DB_PREFIX . "order_product` `op` ON (`op`.`order_id` = `o`.`order_id`) LEFT JOIN `" . DB_PREFIX . "customer_search` `cs` ON (`cs`.`customer_id` = `o`.`customer_id`)";
+				break;
+			case 'year':
+				$sql = "SELECT COUNT(DISTINCT YEAR(`o`.`date_added`)) AS `total` FROM `" . DB_PREFIX . "order` `o` LEFT JOIN `" . DB_PREFIX . "order_product` `op` ON (`op`.`order_id` = `o`.`order_id`) LEFT JOIN `" . DB_PREFIX . "customer_search` `cs` ON (`cs`.`customer_id` = `o`.`customer_id`)";
+				break;
+		}
+
+		$processing_implode = array();
+		
+		$order_statuses = $this->config->get('config_processing_status');
+
+		foreach ($order_statuses as $order_status_id) {
+			$processing_implode[] = "`o`.`order_status_id` = '" . (int)$order_status_id . "'";
+		}
+		
+		$complete_implode = array();
+
+		$order_statuses = $this->config->get('config_complete_status');
+
+		foreach ($order_statuses as $order_status_id) {
+			$complete_implode[] = "`o`.`order_status_id` = '" . (int)$order_status_id . "'";
+		}
+		
+		if ($processing_implode) {
+			$sql .= " WHERE (" . implode(" OR ", $processing_implode) . ")";
+		}
+
+		if ($complete_implode) {
+			$sql .= (!$processing_implode ? " WHERE " : " AND ") . "(" . implode(" OR ", $complete_implode) . ")";
+		}
+		
+		if (!empty($data['filter_date_start'])) {
+			$sql .= " AND DATE(`o`.`date_added`) >= '" . $this->db->escape($data['filter_date_start']) . "'";
+		}
+
+		if (!empty($data['filter_date_end'])) {
+			$sql .= " AND DATE(`o`.`date_added`) <= '" . $this->db->escape($data['filter_date_end']) . "'";
+		}
+		
+		if (!empty($data['filter_category'])) {
+			$sql .= " AND `cs`.`category_id` = '" . (int)$data['filter_category'] . "'";
+		}
+		
+		if (!empty($data['filter_customer'])) {
+			$sql .= "CONCAT(`o`.`payment_firstname`, ' ', `o`.`payment_lastname`) LIKE '%" . $this->db->escape($data['filter_customer']) . "%'";
+		}
+		
+		if (!empty($data['filter_product'])) {
+			$sql .= " AND `op`.`product_id` = '" . (int)$data['filter_product'] . "'";
+		}
+		
+		if (!empty($data['filter_salesrep'])) {
+			$sql .= " AND `o`.`salesrep_" . strtolower($data['filter_salesrep']) . "` = '1'";
+		}
+		
+		if (!empty($data['filter_keyword'])) {
+			$sql .= " AND `cs`.`keyword` = '" . $this->db->escape($data['filter_keyword']) . "'";
+		}
+
+		$sql .= " AND `o`.`language_id` = '" . (int)$this->config->get('config_language_id') . "'";
+
+		$query = $this->db->query($sql);
+
+		return $query->row['total'];
+	}
 
 	public function getTaxes($data = array()) {
 		$sql = "SELECT MIN(o.date_added) AS date_start, MAX(o.date_added) AS date_end, ot.title, SUM(ot.value) AS total, COUNT(o.order_id) AS `orders` FROM `" . DB_PREFIX . "order` o LEFT JOIN `" . DB_PREFIX . "order_total` ot ON (ot.order_id = o.order_id) WHERE ot.code = 'tax'";
