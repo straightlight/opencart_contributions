@@ -262,7 +262,7 @@ class ModelCheckoutOrder extends Model {
 	}
 	
 	public function getCustomerSearchesByOrders($data = array()) {
-		$sql = "SELECT MIN(`o`.`date_added`) AS `date_start`, MAX(`o`.`date_added`) AS `date_end`, MIN(`cs`.`date_added`) AS `search_date_start`, MAX(`cs`.`date_added`) AS `search_date_end`, `o`.`order_id` AS `order_id`, `o`.`customer_id` AS `customer_id`, SUM(`o`.`total`) AS `total`, SUM((SELECT SUM(`op`.`quantity`) FROM `" . DB_PREFIX . "order_product` `op` WHERE `op`.`order_id` = `o`.`order_id`)) AS `products`, SUM((SELECT SUM(`cs`.`products`) FROM `" . DB_PREFIX . "customer_search` `cs` GROUP BY `cs`.`ip`)) AS `searches` FROM `" . DB_PREFIX . "order` `o` LEFT JOIN `" . DB_PREFIX . "order_product` `op` ON (`op`.`order_id` = `o`.`order_id`) LEFT JOIN `" . DB_PREFIX . "customer_search` `cs` ON (`cs`.`customer_id` = `o`.`customer_id`)";
+		$sql = "SELECT MIN(`o`.`date_added`) AS `date_start`, MAX(`o`.`date_added`) AS `date_end`, MIN(`cs`.`date_added`) AS `search_date_start`, MAX(`cs`.`date_added`) AS `search_date_end`, `o`.`order_id` AS `order_id`, `o`.`customer_id` AS `customer_id`, `op`.`product_id` AS `product_id`, SUM(`o`.`total`) AS `total`, SUM((SELECT SUM(`op`.`quantity`) FROM `" . DB_PREFIX . "order_product` `op` WHERE `op`.`order_id` = `o`.`order_id`)) AS `products`, SUM((SELECT SUM(`cs`.`products`) FROM `" . DB_PREFIX . "customer_search` `cs` GROUP BY `cs`.`ip`)) AS `searches` FROM `" . DB_PREFIX . "order` `o` LEFT JOIN `" . DB_PREFIX . "order_product` `op` ON (`op`.`order_id` = `o`.`order_id`) LEFT JOIN `" . DB_PREFIX . "customer_search` `cs` ON (`cs`.`customer_id` = `o`.`customer_id`)";
 		
 		$processing_implode = array();
 		
@@ -288,6 +288,10 @@ class ModelCheckoutOrder extends Model {
 			$sql .= (!$processing_implode ? " WHERE " : " AND ") . "(" . implode(" OR ", $complete_implode) . ")";
 		}
 		
+		if (!empty($data['filter_salesrep'])) {
+			$sql .= " AND `o`.`salesrep_" . strtolower($data['filter_salesrep']) . "` = '1'";
+		}
+
 		$sql .= " AND `o`.`language_id` = `cs`.`language_id`"; 
 		$sql .= " AND `o`.`store_id` = `cs`.`store_id`";
 		$sql .= " AND `cs`.`language_id` = '" . (int)$this->config->get('config_language_id') . "'";
