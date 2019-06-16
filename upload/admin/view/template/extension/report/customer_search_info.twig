@@ -48,7 +48,19 @@
         <div class="form-group">
           <label class="control-label" for="input-ip">{{ entry_ip }}</label>
           <input type="text" name="filter_ip" value="{{ filter_ip }}" placeholder="{{ entry_ip }}" id="input-ip" class="form-control" />
-        </div>		
+        </div>
+		<div class="form-group">
+          <label class="control-label" for="input-salesrep">{{ entry_salesrep }}</label>
+          <select name="filter_salesrep" id="input-salesrep" class="form-control">
+			{% if filter_salesrep == 'max' %}
+				<option value="max" selected="selected">{{ text_salesrep_max }}</option>
+				<option value="min">{{ text_salesrep_min }}</option>
+			{% else %}
+				<option value="max">{{ text_salesrep_max }}</option>
+				<option value="min" selected="selected">{{ text_salesrep_min }}</option>
+			{% endif %}
+          </select>
+        </div>
 		<div class="form-group">
           <label class="control-label" for="input-keyword">{{ entry_keyword }}</label>
           <input type="text" name="filter_keyword" value="{{ filter_keyword }}" placeholder="{{ entry_keyword }}" id="input-keyword" class="form-control" />
@@ -164,6 +176,12 @@ $('#button-filter').on('click', function() {
 		url += '&filter_ip=' + encodeURIComponent(filter_ip);
 	}
 	
+	var filter_salesrep = $('select[name=\'filter_salesrep\']').val();
+	
+	if (filter_salesrep) {
+		url += '&filter_salesrep=' + encodeURIComponent(filter_salesrep);
+	}
+	
 	var filter_group = $('select[name=\'filter_group\']').val();
 	
 	if (filter_group) {
@@ -256,7 +274,7 @@ $('input[name=\'filter_keyword\']').autocomplete({
 		});
 	},
 	'select': function(item) {
-		$('input[name=\'filter_keyword\']').val(item['label']);
+		$('input[name=\'filter_product\']').val(item['label']);
 	}
 });
 //--></script>
