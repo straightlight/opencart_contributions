@@ -1,6 +1,7 @@
 <?php
 // Text
 $_['text_subject']          		= '%s - Bestsellers';
+$_['text_customer_search']      = 'Searched %s time(s)';
 $_['text_products']         		= 'Products';
 $_['text_total']            		= 'Total';
 $_['text_order_period_day'] 		= '%s day interval';
