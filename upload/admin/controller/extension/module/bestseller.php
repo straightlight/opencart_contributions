@@ -203,6 +203,12 @@ class ControllerExtensionModuleBestSeller extends Controller {
 			$this->model_setting_event->addEvent('extension_module_bestseller_checkout', 'catalog/model/checkout/order/addOrder/before', 'extension/module/bestseller/getBestSellerByOrders');
 		}
 	}
+	
+	public function uninstall() {
+		$this->load->model('setting/event');
+		
+		$this->model_setting_event->deleteEventByCode('extension_module_bestseller_checkout');
+	}
 
 	protected function validate() {
 		if (!$this->user->hasPermission('modify', 'extension/module/bestseller')) {
