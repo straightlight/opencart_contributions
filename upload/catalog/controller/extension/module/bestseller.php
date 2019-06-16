@@ -253,7 +253,7 @@ class ControllerExtensionModuleBestSeller extends Controller {
 																							   );
 						}
 																 
-						$this->model_checkout_order->setSalesRepMin($order_info['order_id']);
+						$this->model_checkout_order->setSalesRepMax($order_info['order_id']);
 					}
 				}
 			}
