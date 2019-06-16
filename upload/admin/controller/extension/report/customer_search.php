@@ -136,6 +136,12 @@ class ControllerExtensionReportCustomerSearch extends Controller {
 			$filter_ip = '';
 		}
 		
+		if (isset($this->request->get['filter_salesrep'])) {
+			$filter_salesrep = $this->request->get['filter_salesrep'];
+		} else {
+			$filter_salesrep = '';
+		}
+		
 		if (isset($this->request->get['filter_group'])) {
 			$filter_group = $this->request->get['filter_group'];
 		} else {
@@ -161,7 +167,8 @@ class ControllerExtensionReportCustomerSearch extends Controller {
 			'filter_customer'   => $filter_customer,
 			'filter_category'	=> $filter_category,
 			'filter_product'	=> $filter_product,
-			'filter_ip'         => $filter_ip,			
+			'filter_ip'         => $filter_ip,
+			'filter_salesrep'	=> $filter_salesrep,
 			'filter_group'		=> $filter_group,
 			'start'             => ($page - 1) * 20,
 			'limit'             => 20
@@ -234,6 +241,10 @@ class ControllerExtensionReportCustomerSearch extends Controller {
 			$url .= '&filter_ip=' . $this->request->get['filter_ip'];
 		}
 		
+		if (isset($this->request->get['filter_salesrep'])) {
+			$url .= '&filter_salesrep=' . $this->request->get['filter_salesrep'];
+		}
+		
 		if (isset($this->request->get['filter_group'])) {
 			$url .= '&filter_group=' . $this->request->get['filter_group'];
 		}
@@ -258,7 +269,8 @@ class ControllerExtensionReportCustomerSearch extends Controller {
 		$data['filter_customer'] = $filter_customer;
 		$data['filter_product'] = $filter_product;
 		$data['filter_category'] = $filter_category;
-		$data['filter_ip'] = $filter_ip;				
+		$data['filter_ip'] = $filter_ip;
+		$data['filter_salesrep'] = $filter_salesrep;
 		$data['filter_group'] = $filter_group;
 
 		return $this->load->view('extension/report/customer_search_info', $data);
