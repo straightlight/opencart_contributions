@@ -1505,4 +1505,25 @@ class ControllerCustomerCustomer extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
 	}
+	
+	public function searchKeyword() {
+		$json = array();
+		
+		if (!empty($this->request->get['filter_name'])) {
+			$this->load->model('customer/customer');
+			
+			$filter_data = array('keyword'			=> $this->request->get['filter_name'],
+								);
+								
+			$searches = $this->model_customer_customer->getSearchKeywords($filter_data);
+			
+			foreach ($searches as $search) {
+				$json[] = array('keyword'		=> $search['keyword'],
+							   );
+			}
+		}
+		
+		$this->response->addHeader('Content-Type: application/json');
+		$this->response->setOutput(json_encode($json));
+	}
 }
