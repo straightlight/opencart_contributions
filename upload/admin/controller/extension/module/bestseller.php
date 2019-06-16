@@ -191,6 +191,18 @@ class ControllerExtensionModuleBestSeller extends Controller {
 
 		$this->response->setOutput($this->load->view('extension/module/bestseller', $data));
 	}
+	
+	public function install() {
+		// If OC has been upgraded, verify that the module has the new event registered.
+		$this->load->model('setting/event');
+
+		$bestseller_event = $this->model_setting_event->getEventByCode("extension_module_bestseller_checkout");
+
+		if (empty($bestseller_event)) {
+			// Event is missing, add it
+			$this->model_setting_event->addEvent('extension_module_bestseller_checkout', 'catalog/model/checkout/order/addOrder/before', 'extension/module/bestseller/getBestSellerByOrders');
+		}
+	}
 
 	protected function validate() {
 		if (!$this->user->hasPermission('modify', 'extension/module/bestseller')) {
