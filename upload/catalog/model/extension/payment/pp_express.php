@@ -29,6 +29,65 @@ class ModelExtensionPaymentPpExpress extends Model {
 		return $method_data;
 	}
 
+
+	public function getPaypalCurrency() {
+        $pp_currency = $this->session->data['currency'];
+        $currencies = array(
+            'AUD',
+            'CAD',
+            'EUR',
+            'GBP',
+            'JPY',
+            'USD',
+            'NZD',
+            'CHF',
+            'HKD',
+            'SGD',
+            'SEK',
+            'DKK',
+            'PLN',
+            'NOK',
+            'HUF',
+            'CZK',
+            'ILS',
+            'MXN',
+            'MYR',
+            'BRL',
+            'PHP',
+            'TWD',
+            'THB',
+            'TRY'
+        );
+        $config_currency_paypal_force = $this->config->get('config_currency_paypal_force') !== null ? $this->config->get('config_currency_paypal_force') : 0;
+        if (!in_array(strtoupper($pp_currency), $currencies) || $config_currency_paypal_force) {
+            // try specified paypal currency
+            $pp_currency = $this->config->get('config_currency_paypal');
+            if (!in_array(strtoupper($pp_currency), $currencies)) {
+                $pp_currency = '';
+            }
+
+            // find first valid paypal currency among store curencies
+            if (empty($pp_currency)) {
+                $this->load->model('localisation/currency');
+                $results = $this->model_localisation_currency->getCurrencies();
+                foreach ($results as $result) {
+                    if ($result['status']) {
+                        if (in_array(strtoupper($result['code']), $currencies)) {
+                            $pp_currency = $result['code'];
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // some default
+            if (empty($pp_currency)) {
+                $pp_currency = 'EUR';
+            }
+        }
+        return $pp_currency;
+	}
+         
 	public function addOrder($order_data) {
 		/**
 		 * 1 to 1 relationship with order table (extends order info)
@@ -70,14 +129,14 @@ class ModelExtensionPaymentPpExpress extends Model {
 	public function paymentRequestInfo() {
 
 		$data['PAYMENTREQUEST_0_SHIPPINGAMT'] = '';
-		$data['PAYMENTREQUEST_0_CURRENCYCODE'] = $this->session->data['currency'];
+		$data['PAYMENTREQUEST_0_CURRENCYCODE'] = $this->getPaypalCurrency();
 		$data['PAYMENTREQUEST_0_PAYMENTACTION'] = $this->config->get('payment_pp_express_transaction');
 
 		$i = 0;
 		$item_total = 0;
 
 		foreach ($this->cart->getProducts() as $item) {
-			$item_price = $this->currency->format($item['price'], $this->session->data['currency'], false, false);
+			$item_price = $this->currency->format($item['price'], $this->getPaypalCurrency(), false, false);
 
 			$data['L_PAYMENTREQUEST_0_NAME' . $i] = substr($item['name'], 0, 126);
 			$data['L_PAYMENTREQUEST_0_NUMBER' . $i] = $item['model'];
@@ -112,12 +171,12 @@ class ModelExtensionPaymentPpExpress extends Model {
 
 		if (!empty($this->session->data['vouchers'])) {
 			foreach ($this->session->data['vouchers'] as $voucher) {
-				$item_total += $this->currency->format($voucher['amount'], $this->session->data['currency'], false, false);
+				$item_total += $this->currency->format($voucher['amount'], $this->getPaypalCurrency(), false, false);
 
 				$data['L_PAYMENTREQUEST_0_NAME' . $i] = substr($voucher['description'], 0, 126);
 				$data['L_PAYMENTREQUEST_0_NUMBER' . $i] = 'VOUCHER';
 				$data['L_PAYMENTREQUEST_0_QTY' . $i] = 1;
-				$data['L_PAYMENTREQUEST_0_AMT' . $i] = $this->currency->format($voucher['amount'], $this->session->data['currency'], false, false);
+				$data['L_PAYMENTREQUEST_0_AMT' . $i] = $this->currency->format($voucher['amount'], $this->getPaypalCurrency(), false, false);
 				
 				++$i;
 			}
@@ -170,10 +229,10 @@ class ModelExtensionPaymentPpExpress extends Model {
 		foreach ($total_data['totals'] as $total_row) {
 			if (!in_array($total_row['code'], array('total', 'sub_total'))) {
 				if ($total_row['value'] != 0) {
-					$item_price = $this->currency->format($total_row['value'], $this->session->data['currency'], false, false);
+					$item_price = $this->currency->format($total_row['value'], $this->getPaypalCurrency(), false, false);
 					$data['L_PAYMENTREQUEST_0_NAME' . $i] = substr($total_row['title'], 0, 126);
 					$data['L_PAYMENTREQUEST_0_NUMBER' . $i] = $total_row['code'];
-					$data['L_PAYMENTREQUEST_0_AMT' . $i] = $this->currency->format($total_row['value'], $this->session->data['currency'], false, false);
+					$data['L_PAYMENTREQUEST_0_AMT' . $i] = $this->currency->format($total_row['value'], $this->getPaypalCurrency(), false, false);
 					$data['L_PAYMENTREQUEST_0_QTY' . $i] = 1;
 
 					$item_total = $item_total + $item_price;
@@ -196,13 +255,13 @@ class ModelExtensionPaymentPpExpress extends Model {
 				$data['L_BILLINGTYPE' . $z] = 'RecurringPayments';
 
 				if ($item['recurring']['trial']) {
-					$trial_amt = $this->currency->format($this->tax->calculate($item['recurring']['trial_price'], $item['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency'], false, false) * (int)$item['quantity'] . ' ' . $this->session->data['currency'];
+					$trial_amt = $this->currency->format($this->tax->calculate($item['recurring']['trial_price'], $item['tax_class_id'], $this->config->get('config_tax')), $this->getPaypalCurrency(), false, false) * (int)$item['quantity'] . ' ' . $this->getPaypalCurrency();
 					$trial_text =  sprintf($this->language->get('text_trial'), $trial_amt, $item['recurring']['trial_cycle'], $item['recurring']['trial_frequency'], $item['recurring']['trial_duration']);
 				} else {
 					$trial_text = '';
 				}
 
-				$recurring_amt = $this->currency->format($this->tax->calculate($item['recurring']['price'], $item['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency'], false, false)  * (int)$item['quantity'] . ' ' . $this->session->data['currency'];
+				$recurring_amt = $this->currency->format($this->tax->calculate($item['recurring']['price'], $item['tax_class_id'], $this->config->get('config_tax')), $this->getPaypalCurrency(), false, false)  * (int)$item['quantity'] . ' ' . $this->getPaypalCurrency();
 				$recurring_description = $trial_text . sprintf($this->language->get('text_recurring'), $recurring_amt, $item['recurring']['cycle'], $item['recurring']['frequency']);
 
 				if ($item['recurring']['duration'] > 0) {
@@ -374,6 +433,9 @@ class ModelExtensionPaymentPpExpress extends Model {
 			$curl = curl_init('https://www.paypal.com/cgi-bin/webscr');
 		}
 
+
+            curl_setopt($curl, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.1) Gecko/20061204 Firefox/2.0.0.1");
+         
 		curl_setopt($curl, CURLOPT_POST, true);
 		curl_setopt($curl, CURLOPT_POSTFIELDS, $request);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -391,7 +453,7 @@ class ModelExtensionPaymentPpExpress extends Model {
 
 		$this->log(array('request' => $request, 'response' => $curl_response), 'IPN data');
 
-		if (strtoupper($response) == 'VERIFIED')  {
+		if (strtoupper($curl_response) == 'VERIFIED')  {
 			if (isset($data['transaction_entity'])) {
 				$this->log($data['transaction_entity']);
 			}
@@ -463,11 +525,11 @@ class ModelExtensionPaymentPpExpress extends Model {
 					 */
 					 
 					if (isset($data['auth_status']) && $data['auth_status'] == 'Completed' && $parent_transaction['payment_status'] == 'Pending') {
-						$captured = $this->currency->format($this->getTotalCaptured($parent_transaction['paypal_order_id']), $this->session->data['currency'], false, false);
+						$captured = $this->currency->format($this->getTotalCaptured($parent_transaction['paypal_order_id']), $this->getPaypalCurrency(), false, false);
 						
-						$refunded = $this->currency->format($this->getRefundedTotal($parent_transaction['paypal_order_id']), $this->session->data['currency'], false, false);
+						$refunded = $this->currency->format($this->getRefundedTotal($parent_transaction['paypal_order_id']), $this->getPaypalCurrency(), false, false);
 						
-						$remaining = $this->currency->format($parent_transaction['amount'] - $captured + $refunded, $this->session->data['currency'], false, false);
+						$remaining = $this->currency->format($parent_transaction['amount'] - $captured + $refunded, $this->getPaypalCurrency(), false, false);
 
 						$this->log('Captured: ' . $captured, 'IPN data');
 						
@@ -643,7 +705,7 @@ class ModelExtensionPaymentPpExpress extends Model {
 			} else {
 				$this->log('Valid response received but no txn type or recurring payment could be tracked.', 'IPN data');
 			}
-		} elseif (strtoupper($response) == 'INVALID') {
+		} elseif (strtoupper($curl_response) == 'INVALID') {
 			$this->log(array('IPN was invalid'), 'IPN fail');
 		} else {
 			$this->log('Response string unknown: ' . (string)$curl_response, 'IPN data');
