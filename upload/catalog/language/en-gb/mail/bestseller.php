@@ -27,4 +27,3 @@ $_['text_payment']						= 'Payer';
 $_['text_email']						= 'Email';
 $_['text_reputable']					= 'Reputable';
 $_['text_affiliate']					= 'Affiliate';
-$_['text_footer']           			= 'Please reply to this e-mail if you have any questions.';
