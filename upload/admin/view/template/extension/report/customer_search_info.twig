@@ -52,12 +52,15 @@
 		<div class="form-group">
           <label class="control-label" for="input-salesrep">{{ entry_salesrep }}</label>
           <select name="filter_salesrep" id="input-salesrep" class="form-control">
-			{% if filter_salesrep == 'max' %}
-				<option value="max" selected="selected">{{ text_salesrep_max }}</option>
-				<option value="min">{{ text_salesrep_min }}</option>
+			{% if filter_salesrep == 2 %}
+				<option value="2" selected="selected">{{ text_salesrep_max }}</option>
+				<option value="1">{{ text_salesrep_min }}</option>
+			{% elseif filter_salesrep == 1 %}
+				<option value="1">{{ text_salesrep_max }}</option>
+				<option value="2" selected="selected">{{ text_salesrep_min }}</option>
 			{% else %}
-				<option value="max">{{ text_salesrep_max }}</option>
-				<option value="min" selected="selected">{{ text_salesrep_min }}</option>
+				<option value="2">{{ text_salesrep_max }}</option>
+				<option value="1">{{ text_salesrep_min }}</option>
 			{% endif %}
           </select>
         </div>
