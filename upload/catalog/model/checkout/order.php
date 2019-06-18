@@ -261,15 +261,15 @@ class ModelCheckoutOrder extends Model {
 		return $query->rows;
 	}
 	
-	public function getCustomerSearchesByOrders($data = array()) {
-		$sql = "SELECT MIN(`o`.`date_added`) AS `date_start`, MAX(`o`.`date_added`) AS `date_end`, MIN(`cs`.`date_added`) AS `search_date_start`, MAX(`cs`.`date_added`) AS `search_date_end`, `o`.`order_id` AS `order_id`, `o`.`customer_id` AS `customer_id`, `op`.`product_id` AS `product_id`, SUM(`o`.`total`) AS `total`, SUM((SELECT SUM(`op`.`quantity`) FROM `" . DB_PREFIX . "order_product` `op` WHERE `op`.`order_id` = `o`.`order_id`)) AS `products`, SUM((SELECT SUM(`cs`.`products`) FROM `" . DB_PREFIX . "customer_search` `cs` GROUP BY `cs`.`ip`)) AS `searches` FROM `" . DB_PREFIX . "order` `o` LEFT JOIN `" . DB_PREFIX . "order_product` `op` ON (`op`.`order_id` = `o`.`order_id`) LEFT JOIN `" . DB_PREFIX . "customer_search` `cs` ON (`cs`.`customer_id` = `o`.`customer_id`)";
+	public function getCustomerSearchesByOrders($data = array(), $filter_data = array()) {
+		$sql = "SELECT MIN(`o`.`date_added`) AS `date_start`, MAX(`o`.`date_added`) AS `date_end`, MIN(`cs`.`date_added`) AS `search_date_start`, MAX(`cs`.`date_added`) AS `search_date_end`, `o`.`order_id` AS `order_id`, `o`.`ip` AS `order_ip`, `cs`.`category_id` AS `category_id`, `cs`.`ip` AS `customer_search_ip`, SUM(`o`.`total`) AS `total`, SUM((SELECT SUM(`op`.`quantity`) FROM `" . DB_PREFIX . "order_product` `op` WHERE `op`.`order_id` = `o`.`order_id`)) AS `products`, SUM((SELECT SUM(`cs`.`products`) FROM `" . DB_PREFIX . "customer_search` `cs` GROUP BY `cs`.`ip`)) AS `searches` FROM `" . DB_PREFIX . "order` `o` LEFT JOIN `" . DB_PREFIX . "order_product` `op` ON (`op`.`order_id` = `o`.`order_id`) LEFT JOIN `" . DB_PREFIX . "customer_search` `cs` ON (`cs`.`customer_id` = `o`.`customer_id`)";
 		
 		$processing_implode = array();
 		
 		$order_statuses = $this->config->get('config_processing_status');
 
 		foreach ($order_statuses as $order_status_id) {
-			$processing_implode[] = "o.order_status_id = '" . (int)$order_status_id . "'";
+			$processing_implode[] = "`o`.`order_status_id` = '" . (int)$order_status_id . "'";
 		}
 		
 		$complete_implode = array();
@@ -277,7 +277,7 @@ class ModelCheckoutOrder extends Model {
 		$order_statuses = $this->config->get('config_complete_status');
 
 		foreach ($order_statuses as $order_status_id) {
-			$complete_implode[] = "o.order_status_id = '" . (int)$order_status_id . "'";
+			$complete_implode[] = "`o`.`order_status_id` = '" . (int)$order_status_id . "'";
 		}
 		
 		if ($processing_implode) {
@@ -288,8 +288,8 @@ class ModelCheckoutOrder extends Model {
 			$sql .= (!$processing_implode ? " WHERE " : " AND ") . "(" . implode(" OR ", $complete_implode) . ")";
 		}
 		
-		if (!empty($data['filter_salesrep'])) {
-			$sql .= " AND `o`.`salesrep_" . strtolower($data['filter_salesrep']) . "` = '1'";
+		if (!empty($filter_data['filter_salesrep'])) {
+			$sql .= " AND `o`.`salesrep` = '0'";
 		}
 
 		$sql .= " AND `o`.`language_id` = `cs`.`language_id`"; 
@@ -299,8 +299,8 @@ class ModelCheckoutOrder extends Model {
 		$sql .= " AND `o`.`currency_id` = '" . (int)$this->config->get('config_currency_id') . "'";
 		$sql .= " AND `o`.`customer_group_id` = '" . (int)$this->config->get('config_customer_group_id') . "'";
 		
-		if (!empty($data['filter_group'])) {
-			$group = $data['filter_group'];
+		if (!empty($data['group'])) {
+			$group = $data['group'];
 		} else {
 			$group = 'week';
 		}
@@ -340,12 +340,8 @@ class ModelCheckoutOrder extends Model {
 		return $query->rows;
 	}
 	
-	public function setSalesRepMin($order_id) {
-		$this->db->query("UPDATE `" . DB_PREFIX . "order` SET `salesrep_min` = 1 WHERE `order_id` = '" . (int)$order_id . "'");
-	}
-	
-	public function setSalesRepMax($order_id) {
-		$this->db->query("UPDATE `" . DB_PREFIX . "order` SET `salesrep_max` = 1 WHERE `order_id` = '" . (int)$order_id . "'");
+	public function setSalesRep($order_id, $rep) {
+		$this->db->query("UPDATE `" . DB_PREFIX . "order` SET `salesrep` = " . (int)$rep . " WHERE `order_id` = '" . (int)$order_id . "'");
 	}
 	
 	public function addOrderHistory($order_id, $order_status_id, $comment = '', $notify = false, $override = false) {
