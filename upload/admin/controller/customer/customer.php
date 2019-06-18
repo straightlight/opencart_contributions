@@ -1024,39 +1024,21 @@ class ControllerCustomerCustomer extends Controller {
 				if ((utf8_strlen($value['city']) < 2) || (utf8_strlen($value['city']) > 128)) {
 					$this->error['address'][$key]['city'] = $this->language->get('error_city');
 				}
-				
-				if (!isset($value['country_id']) || !is_numeric($value['country_id'])) {
+
+				$this->load->model('localisation/country');
+
+				$country_info = $this->model_localisation_country->getCountry($value['country_id']);
+
+				if ($country_info && $country_info['postcode_required'] && (utf8_strlen($value['postcode']) < 2 || utf8_strlen($value['postcode']) > 10)) {
+					$this->error['address'][$key]['postcode'] = $this->language->get('error_postcode');
+				}
+
+				if ($value['country_id'] == '') {
 					$this->error['address'][$key]['country'] = $this->language->get('error_country');
-				} elseif (!isset($value['zone_id']) || !is_numeric($value['zone_id'])) {
+				}
+
+				if (!isset($value['zone_id']) || $value['zone_id'] == '') {
 					$this->error['address'][$key]['zone'] = $this->language->get('error_zone');
-				} else {
-					$this->load->model('localisation/country');
-	
-					$country_info = $this->model_localisation_country->getCountry($value['country_id']);
-
-					if (isset($country_info['status']) && $country_info['status'] == 1) {
-						if (isset($country_info['postcode_required']) && $country_info['postcode_required'] && (utf8_strlen(trim($value['postcode'])) < 2 || utf8_strlen(trim($value['postcode'])) > 10)) {
-							$this->error['address'][$key]['postcode'] = $this->language->get('error_postcode');
-						} else {
-							$this->load->model('localisation/zone');
-		
-							$match = $this->model_localisation_zone->getZonesByCountryId($value['country_id']);
-
-							if (!$match) {
-								if (!empty($value['zone_id'])) {
-									$this->error['address'][$key]['country'] = $this->language->get('error_country_match');
-								}
-							} else {
-								$zone_info = $this->model_localisation_zone->getZone($value['zone_id']);
-
-								if ((!isset($zone_info['status']) || !isset($zone_info['country_id'])) || ($zone_info['status'] != 1) || ($zone_info['country_id'] != (int)$value['country_id'])) {
-									$this->error['address'][$key]['country'] = $this->language->get('error_zone_status');
-								}
-							}
-						}
-					} else {
-						$this->error['address'][$key]['country'] = $this->language->get('error_country');
-					}
 				}
 
 				foreach ($custom_fields as $custom_field) {
