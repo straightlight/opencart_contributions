@@ -38,7 +38,7 @@ class ControllerLocalisationGeoZone extends Controller {
 				$url .= '&page=' . $this->request->get['page'];
 			}
 
-			$this->response->redirect($this->url->link('localisation/geo_zone', 'user_token=' . $this->session->data['user_token'] . $url, true));
+			$this->response->redirect($this->url->link('localisation/geo_zone', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language')));
 		}
 
 		$this->getForm();
@@ -70,7 +70,7 @@ class ControllerLocalisationGeoZone extends Controller {
 				$url .= '&page=' . $this->request->get['page'];
 			}
 
-			$this->response->redirect($this->url->link('localisation/geo_zone', 'user_token=' . $this->session->data['user_token'] . $url, true));
+			$this->response->redirect($this->url->link('localisation/geo_zone', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language')));
 		}
 
 		$this->getForm();
@@ -104,7 +104,7 @@ class ControllerLocalisationGeoZone extends Controller {
 				$url .= '&page=' . $this->request->get['page'];
 			}
 
-			$this->response->redirect($this->url->link('localisation/geo_zone', 'user_token=' . $this->session->data['user_token'] . $url, true));
+			$this->response->redirect($this->url->link('localisation/geo_zone', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language')));
 		}
 
 		$this->getList();
@@ -147,16 +147,16 @@ class ControllerLocalisationGeoZone extends Controller {
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
+			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'))
 		);
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('localisation/geo_zone', 'user_token=' . $this->session->data['user_token'] . $url, true)
+			'href' => $this->url->link('localisation/geo_zone', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language'))
 		);
 
-		$data['add'] = $this->url->link('localisation/geo_zone/add', 'user_token=' . $this->session->data['user_token'] . $url, true);
-		$data['delete'] = $this->url->link('localisation/geo_zone/delete', 'user_token=' . $this->session->data['user_token'] . $url, true);
+		$data['add'] = $this->url->link('localisation/geo_zone/add', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language'));
+		$data['delete'] = $this->url->link('localisation/geo_zone/delete', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language'));
 
 		$data['geo_zones'] = array();
 
@@ -176,7 +176,7 @@ class ControllerLocalisationGeoZone extends Controller {
 				'geo_zone_id' => $result['geo_zone_id'],
 				'name'        => $result['name'],
 				'description' => $result['description'],
-				'edit'        => $this->url->link('localisation/geo_zone/edit', 'user_token=' . $this->session->data['user_token'] . '&geo_zone_id=' . $result['geo_zone_id'] . $url, true)
+				'edit'        => $this->url->link('localisation/geo_zone/edit', 'user_token=' . $this->session->data['user_token'] . '&geo_zone_id=' . $result['geo_zone_id'] . $url. '&language=' . $this->config->get('config_language'))
 			);
 		}
 
@@ -212,8 +212,8 @@ class ControllerLocalisationGeoZone extends Controller {
 			$url .= '&page=' . $this->request->get['page'];
 		}
 
-		$data['sort_name'] = $this->url->link('localisation/geo_zone', 'user_token=' . $this->session->data['user_token'] . '&sort=name' . $url, true);
-		$data['sort_description'] = $this->url->link('localisation/geo_zone', 'user_token=' . $this->session->data['user_token'] . '&sort=description' . $url, true);
+		$data['sort_name'] = $this->url->link('localisation/geo_zone', 'user_token=' . $this->session->data['user_token'] . '&sort=name' . $url. '&language=' . $this->config->get('config_language'));
+		$data['sort_description'] = $this->url->link('localisation/geo_zone', 'user_token=' . $this->session->data['user_token'] . '&sort=description' . $url. '&language=' . $this->config->get('config_language'));
 
 		$url = '';
 
@@ -229,7 +229,7 @@ class ControllerLocalisationGeoZone extends Controller {
 		$pagination->total = $geo_zone_total;
 		$pagination->page = $page;
 		$pagination->limit = $this->config->get('config_limit_admin');
-		$pagination->url = $this->url->link('localisation/geo_zone', 'user_token=' . $this->session->data['user_token'] . $url . '&page={page}', true);
+		$pagination->url = $this->url->link('localisation/geo_zone', 'user_token=' . $this->session->data['user_token'] . $url . '&page={page}&language=' . $this->config->get('config_language'));
 
 		$data['pagination'] = $pagination->render();
 
@@ -290,21 +290,21 @@ class ControllerLocalisationGeoZone extends Controller {
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
+			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'))
 		);
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('localisation/geo_zone', 'user_token=' . $this->session->data['user_token'] . $url, true)
+			'href' => $this->url->link('localisation/geo_zone', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language'))
 		);
 
 		if (!isset($this->request->get['geo_zone_id'])) {
-			$data['action'] = $this->url->link('localisation/geo_zone/add', 'user_token=' . $this->session->data['user_token'] . $url, true);
+			$data['action'] = $this->url->link('localisation/geo_zone/add', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language'));
 		} else {
-			$data['action'] = $this->url->link('localisation/geo_zone/edit', 'user_token=' . $this->session->data['user_token'] . '&geo_zone_id=' . $this->request->get['geo_zone_id'] . $url, true);
+			$data['action'] = $this->url->link('localisation/geo_zone/edit', 'user_token=' . $this->session->data['user_token'] . '&geo_zone_id=' . $this->request->get['geo_zone_id'] . $url. '&language=' . $this->config->get('config_language'));
 		}
 
-		$data['cancel'] = $this->url->link('localisation/geo_zone', 'user_token=' . $this->session->data['user_token'] . $url, true);
+		$data['cancel'] = $this->url->link('localisation/geo_zone', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language'));
 
 		if (isset($this->request->get['geo_zone_id']) && ($this->request->server['REQUEST_METHOD'] != 'POST')) {
 			$geo_zone_info = $this->model_localisation_geo_zone->getGeoZone($this->request->get['geo_zone_id']);
