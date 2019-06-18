@@ -38,7 +38,7 @@ class ControllerLocalisationLocation extends Controller {
 				$url .= '&page=' . $this->request->get['page'];
 			}
 
-			$this->response->redirect($this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url, true));
+			$this->response->redirect($this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language')));
 		}
 
 		$this->getForm();
@@ -70,7 +70,7 @@ class ControllerLocalisationLocation extends Controller {
 				$url .= '&page=' . $this->request->get['page'];
 			}
 
-			$this->response->redirect($this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url, true));
+			$this->response->redirect($this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language')));
 		}
 
 		$this->getForm();
@@ -104,7 +104,7 @@ class ControllerLocalisationLocation extends Controller {
 				$url .= '&page=' . $this->request->get['page'];
 			}
 
-			$this->response->redirect($this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url, true));
+			$this->response->redirect($this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language')));
 		}
 
 		$this->getList();
@@ -147,16 +147,16 @@ class ControllerLocalisationLocation extends Controller {
 
 		$data['breadcrumbs'][] =   array(
 			'text' =>  $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
+			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'))
 		);
 
 		$data['breadcrumbs'][] =   array(
 			'text' =>  $this->language->get('heading_title'),
-			'href' =>  $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url, true)
+			'href' =>  $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language'))
 		);
 
-		$data['add'] = $this->url->link('localisation/location/add', 'user_token=' . $this->session->data['user_token'] . $url, true);
-		$data['delete'] = $this->url->link('localisation/location/delete', 'user_token=' . $this->session->data['user_token'] . $url, true);
+		$data['add'] = $this->url->link('localisation/location/add', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language'));
+		$data['delete'] = $this->url->link('localisation/location/delete', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language'));
 
 		$data['location'] = array();
 
@@ -176,7 +176,7 @@ class ControllerLocalisationLocation extends Controller {
 				'location_id' => $result['location_id'],
 				'name'        => $result['name'],
 				'address'     => $result['address'],
-				'edit'        => $this->url->link('localisation/location/edit', 'user_token=' . $this->session->data['user_token'] . '&location_id=' . $result['location_id'] . $url, true)
+				'edit'        => $this->url->link('localisation/location/edit', 'user_token=' . $this->session->data['user_token'] . '&location_id=' . $result['location_id'] . $url. '&language=' . $this->config->get('config_language'))
 			);
 		}
 
@@ -212,8 +212,8 @@ class ControllerLocalisationLocation extends Controller {
 			$url .= '&page=' . $this->request->get['page'];
 		}
 
-		$data['sort_name'] = $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . '&sort=name' . $url, true);
-		$data['sort_address'] = $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . '&sort=address' . $url, true);
+		$data['sort_name'] = $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . '&sort=name' . $url. '&language=' . $this->config->get('config_language'));
+		$data['sort_address'] = $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . '&sort=address' . $url. '&language=' . $this->config->get('config_language'));
 
 		$url = '';
 
@@ -229,7 +229,7 @@ class ControllerLocalisationLocation extends Controller {
 		$pagination->total = $location_total;
 		$pagination->page = $page;
 		$pagination->limit = $this->config->get('config_limit_admin');
-		$pagination->url = $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url . '&page={page}', true);
+		$pagination->url = $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url . '&page={page}&language=' . $this->config->get('config_language'));
 
 		$data['pagination'] = $pagination->render();
 
@@ -296,21 +296,21 @@ class ControllerLocalisationLocation extends Controller {
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
+			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'))
 		);
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url, true)
+			'href' => $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language'))
 		);
 
 		if (!isset($this->request->get['location_id'])) {
-			$data['action'] = $this->url->link('localisation/location/add', 'user_token=' . $this->session->data['user_token'] . $url, true);
+			$data['action'] = $this->url->link('localisation/location/add', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language'));
 		} else {
-			$data['action'] = $this->url->link('localisation/location/edit', 'user_token=' . $this->session->data['user_token'] .  '&location_id=' . $this->request->get['location_id'] . $url, true);
+			$data['action'] = $this->url->link('localisation/location/edit', 'user_token=' . $this->session->data['user_token'] .  '&location_id=' . $this->request->get['location_id'] . $url. '&language=' . $this->config->get('config_language'));
 		}
 
-		$data['cancel'] = $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url, true);
+		$data['cancel'] = $this->url->link('localisation/location', 'user_token=' . $this->session->data['user_token'] . $url. '&language=' . $this->config->get('config_language'));
 
 		if (isset($this->request->get['location_id']) && ($this->request->server['REQUEST_METHOD'] != 'POST')) {
 			$location_info = $this->model_localisation_location->getLocation($this->request->get['location_id']);
@@ -327,7 +327,7 @@ class ControllerLocalisationLocation extends Controller {
 			'store_id' => 0,
 			'name'     => $this->config->get('config_name') . ' (' . $this->language->get('text_default') . ')',
 			'url'      => $this->config->get('config_secure') ? HTTPS_CATALOG : HTTP_CATALOG,
-			'edit'     => $this->url->link('setting/setting', 'user_token=' . $this->session->data['user_token'], true)
+			'edit'     => $this->url->link('setting/setting', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'))
 		);
 
 		$store_total = $this->model_setting_store->getTotalStores();
@@ -339,7 +339,7 @@ class ControllerLocalisationLocation extends Controller {
 				'store_id' => $result['store_id'],
 				'name'     => $result['name'],
 				'url'      => $result['url'],
-				'edit'     => $this->url->link('setting/store/edit', 'user_token=' . $this->session->data['user_token'] . '&store_id=' . $result['store_id'], true)
+				'edit'     => $this->url->link('setting/store/edit', 'user_token=' . $this->session->data['user_token'] . '&store_id=' . $result['store_id']. '&language=' . $this->config->get('config_language'))
 			);
 		}
 
