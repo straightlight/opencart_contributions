@@ -26,12 +26,12 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 
 			$this->session->data['success'] = $this->language->get('text_success');
 
-			$this->response->redirect($this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=payment', true));
+			$this->response->redirect($this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=payment&language=' . $this->config->get('config_language')' . $this->config->get('config_language')));
 		}
 
 		$data['user_token'] = $this->session->data['user_token'];
 
-		$data['button_configure'] = $this->url->link('extension/module/pp_button/configure', 'user_token=' . $this->session->data['user_token'], true);
+		$data['button_configure'] = $this->url->link('extension/module/pp_button/configure', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'));
 
 		if (isset($this->error['warning'])) {
 			$data['error_warning'] = $this->error['warning'];
@@ -95,24 +95,24 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true),
+			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language')),
 		);
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_extension'),
-			'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=payment', true),
+			'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=payment&language=' . $this->config->get('config_language')' . $this->config->get('config_language')),
 		);
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token'], true),
+			'href' => $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language')),
 		);
 
-		$data['action'] = $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token'], true);
+		$data['action'] = $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'));
 
-		$data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=payment', true);
+		$data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=payment&language=' . $this->config->get('config_language')' . $this->config->get('config_language'));
 
-		$data['search'] = $this->url->link('extension/payment/pp_express/search', 'user_token=' . $this->session->data['user_token'], true);
+		$data['search'] = $this->url->link('extension/payment/pp_express/search', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'));
 
 		if (isset($this->request->post['payment_pp_express_username'])) {
 			$data['payment_pp_express_username'] = $this->request->post['payment_pp_express_username'];
@@ -393,7 +393,7 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 		$country = $this->model_localisation_country->getCountry($this->config->get('config_country_id'));
 
 		$post_data = array(
-			'return_url' => $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token'], true),
+			'return_url' => $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language')),
 			'store_url' => HTTP_CATALOG,
 			'store_version' => VERSION,
 			'store_country' => (isset($country['iso_code_3']) ? $country['iso_code_3'] : ''),
@@ -564,9 +564,9 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 					'payment_status' => $result['payment_status'],
 					'pending_reason' => $result['pending_reason'],
 					'date_added'     => date($this->language->get('datetime_format'), strtotime($result['date_added'])),
-					'view'           => $this->url->link('extension/payment/pp_express/info', 'user_token=' . $this->session->data['user_token'] . '&transaction_id=' . $result['transaction_id'], true),
-					'refund'         => $this->url->link('extension/payment/pp_express/refund', 'user_token=' . $this->session->data['user_token'] . '&transaction_id=' . $result['transaction_id'], true),
-					'resend'         => $this->url->link('extension/payment/pp_express/resend', 'user_token=' . $this->session->data['user_token'] . '&paypal_order_transaction_id=' . $result['paypal_order_transaction_id'], true)
+					'view'           => $this->url->link('extension/payment/pp_express/info', 'user_token=' . $this->session->data['user_token'] . '&transaction_id=' . $result['transaction_id']. '&language=' . $this->config->get('config_language')),
+					'refund'         => $this->url->link('extension/payment/pp_express/refund', 'user_token=' . $this->session->data['user_token'] . '&transaction_id=' . $result['transaction_id']. '&language=' . $this->config->get('config_language')),
+					'resend'         => $this->url->link('extension/payment/pp_express/resend', 'user_token=' . $this->session->data['user_token'] . '&paypal_order_transaction_id=' . $result['paypal_order_transaction_id']. '&language=' . $this->config->get('config_language'))
 				);
 			}
 		}
@@ -670,23 +670,23 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 
 			$data['breadcrumbs'][] = array(
 				'text' => $this->language->get('text_home'),
-				'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true),
+				'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language')),
 			);
 
 			$data['breadcrumbs'][] = array(
 				'text' => $this->language->get('text_pp_express'),
-				'href' => $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token'], true),
+				'href' => $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language')),
 			);
 
 			$data['breadcrumbs'][] = array(
 				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/payment/pp_express/refund', 'user_token=' . $this->session->data['user_token'], true),
+				'href' => $this->url->link('extension/payment/pp_express/refund', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language')),
 			);
 
 			//button actions
-			$data['action'] = $this->url->link('extension/payment/pp_express/doRefund', 'user_token=' . $this->session->data['user_token'], true);
+			$data['action'] = $this->url->link('extension/payment/pp_express/doRefund', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'));
 			
-			$data['cancel'] = $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token'], true);
+			$data['cancel'] = $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'));
 
 			$data['transaction_id'] = $this->request->get['transaction_id'];
 
@@ -730,12 +730,12 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 
 			$data['breadcrumbs'][] = array(
 				'text' => $this->language->get('text_pp_express'),
-				'href' => $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token'], true),
+				'href' => $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language')),
 			);
 
 			$data['breadcrumbs'][] = array(
 				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/payment/pp_express/refund', 'user_token=' . $this->session->data['user_token'], true),
+				'href' => $this->url->link('extension/payment/pp_express/refund', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language')),
 			);
 			
 			$this->document->setTitle($this->language->get('error_heading_title'));
@@ -822,7 +822,7 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 								
 							$this->model_extension_payment_pp_express->addTransaction($transaction, $call_data);
 								
-							$this->response->redirect($this->url->link('sale/order/info', 'user_token=' . $this->session->data['user_token'] . '&order_id=' . (int)$paypal_order['order_id'], true));
+							$this->response->redirect($this->url->link('sale/order/info', 'user_token=' . $this->session->data['user_token'] . '&order_id=' . (int)$paypal_order['order_id']. '&language=' . $this->config->get('config_language')));
 								
 						} elseif ($result['ACK'] != 'Failure' && $result['ACK'] != 'FailureWithWarning') {
 							$transaction['transaction_id'] = $result['REFUNDTRANSACTIONID'];
@@ -840,25 +840,25 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 
 							// Redirect back to the order
 							
-							$this->response->redirect($this->url->link('sale/order/info', 'user_token=' . $this->session->data['user_token'] . '&order_id=' . (int)$paypal_order['order_id'], true));
+							$this->response->redirect($this->url->link('sale/order/info', 'user_token=' . $this->session->data['user_token'] . '&order_id=' . (int)$paypal_order['order_id']. '&language=' . $this->config->get('config_language')));
 						} else {
 							$this->model_extension_payment_pp_express->log(json_encode($result));
 								
 							$this->session->data['error'] = (isset($result['L_SHORTMESSAGE0']) ? $result['L_SHORTMESSAGE0'] : 'There was an error') . (isset($result['L_LONGMESSAGE0']) ? '<br />' . $result['L_LONGMESSAGE0'] : '');
 								
-							$this->response->redirect($this->url->link('extension/payment/pp_express/refund', 'user_token=' . $this->session->data['user_token'] . '&transaction_id=' . $this->request->post['transaction_id'], true));
+							$this->response->redirect($this->url->link('extension/payment/pp_express/refund', 'user_token=' . $this->session->data['user_token'] . '&transaction_id=' . $this->request->post['transaction_id']. '&language=' . $this->config->get('config_language')));
 						}
 					} else {
 						$this->session->data['error'] = $this->language->get('error_data_missing');
 							
-						$this->response->redirect($this->url->link('extension/payment/pp_express/refund', 'user_token=' . $this->session->data['user_token'] . '&transaction_id=' . $this->request->post['transaction_id'], true));
+						$this->response->redirect($this->url->link('extension/payment/pp_express/refund', 'user_token=' . $this->session->data['user_token'] . '&transaction_id=' . $this->request->post['transaction_id']. '&language=' . $this->config->get('config_language')));
 					}				
 				}
 			}
 		} else {
 			$this->session->data['error'] = $this->language->get('error_data');
 			
-			$this->response->redirect($this->url->link('extension/payment/pp_express/refund', 'user_token=' . $this->session->data['user_token'] . '&transaction_id=' . $this->request->post['transaction_id'], true));
+			$this->response->redirect($this->url->link('extension/payment/pp_express/refund', 'user_token=' . $this->session->data['user_token'] . '&transaction_id=' . $this->request->post['transaction_id']. '&language=' . $this->config->get('config_language')));
 		}
 	}
 
@@ -1090,17 +1090,17 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true),
+			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language')),
 		);
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_pp_express'),
-			'href' => $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token'], true),
+			'href' => $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language')),
 		);
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('extension/payment/pp_express/search', 'user_token=' . $this->session->data['user_token'], true),
+			'href' => $this->url->link('extension/payment/pp_express/search', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language')),
 		);
 
 		$this->load->model('extension/payment/pp_express');
@@ -1113,7 +1113,7 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 		
 		$data['date_end'] = date("Y-m-d");
 		
-		$data['view_link'] = $this->url->link('extension/payment/pp_express/info', 'user_token=' . $this->session->data['user_token'], true);
+		$data['view_link'] = $this->url->link('extension/payment/pp_express/info', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'));
 
 		$data['header'] = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');
@@ -1132,17 +1132,17 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 
 			$data['breadcrumbs'][] = array(
 				'text' => $this->language->get('text_home'),
-				'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true),
+				'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language')),
 			);
 
 			$data['breadcrumbs'][] = array(
 				'text' => $this->language->get('text_pp_express'),
-				'href' => $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token'], true),
+				'href' => $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language')),
 			);
 
 			$data['breadcrumbs'][] = array(
 				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/payment/pp_express/info', 'user_token=' . $this->session->data['user_token'] . '&transaction_id=' . $this->request->get['transaction_id'], true),
+				'href' => $this->url->link('extension/payment/pp_express/info', 'user_token=' . $this->session->data['user_token'] . '&transaction_id=' . $this->request->get['transaction_id']. '&language=' . $this->config->get('config_language')),
 			);
 
 			$this->load->model('extension/payment/pp_express');
@@ -1151,9 +1151,9 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 			
 			$data['lines'] = $this->formatRows($data['transaction']);
 			
-			$data['view_link'] = $this->url->link('extension/payment/pp_express/info', 'user_token=' . $this->session->data['user_token'], true);
+			$data['view_link'] = $this->url->link('extension/payment/pp_express/info', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'));
 			
-			$data['cancel'] = $this->url->link('extension/payment/pp_express/search', 'user_token=' . $this->session->data['user_token'], true);
+			$data['cancel'] = $this->url->link('extension/payment/pp_express/search', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'));
 			
 			$data['user_token'] = $this->session->data['user_token'];
 
@@ -1165,12 +1165,12 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 
 			$data['breadcrumbs'][] = array(
 				'text' => $this->language->get('text_pp_express'),
-				'href' => $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token'], true),
+				'href' => $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language')),
 			);
 
 			$data['breadcrumbs'][] = array(
 				'text' => $this->language->get('heading_title'),
-				'href' => $this->url->link('extension/payment/pp_express/info', 'user_token=' . $this->session->data['user_token'], true),
+				'href' => $this->url->link('extension/payment/pp_express/info', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language')),
 			);
 			
 			$this->document->setTitle($this->language->get('error_heading_title'));
@@ -1331,7 +1331,7 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 			$this->session->data['error_merchant_id'] = $this->language->get('error_merchant_id');
 		}
 
-		$this->response->redirect($this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token'], true));
+		$this->response->redirect($this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language')));
 	}
 
 	public function sandbox() {
@@ -1363,7 +1363,7 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 			$this->session->data['error_merchant_id'] = $this->language->get('error_merchant_id');
 		}
 		 
-		$this->response->redirect($this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token'], true));
+		$this->response->redirect($this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language')));
 	}
 
 	protected function formatRows($data) {
@@ -1396,7 +1396,7 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 			if ($recurring['status'] == 2 || $recurring['status'] == 3) {
 				$data['buttons'][] = array(
 					'text' => $this->language->get('button_cancel_recurring'),
-					'link' => $this->url->link('extension/payment/pp_express/recurringCancel', 'order_recurring_id=' . $this->request->get['order_recurring_id'] . '&user_token=' . $this->request->get['user_token'], true)
+					'link' => $this->url->link('extension/payment/pp_express/recurringCancel', 'order_recurring_id=' . $this->request->get['order_recurring_id'] . '&user_token=' . $this->request->get['user_token']. '&language=' . $this->config->get('config_language'))
 				);
 			}
 			
@@ -1406,12 +1406,12 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 			
 			$data['breadcrumbs'][] = array(
 				'text' => $this->language->get('text_pp_express'),
-				'href' => $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token'], true),
+				'href' => $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language')),
 			);
 			
 			$this->document->setTitle($this->language->get('text_error'));
 
-			$data['continue'] = $this->url->link('common/home', '', true);
+			$data['continue'] = $this->url->link('common/home', '&language=' . $this->config->get('config_language'));
 
 			$this->response->addHeader($this->request->server['SERVER_PROTOCOL'] . ' 404 Not Found');
 
@@ -1437,7 +1437,7 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 			$country = $this->model_localisation_country->getCountry($this->config->get('config_country_id'));
 
 			$post_data = array(
-				'return_url' => $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token'], true),
+				'return_url' => $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language')),
 				'store_url' => HTTP_CATALOG,
 				'store_version' => VERSION,
 				'store_country' => (isset($country['iso_code_3']) ? $country['iso_code_3'] : ''),
@@ -1464,10 +1464,10 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 			if (isset($curl_response['url']) && !empty($curl_response['url'])) {
 				$this->response->redirect($curl_response['url']);
 			} else {
-				$this->response->redirect($this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'], true));
+				$this->response->redirect($this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language')));
 			}
 		} else {
-			$this->response->redirect($this->url->link('error/permission', 'user_token=' . $this->session->data['user_token'], true));
+			$this->response->redirect($this->url->link('error/permission', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language')));
 		}
 	}
 
@@ -1479,10 +1479,10 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 		$data['module_link'] = '';
 
 		if ($this->config->get('payment_pp_express_username') || $this->config->get('payment_pp_express_sandbox_username')) {
-			$data['module_link'] = $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token'], true);
+			$data['module_link'] = $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'));
 		} else {
 			if ($this->user->hasPermission('modify', 'extension/extension/payment')) {
-				$data['connect_link'] = $this->url->link('extension/payment/pp_express/connectRedirect', 'user_token=' . $this->session->data['user_token'], true);
+				$data['connect_link'] = $this->url->link('extension/payment/pp_express/connectRedirect', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'));
 			}
 		}
 
