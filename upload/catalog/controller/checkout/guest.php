@@ -145,7 +145,7 @@ $json['error']function save() {
 
 		// Validate if customer is logged in.
 		if ($this->customer->isLogged()) {
-			$json['redirect'] = $this->url->link('checkout/checkout', '', true);
+			$json['redirect'] = $this->url->link('checkout/checkout', '&language=' . $this->config->get('config_language'));
 		}
 
 		// Validate cart has products and has stock.
@@ -155,7 +155,7 @@ $json['error']function save() {
 
 		// Check if guest checkout is available.
 		if (!$this->config->get('config_checkout_guest') || $this->config->get('config_customer_price') || $this->cart->hasDownload()) {
-			$json['redirect'] = $this->url->link('checkout/checkout', '', true);
+			$json['redirect'] = $this->url->link('checkout/checkout', '&language=' . $this->config->get('config_language'));
 		}
 
 		if (!$json) {
