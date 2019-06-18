@@ -284,7 +284,7 @@ class ModelExtensionReportSale extends Model {
 		}
 		
 		if (!empty($data['filter_salesrep'])) {
-			$sql .= " AND `o`.`salesrep_" . strtolower($data['filter_salesrep']) . "` = '1'";
+			$sql .= " AND `o`.`salesrep` . ` = '" . (int)$data['filter_salesrep'] . "'";
 		}
 		
 		if (!empty($data['filter_keyword'])) {
