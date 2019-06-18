@@ -103,7 +103,7 @@ class ControllerExtensionModuleBestSeller extends Controller {
 					'tax'         => $tax,
 					'rating'      => $rating,
 					'searches'	  => $searches,
-					'href'        => $this->url->link('product/product', 'product_id=' . $result['product_id'])
+					'href'        => $this->url->link('product/product', 'product_id=' . $result['product_id'] . '&language=' . $this->config->get('config_language'))
 				);
 			}
 
