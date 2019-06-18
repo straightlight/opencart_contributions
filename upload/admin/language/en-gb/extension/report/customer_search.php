@@ -9,6 +9,8 @@ $_['text_success']      = 'Success: You have modified customer searches report!'
 $_['text_filter']       = 'Filter';
 $_['text_guest']        = 'Guest';
 $_['text_customer']     = '<a href="%s">%s</a>';
+$_['text_salesrep_min'] = 'Min';
+$_['text_salesrep_max'] = 'Max';
 $_['text_year']         = 'Years';
 $_['text_month']        = 'Months';
 $_['text_week']         = 'Weeks';
@@ -40,6 +42,7 @@ $_['entry_category']		= 'Category';
 $_['entry_product']			= 'Product';
 $_['entry_group']			= 'Group By';
 $_['entry_ip']          	= 'IP';
+$_['entry_salesrep']		= 'Sales Reputation';
 $_['entry_status']      	= 'Status';
 $_['entry_sort_order']  	= 'Sort Order';
 
