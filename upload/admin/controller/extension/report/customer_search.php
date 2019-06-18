@@ -61,6 +61,28 @@ class ControllerExtensionReportCustomerSearch extends Controller {
 		$this->response->setOutput($this->load->view('extension/report/customer_search_form', $data));
 	}
 	
+	public function install() {
+		// If OC has been upgraded, verify that the module has the new event registered.
+		$this->load->model('setting/event');
+
+		$bestseller_event = $this->model_setting_event->getEventByCode("extension_module_bestseller_checkout");
+
+		if (empty($bestseller_event)) {
+			// Event is missing, add it
+			$this->model_setting_event->addEvent('extension_module_bestseller_checkout', 'catalog/model/checkout/order/addOrder/before', 'extension/module/bestseller/getBestSellerByOrders');
+		}
+		
+		$this->db->query("ALTER TABLE `" . DB_PREFIX . "order` ADD COLUMN `salesrep` INT(1) NOT NULL DEFAULT '0' BEFORE `date_added`");
+	}
+	
+	public function uninstall() {
+		$this->load->model('setting/event');
+		
+		$this->model_setting_event->deleteEventByCode('extension_module_bestseller_checkout');
+		
+		$this->db->query("ALTER TABLE `" . DB_PREFIX . "order` DROP COLUMN `salesrep`");
+	}
+	
 	protected function validate() {
 		if (!$this->user->hasPermission('modify', 'extension/report/customer_search')) {
 			$this->error['warning'] = $this->language->get('error_permission');
@@ -274,17 +296,5 @@ class ControllerExtensionReportCustomerSearch extends Controller {
 		$data['filter_group'] = $filter_group;
 
 		return $this->load->view('extension/report/customer_search_info', $data);
-	}
-	
-	public function install() {
-		// If OC has been upgraded, verify that the module has the new event registered.
-		$this->load->model('setting/event');
-
-		$bestseller_event = $this->model_setting_event->getEventByCode("extension_module_bestseller_checkout");
-
-		if (empty($bestseller_event)) {
-			// Event is missing, add it
-			$this->model_setting_event->addEvent('extension_module_bestseller_checkout', 'catalog/model/checkout/order/addOrder/before', 'extension/module/bestseller/getBestSellerByOrders');
-		}
 	}
 }
