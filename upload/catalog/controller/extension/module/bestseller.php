@@ -164,9 +164,7 @@ class ControllerExtensionModuleBestSeller extends Controller {
 							$product_range = 'minimum';
 							
 							$salesrep = 1;
-						}
-						
-						if ($bestseller['max_products']) {
+						} elseif ($bestseller['max_products']) {
 							$product_range = 'maximum';
 							
 							$salesrep = 2;
