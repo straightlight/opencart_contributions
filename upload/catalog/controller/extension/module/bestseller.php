@@ -160,14 +160,14 @@ class ControllerExtensionModuleBestSeller extends Controller {
 					}
 						
 					if ($notify) {
-						if ($bestseller['min_products']) {
-							$product_range = 'minimum';
-							
-							$salesrep = 1;
-						} elseif ($bestseller['max_products']) {
+						if ($bestseller['max_products'] >= $bestseller['products'] && $bestseller['products'] > $bestseller['min_products']) {
 							$product_range = 'maximum';
 							
 							$salesrep = 2;
+						} else {
+							$product_range = 'minimum';
+							
+							$salesrep = 1;
 						}
 						
 						$order_info = $this->model_checkout_order->getOrder($bestseller['order_id']);
