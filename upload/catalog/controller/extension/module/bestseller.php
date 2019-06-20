@@ -103,7 +103,7 @@ class ControllerExtensionModuleBestSeller extends Controller {
 					'tax'         => $tax,
 					'rating'      => $rating,
 					'searches'	  => $searches,
-					'href'        => $this->url->link('product/product', 'product_id=' . $result['product_id'] . '&language=' . $this->config->get('config_language'))
+					'href'        => $this->url->link('product/product', 'product_id=' . $result['product_id'])
 				);
 			}
 
@@ -135,7 +135,7 @@ class ControllerExtensionModuleBestSeller extends Controller {
 			$filter_data = array('filter_salesrep'			=> true,
 								);
 			
-			$bestsellers = $this->model_checkout_order->getBestSellerByOrders($this->session->data['bestseller_setting'], $filter_data);
+			$bestsellers = $this->model_checkout_order->getCustomerSearchesByOrders($this->session->data['bestseller_setting'], $filter_data);
 			
 			$tmp_bestsellers_data = array();
 			
@@ -160,258 +160,121 @@ class ControllerExtensionModuleBestSeller extends Controller {
 					}
 						
 					if ($notify) {
-						$notify_data = array('order_id'					=> $bestseller['order_id'],
-											 'category_id'				=> $bestseller['category_id'],
-											 'customer_search_ip'		=> $bestseller['customer_search_ip'],
-											 'search_date_end'			=> $bestseller['search_date_end'],
-											 'searches'					=> $bestseller['searches'],
-											 'notify'					=> $notify,
-											);
-											
-						$notify_encode = json_encode($notify_data);
+						if ($bestseller['min_products']) {
+							$product_range = 'minimum';
+							
+							$salesrep = 1;
+						}
 						
-						$tmp_bestsellers_data[$notify_encode][] = $bestseller['products'];
+						if ($bestseller['max_products']) {
+							$product_range = 'maximum';
+							
+							$salesrep = 2;
+						}
+						
+						$order_info = $this->model_checkout_order->getOrder($bestseller['order_id']);
+						
+						if ($order_info) {
+							$order_totals = $this->model_checkout_order->getOrderTotals($order_info['order_id']);
+							
+							$affiliate = $this->model_account_customer->getAffiliateByTracking($order_info['tracking']);
+							
+							$affiliate_id = 0;
+							
+							$affiliate_name = '';
+							
+							if ($affiliate) {
+								$affiliate_info = $this->model_account_customer->getCustomer($affiliate['customer_id']);							
+								
+								if ($affiliate_info) {
+									$affiliate_id = $affiliate_info['affiliate_id'];
+									
+									$affiliate_name = $affiliate_info['firstname'] . ' ' . $affiliate_info['lastname'];
+								}
+							}
+							
+							$tmp_order_products = $this->model_sale_order->getOrderProducts($order_info['order_id']);
+							
+							if ($tmp_order_products) {
+								$order_products = array();
+								
+								$option_data = array();
+								
+								foreach ($tmp_order_products as $order_product) {
+									$product_to_categories = $this->model_catalog_product->getCategories($order_product['product_id']);
+									
+									$categories = array();
+									
+									foreach ($product_to_categories as $result) {
+										if ($result['category_id'] == $bestseller['category_id']) {
+											$categories[$order_product['product_id']] = $result['category_id'];
+										}
+									}
+									
+									$category = array();
+									
+									if (!empty($categories[$order_product['product_id']])) {
+										$category = $this->model_catalog_category->getCategory($categories[$order_product['product_id']]);
+									}
+									
+									$order_products[] = array('name'				=> $order_product['name'],
+															  'model'				=> $order_product['model'],
+															  'quantity'			=> $order_product['quantity'],
+															  'category'			=> $category,
+															  'price'				=> $this->currency->format($order_product['price'], $this->config->get('config_currency')),
+															  'total'				=> $this->currency->format($order_product['total'], $this->config->get('config_currency')),
+															 );
+															 
+									$order_options = $this->model_checkout_order->getOrderOptions($order_info['order_id'], $order_product['order_product_id']);
+
+									foreach ($order_options as $option) {
+										if ($option['type'] != 'file') {
+											$value = $option['value'];
+										} else {
+											$upload_info = $this->model_tool_upload->getUploadByCode($option['value']);
+
+											if ($upload_info) {
+												$value = $upload_info['name'];
+											} else {
+												$value = '';
+											}
+										}
+
+										$option_data[] = array(
+											'name'  => $option['name'],
+											'value' => (utf8_strlen($value) > 20 ? utf8_substr($value, 0, 20) . '..' : $value)
+										);
+									}
+								}
+								
+								$reputable = false;
+								
+								if (date($this->language->get('datetime_format'), $order_info['date_added']) < date($this->language->get('datetime_format'), $bestseller['search_date_end'])) {
+									$date_interval = sprintf($this->language->get('text_order_date_interval_search'), date($this->language->get('datetime_format'), $order_info['date_added']), date($this->language->get('datetime_format'), $bestseller['search_date_end']), $bestseller['products']);
+								} elseif (date($this->language->get('datetime_format'), $order_info['date_added']) > date($this->language->get('datetime_format'), $bestseller['search_date_end']) && !empty($order_info['order_ip']) && $order_info['order_ip'] != $order_info['customer_search_ip']) {
+									$date_interval = sprintf($this->language->get('text_order_date_interval'), date($this->language->get('datetime_format'), $order_info['date_added']), date($this->language->get('datetime_format'), $bestseller['search_date_end']), $bestseller['products']);
+									
+									$reputable = true;
+								}
+								
+								$data['bestsellers'][$product_range][] = array('payment_name'					=> $order_info['payment_firstname'] . ' ' . $order_info['payment_lastname'],
+																			   'email'							=> $order_info['email'],
+																			   'total'							=> $this->currency->format($order_info['total'], $this->config->get('config_currency')),
+																			   'products'						=> $bestseller['products'],
+																			   'searches'						=> $bestseller['searches'],
+																			   'order_products'					=> $order_products,
+																			   'order_options'					=> $option_data,																	  
+																			   'totals'							=> $order_totals,
+																			   'affiliate_name'					=> $affiliate_name,
+																			   'affiliate_tracking'				=> $order_info['tracking'],
+																			   'reputable'						=> $reputable,
+																			   'date_interval'					=> $date_interval,
+																			  );
+																								   
+								$this->model_checkout_order->setSalesRep($order_info['order_id'], $salesrep);
+							}
+						}
 					}					
-				}
-			}
-			
-			$bestsellers_data = array();
-			
-			foreach ($tmp_bestsellers_data as $order => $results) {
-				if (!empty($results) && is_array($results)) {
-					if (min($results) > 1 && max($results) > 1) {
-						if (min($results) < max($results) && max($results) > 0) {
-							$bestsellers_data['minimum'][$order] = min($results);
-						}
-						
-						if (max($results) < min($results) && min($results) > 0) {
-							$bestsellers_data['maximum'][$order] = max($results);
-						}
-					}
-				}
-			}
-			
-			$bestsellers = $bestsellers_data;
-			
-			$data['bestsellers'] = array();
-			
-			// Minimum products ordered for worst level of sales.
-			if (!empty($bestsellers['minimum'])) {
-				foreach ($bestsellers['minimum'] as $order => $value) {
-					$order_decoded = json_decode($order, true);
-					
-					$order_info = $this->model_checkout_order->getOrder($order_decoded['order_id']);
-					
-					if ($order_info) {
-						$order_totals = $this->model_checkout_order->getOrderTotals($order_info['order_id']);
-						
-						$affiliate = $this->model_account_customer->getAffiliateByTracking($order_info['tracking']);
-						
-						$affiliate_id = 0;
-						
-						$affiliate_name = '';
-						
-						if ($affiliate) {
-							$affiliate_info = $this->model_account_customer->getCustomer($affiliate['customer_id']);							
-							
-							if ($affiliate_info) {
-								$affiliate_id = $affiliate_info['affiliate_id'];
-								
-								$affiliate_name = $affiliate_info['firstname'] . ' ' . $affiliate_info['lastname'];
-							}
-						}
-						
-						$tmp_order_products = $this->model_sale_order->getOrderProducts($order_info['order_id']);
-						
-						if ($tmp_order_products) {
-							$order_products = array();
-							
-							$option_data = array();
-							
-							foreach ($tmp_order_products as $order_product) {
-								$product_to_categories = $this->model_catalog_product->getCategories($order_product['product_id']);
-								
-								$categories = array();
-								
-								foreach ($product_to_categories as $result) {
-									if ($result['category_id'] == $order_decoded['category_id']) {
-										$categories[$order_product['product_id']] = $result['category_id'];
-									}
-								}
-								
-								$category = array();
-								
-								if (!empty($categories[$order_product['product_id']])) {
-									$category = $this->model_catalog_category->getCategory($categories[$order_product['product_id']]);
-								}
-								
-								$order_products[] = array('name'				=> $order_product['name'],
-														  'model'				=> $order_product['model'],
-														  'quantity'			=> $order_product['quantity'],
-														  'category'			=> $category,
-														  'price'				=> $this->currency->format($order_product['price'], $this->config->get('config_currency')),
-														  'total'				=> $this->currency->format($order_product['total'], $this->config->get('config_currency')),
-														 );
-														 
-								$order_options = $this->model_checkout_order->getOrderOptions($order_info['order_id'], $order_product['order_product_id']);
-
-								foreach ($order_options as $option) {
-									if ($option['type'] != 'file') {
-										$option_value = $option['value'];
-									} else {
-										$upload_info = $this->model_tool_upload->getUploadByCode($option['value']);
-
-										if ($upload_info) {
-											$option_value = $upload_info['name'];
-										} else {
-											$option_value = '';
-										}
-									}
-
-									$option_data[] = array(
-										'name'  => $option['name'],
-										'value' => (utf8_strlen($option_value) > 20 ? utf8_substr($option_value, 0, 20) . '..' : $option_value)
-									);
-								}
-							}
-							
-							$reputable = false;
-							
-							if (date($this->language->get('datetime_format'), $order_info['date_added']) < date($this->language->get('datetime_format'), $order_decoded['search_date_end'])) {
-								$date_interval = sprintf($this->language->get('text_order_date_interval_search'), date($this->language->get('datetime_format'), $order_info['date_added']), date($this->language->get('datetime_format'), $order_decoded['search_date_end']), $value);
-							} elseif (date($this->language->get('datetime_format'), $order_info['date_added']) > date($this->language->get('datetime_format'), $order_decoded['search_date_end']) && !empty($order_info['order_ip']) && $order_info['order_ip'] != $order_info['customer_search_ip']) {
-								$date_interval = sprintf($this->language->get('text_order_date_interval'), date($this->language->get('datetime_format'), $order_info['date_added']), date($this->language->get('datetime_format'), $order_decoded['search_date_end']), $value);
-								
-								$reputable = true;
-							}
-							
-							$data['bestsellers']['minimum'][] = array('payment_name'					=> $order_info['payment_firstname'] . ' ' . $order_info['payment_lastname'],
-																	  'email'							=> $order_info['email'],
-																	  'total'							=> $this->currency->format($order_info['total'], $this->config->get('config_currency')),
-																	  'products'						=> $value,
-																	  'searches'						=> $order_decoded['searches'],
-																	  'order_products'					=> $order_products,
-																	  'order_options'					=> $option_data,																	  
-																	  'totals'							=> $order_totals,
-																	  'affiliate_name'					=> $affiliate_name,
-																	  'affiliate_tracking'				=> $order_info['tracking'],
-																	  'reputable'						=> $reputable,
-																	  'date_interval'					=> $date_interval,
-																	 );
-																							   
-							$this->model_checkout_order->setSalesRep($order_info['order_id'], 1);
-						}
-					}
-				}
-			}
-			
-			// Maximum products ordered for best level of sales.
-			if (!empty($bestsellers['maximum'])) {
-				foreach ($bestsellers['maximum'] as $order => $value) {
-					$order_decoded = json_decode($order, true);
-					
-					$order_info = $this->model_checkout_order->getOrder($order_decoded['order_id']);
-					
-					if ($order_info) {
-						$order_totals = $this->model_checkout_order->getOrderTotals($order_info['order_id']);
-						
-						$affiliate = $this->model_account_customer->getAffiliateByTracking($order_info['tracking']);
-						
-						$affiliate_id = 0;
-						
-						$affiliate_name = '';
-						
-						if ($affiliate) {
-							$affiliate_info = $this->model_account_customer->getCustomer($affiliate['customer_id']);
-							
-							if ($affiliate_info) {
-								$affiliate_id = $affiliate_info['affiliate_id'];
-								
-								$affiliate_name = $affiliate_info['firstname'] . ' ' . $affiliate_info['lastname'];
-							}
-						}
-						
-						$tmp_order_products = $this->model_sale_order->getOrderProducts($order_info['order_id']);
-						
-						if ($tmp_order_products) {
-							$order_products = array();
-							
-							$option_data = array();
-							
-							foreach ($tmp_order_products as $order_product) {
-								$product_to_categories = $this->model_catalog_product->getCategories($order_product['product_id']);
-								
-								$categories = array();
-								
-								foreach ($product_to_categories as $result) {
-									if ($result['category_id'] == $order_decoded['category_id']) {
-										$categories[$order_product['product_id']] = $result['category_id'];
-									}
-								}
-								
-								$category = array();
-								
-								if (!empty($categories[$order_product['product_id']])) {
-									$category = $this->model_catalog_category->getCategory($categories[$order_product['product_id']]);
-								}
-								
-								$order_products[] = array('name'				=> $order_product['name'],
-														  'model'				=> $order_product['model'],
-														  'quantity'			=> $order_product['quantity'],
-														  'category'			=> $category,
-														  'price'				=> $this->currency->format($order_product['price'], $this->config->get('config_currency')),
-														  'total'				=> $this->currency->format($order_product['total'], $this->config->get('config_currency')),
-														 );
-								
-								$order_options = $this->model_checkout_order->getOrderOptions($order_info['order_id'], $order_product['order_product_id']);
-
-								foreach ($order_options as $option) {
-									if ($option['type'] != 'file') {
-										$option_value = $option['value'];
-									} else {
-										$upload_info = $this->model_tool_upload->getUploadByCode($option['value']);
-
-										if ($upload_info) {
-											$option_value = $upload_info['name'];
-										} else {
-											$option_value = '';
-										}
-									}
-
-									$option_data[] = array(
-										'name'  => $option['name'],
-										'value' => (utf8_strlen($option_value) > 20 ? utf8_substr($option_value, 0, 20) . '..' : $option_value)
-									);
-								}
-							}
-							
-							$reputable = false;
-							
-							if (date($this->language->get('datetime_format'), $order_info['date_added']) < date($this->language->get('datetime_format'), $order_decoded['search_date_end'])) {
-								$date_interval = sprintf($this->language->get('text_order_date_interval_search'), date($this->language->get('datetime_format'), $order_info['date_added']), date($this->language->get('datetime_format'), $order_decoded['search_date_end']), $value);								
-							} elseif (date($this->language->get('datetime_format'), $order_info['date_added']) > date($this->language->get('datetime_format'), $order_decoded['search_date_end']) && !empty($order_info['ip']) && $order_info['ip'] != $order_decoded['customer_search_ip']) {
-								$date_interval = sprintf($this->language->get('text_order_date_interval'), date($this->language->get('datetime_format'), $order_info['date_added']), date($this->language->get('datetime_format'), $order_decoded['search_date_end']), $value);
-								
-								$reputable = true;
-							}
-							
-							$data['bestsellers']['maximum'][] = array('payment_name'					=> $order_info['payment_firstname'] . ' ' . $order_info['payment_lastname'],
-																	  'email'							=> $order_info['email'],
-																	  'total'							=> $this->currency->format($order_info['total'], $this->config->get('config_currency')),
-																	  'products'						=> $value,
-																	  'searches'						=> $order_decoded['searches'],
-																	  'order_products'					=> $order_products,
-																	  'order_options'					=> $option_data,																	  
-																	  'totals'							=> $order_totals,
-																	  'affiliate_name'					=> $affiliate_name,
-																	  'affiliate_tracking'				=> $order_info['tracking'],
-																	  'reputable'						=> $reputable,
-																	  'date_interval'					=> $date_interval,
-																	 );
-																							   
-							$this->model_checkout_order->setSalesRep($order_info['order_id'], 2);
-						}
-					}
 				}
 			}
 			
