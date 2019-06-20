@@ -4,6 +4,7 @@ $_['text_subject']          			= '%s - Bestsellers';
 $_['text_greeting']         			= '%s - Bestsellers - Report';
 $_['text_minimum']						= 'Lease sold products';
 $_['text_maximum']						= 'Most sold products';
+$_['text_category']           = 'Category';
 $_['text_product']						= 'Product';
 $_['text_model']						= 'Model';
 $_['text_quantity']						= 'Quantity';
