@@ -26,7 +26,7 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 
 			$this->session->data['success'] = $this->language->get('text_success');
 
-			$this->response->redirect($this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=payment&language=' . $this->config->get('config_language')' . $this->config->get('config_language')));
+			$this->response->redirect($this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=payment&language=' . $this->config->get('config_language')));
 		}
 
 		$data['user_token'] = $this->session->data['user_token'];
@@ -100,7 +100,7 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_extension'),
-			'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=payment&language=' . $this->config->get('config_language')' . $this->config->get('config_language')),
+			'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=payment&language=' . $this->config->get('config_language')),
 		);
 
 		$data['breadcrumbs'][] = array(
@@ -110,7 +110,7 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 
 		$data['action'] = $this->url->link('extension/payment/pp_express', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'));
 
-		$data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=payment&language=' . $this->config->get('config_language')' . $this->config->get('config_language'));
+		$data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=payment&language=' . $this->config->get('config_language'));
 
 		$data['search'] = $this->url->link('extension/payment/pp_express/search', 'user_token=' . $this->session->data['user_token']. '&language=' . $this->config->get('config_language'));
 
