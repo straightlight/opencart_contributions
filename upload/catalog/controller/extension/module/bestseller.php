@@ -53,7 +53,41 @@ class ControllerExtensionModuleBestSeller extends Controller {
 
 		if ($results) {
 			if (empty($this->session->data['bestseller_setting'])) {
-				$this->session->data['bestseller_setting'] = $setting;
+				$date_format_short = str_replace('/', '-', $this->language->get('date_format_short'));
+		
+				$date = new DateTime(date($date_format_short));
+				
+				$notify = false;
+				
+				if ($setting['group'] == 'day') {
+					$date->modify('-' . $setting['order_period_value'] . ' day');
+		
+					if ($date->format($date_format_short)) {
+						$notify = true;
+					}
+				} elseif ($setting['group'] == 'week') {
+					$date->modify('-' . $setting['order_period_value'] . ' week');
+		
+					if ($date->format($date_format_short)) {
+						$notify = true;
+					}
+				} elseif ($setting['group'] == 'month') {
+					$date->modify('-' . $setting['order_period_value'] . ' month');
+		
+					if ($date->format($date_format_short)) {
+						$notify = true;
+					}
+				} elseif ($setting['group'] == 'year') {
+					$date->modify('-' . $setting['order_period_value'] . ' year');
+		
+					if ($date->format($date_format_short)) {
+						$notify = true;
+					}
+				}				
+						
+				if ($notify) {
+					$this->session->data['bestseller_setting'] = $setting;
+				}
 			}
 			
 			foreach ($results as $result) {
@@ -139,6 +173,10 @@ class ControllerExtensionModuleBestSeller extends Controller {
 			
 			$tmp_bestsellers_data = array();
 			
+			$date_format_short = str_replace('/', '-', $this->language->get('date_format_short'));
+		
+			$date = new DateTime(date($date_format_short));
+			
 			foreach ($bestsellers as $bestseller) {
 				if ($bestseller['search_date_end']) {
 					$datetime1 = new DateTime($bestseller['date_end']);
@@ -146,6 +184,8 @@ class ControllerExtensionModuleBestSeller extends Controller {
 					$datetime2 = new DateTime($bestseller['search_date_end']);
 
 					$difference = $datetime1->diff($datetime2);
+					
+					$notify = false;
 					
 					if (($difference->d > 0 && $difference->d >= $this->session->data['bestseller_setting']['order_period_value'] && $difference->d <= 364) || ($difference->d % 7 > 0 && $difference->d % 7 >= $this->session->data['bestseller_setting']['order_period_value'] && $difference->d % 7 <= 52) || ($difference->m > 0 && $difference->m >= $this->session->data['bestseller_setting']['order_period_value'] && $difference->m <= 12) || ($difference->y > 0 && $difference->y >= $this->session->data['bestseller_setting']['order_period_value'])) {
 						if ($this->session->data['bestseller_setting']['group'] == 'day') {
