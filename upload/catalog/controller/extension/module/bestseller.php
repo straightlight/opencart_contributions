@@ -204,7 +204,7 @@ class ControllerExtensionModuleBestSeller extends Controller {
 									$categories = array();
 									
 									foreach ($product_to_categories as $result) {
-										if ($result['category_id'] == $bestseller['category_id']) {
+										if ($result['category_id'] == $bestseller['category_id'] && $result['product_id'] == $bestseller['product_id']) {
 											$categories[$order_product['product_id']] = $result['category_id'];
 										}
 									}
