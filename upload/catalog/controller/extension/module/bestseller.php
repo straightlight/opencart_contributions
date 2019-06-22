@@ -212,7 +212,7 @@ class ControllerExtensionModuleBestSeller extends Controller {
 						
 						$order_info = $this->model_checkout_order->getOrder($bestseller['order_id']);
 						
-						if ($order_info) {
+						if ($order_info && $order_info['store_id'] == $this->config->get('config_store_id')) {
 							$order_totals = $this->model_checkout_order->getOrderTotals($order_info['order_id']);
 							
 							$affiliate = $this->model_account_customer->getAffiliateByTracking($order_info['tracking']);
