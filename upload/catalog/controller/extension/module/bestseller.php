@@ -158,7 +158,11 @@ class ControllerExtensionModuleBestSeller extends Controller {
 			
 			$this->load->model('catalog/category');
 			
-			$this->load->model('catalog/product');						
+			$this->load->model('catalog/product');
+			
+			$this->load->model('tool/upload');
+			
+			$this->load->model('account/customer');
 			
 			$data['store_url'] = HTTP_CATALOG . 'index.php?route=common/home';
 			
@@ -212,7 +216,7 @@ class ControllerExtensionModuleBestSeller extends Controller {
 						
 						$order_info = $this->model_checkout_order->getOrder($bestseller['order_id']);
 						
-						if ($order_info && $order_info['store_id'] == $this->config->get('config_store_id')) {
+						if ($order_info) {
 							$order_totals = $this->model_checkout_order->getOrderTotals($order_info['order_id']);
 							
 							$affiliate = $this->model_account_customer->getAffiliateByTracking($order_info['tracking']);
@@ -231,7 +235,7 @@ class ControllerExtensionModuleBestSeller extends Controller {
 								}
 							}
 							
-							$tmp_order_products = $this->model_sale_order->getOrderProducts($order_info['order_id']);
+							$tmp_order_products = $this->model_checkout_order->getOrderProducts($order_info['order_id']);
 							
 							if ($tmp_order_products) {
 								$order_products = array();
@@ -247,7 +251,7 @@ class ControllerExtensionModuleBestSeller extends Controller {
 										if ($result['category_id'] == $bestseller['category_id'] && $result['product_id'] == $bestseller['product_id']) {
 											$categories[$order_product['product_id']] = $result['category_id'];
 										}
-									}
+									}									
 									
 									$category = array();
 									
@@ -255,10 +259,19 @@ class ControllerExtensionModuleBestSeller extends Controller {
 										$category = $this->model_catalog_category->getCategory($categories[$order_product['product_id']]);
 									}
 									
+									$product_info = $this->model_catalog_product->getProduct($order_product['product_id']);
+									
+									$manufacturer = '';
+									
+									if ($product_info['manufacturer']) {
+										$manufacturer = $product_info['manufacturer'];
+									}
+									
 									$order_products[] = array('name'				=> $order_product['name'],
 															  'model'				=> $order_product['model'],
 															  'quantity'			=> $order_product['quantity'],
 															  'category'			=> $category,
+															  'manufacturer'		=> $manufacturer,
 															  'price'				=> $this->currency->format($order_product['price'], $this->config->get('config_currency')),
 															  'total'				=> $this->currency->format($order_product['total'], $this->config->get('config_currency')),
 															 );
