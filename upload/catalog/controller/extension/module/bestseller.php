@@ -52,11 +52,11 @@ class ControllerExtensionModuleBestSeller extends Controller {
 		}
 
 		if ($results) {
-			if (empty($this->session->data['bestseller_setting'])) {
-				$date_format_short = str_replace('/', '-', $this->language->get('date_format_short'));
+			$date_format_short = str_replace('/', '-', $this->language->get('date_format_short'));
 		
-				$date = new DateTime(date($date_format_short));
-				
+			$date = new DateTime(date($date_format_short));
+			
+			if (empty($this->session->data['bestseller_setting'])) {
 				$notify = false;
 				
 				if ($setting['group'] == 'day') {
@@ -91,6 +91,18 @@ class ControllerExtensionModuleBestSeller extends Controller {
 			}
 			
 			foreach ($results as $result) {
+				$date1 = new DateTime(date($date_format_short, strtotime($result['date_added'])));
+				
+				$date2 = new DateTime(date($date_format_short, strtotime(time())));
+				
+				$interval = $date1->diff($date2);
+				
+				$is_new = false;
+				
+				if ($setting['group'] == 'day' && $interval->d > 0 && $interval->d <= $setting['order_period_value']) {
+					$is_new = true;
+				}
+			
 				if ($result['image']) {
 					$image = $this->model_tool_image->resize($result['image'], $setting['width'], $setting['height']);
 				} else {
@@ -135,6 +147,7 @@ class ControllerExtensionModuleBestSeller extends Controller {
 					'price'       => $price,
 					'special'     => $special,
 					'tax'         => $tax,
+					'is_new'	  => $is_new,
 					'rating'      => $rating,
 					'searches'	  => $searches,
 					'href'        => $this->url->link('product/product', 'product_id=' . $result['product_id'])
@@ -263,8 +276,22 @@ class ControllerExtensionModuleBestSeller extends Controller {
 									
 									$manufacturer = '';
 									
-									if ($product_info['manufacturer']) {
-										$manufacturer = $product_info['manufacturer'];
+									$is_new = false;
+									
+									if ($product_info) {
+										if ($product_info['manufacturer']) {
+											$manufacturer = $product_info['manufacturer'];
+										}
+										
+										$product_date1 = new DateTime(date($date_format_short, strtotime($product_info['date_added'])));
+				
+										$product_date2 = new DateTime(date($date_format_short, strtotime(time())));
+				
+										$interval = $product_date1->diff($product_date2);
+										
+										if ($this->session->data['bestseller_setting']['group'] == 'day' && $interval->d > 0 && $interval->d <= $this->session->data['bestseller_setting']['order_period_value']) {
+											$is_new = true;
+										}
 									}
 									
 									$order_products[] = array('name'				=> $order_product['name'],
@@ -272,6 +299,7 @@ class ControllerExtensionModuleBestSeller extends Controller {
 															  'quantity'			=> $order_product['quantity'],
 															  'category'			=> $category,
 															  'manufacturer'		=> $manufacturer,
+															  'is_new'				=> $is_new,
 															  'price'				=> $this->currency->format($order_product['price'], $this->config->get('config_currency')),
 															  'total'				=> $this->currency->format($order_product['total'], $this->config->get('config_currency')),
 															 );
