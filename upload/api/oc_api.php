@@ -4,8 +4,8 @@
 
 $json = array();
 
-if (file_exists('opencart3032/config.php')) {
-	require_once('opencart3032/config.php');
+if (file_exists('../config.php')) {
+	require_once('../config.php');
 }
 
 // Check Version
