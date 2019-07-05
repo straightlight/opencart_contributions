@@ -4,8 +4,8 @@
 
 $json = array();
 
-if (file_exists('../config.php')) {
-	require_once('../config.php');
+if (file_exists('opencart3032/config.php')) {
+	require_once('opencart3032/config.php');
 }
 
 // Check Version
@@ -259,12 +259,12 @@ if (!$api_info->num_rows) {
 				
 				$registry->get('model_account_api')->addApiSession($api_info['api_id'], $api_session->getId(), $registry->get('request')->server['REMOTE_ADDR']);
 				
-				$api_session->data['api_id'] = $api_info['api_id'];
+				$api_session->data['oc_api_id'] = $api_info['api_id'];
 				
 				$json['api_session_id'] = $api_session->getId();
 				
 				// Create Token
-				$json['api_token'] = $api_session->getId();
+				$json['oc_api_token'] = $api_session->getId();
 			} else {
 				$json['error']['key'] = $registry->get('language')->get('error_key');
 			}		
