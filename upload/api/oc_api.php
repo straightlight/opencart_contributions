@@ -182,8 +182,6 @@ $registry->set('request', new Request());
 
 // Response
 $response = new Response();
-$response->addHeader('Content-Type: text/html; charset=utf-8');
-$response->setCompression($registry->get('config')->get('config_compression'));
 $registry->set('response', $response);
 
 // Database
@@ -203,12 +201,15 @@ if (!$api_info->num_rows) {
 		$json = array();
 		
 		$json['error']['token'] = 'No API Access!';
-	} else {
+	} elseif (!$is_ajax) {
 		$registry->get('response')->addHeader($registry->get('request')->server['SERVER_PROTOCOL'] . ' 404 Not Found');
 		
 		die('You are not authorized to view this page!');
 	}
 } else {
+	$registry->get('response')->addHeader('Content-Type: text/html; charset=utf-8');
+	$registry->get('response')->setCompression($registry->get('config')->get('config_compression'));
+	
 	$json = array();
 	
 	$api_token = '';
