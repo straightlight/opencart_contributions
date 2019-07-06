@@ -533,7 +533,7 @@ if (!$api_info->num_rows) {
 			// Logged customer
 			$customer_logged = false;
 			
-			if (!empty($registry->get('request')->post['email']) && filter_var($registry->get('request')->post['email'], FILTER_VALIDATE_EMAIL) && $registry->get('request')->post['email'] == $registry->get('customer')->getEmail()) {
+			if (!empty($registry->get('request')->get['email']) && filter_var($registry->get('request')->get['email'], FILTER_VALIDATE_EMAIL) && $registry->get('request')->get['email'] == $registry->get('customer')->getEmail()) {
 				$cart_query = $registry->get('cart')->getProducts();
 				
 				foreach ($cart_query as $cart) {
