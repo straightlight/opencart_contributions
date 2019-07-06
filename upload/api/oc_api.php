@@ -527,8 +527,6 @@ if (!$api_info->num_rows) {
 			// Cart
 			$registry->set('cart', new Cart\Cart($registry));
 			
-			$json['cart'] = $registry->get('cart')->getProducts();
-					
 			// Encryption
 			$registry->set('encryption', new Encryption($registry->get('config')->get('config_encryption')));
 			
@@ -536,6 +534,14 @@ if (!$api_info->num_rows) {
 			$customer_logged = false;
 			
 			if (!empty($registry->get('request')->post['email']) && filter_var($registry->get('request')->post['email'], FILTER_VALIDATE_EMAIL) && $registry->get('request')->post['email'] == $registry->get('customer')->getEmail()) {
+				$cart_query = $registry->get('cart')->getProducts();
+				
+				foreach ($cart_query as $cart) {
+					if ($cart['customer_id'] == $registry->get('customer')->getId()) {
+						$json['cart'][] = $cart;
+					}
+				}
+				
 				$customer_logged = true;
 			}
 			
