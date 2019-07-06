@@ -526,6 +526,8 @@ if (!$api_info->num_rows) {
 					
 			// Cart
 			$registry->set('cart', new Cart\Cart($registry));
+			
+			$json['cart'] = $registry->get('cart')->getProducts();
 					
 			// Encryption
 			$registry->set('encryption', new Encryption($registry->get('config')->get('config_encryption')));
