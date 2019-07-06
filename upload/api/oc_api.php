@@ -659,10 +659,6 @@ if (!$api_info->num_rows) {
 				$json['heading_title'] = $registry->get('language')->get('heading_title');
 			}
 
-			$json['text_compare'] = sprintf($registry->get('language')->get('text_compare'), (isset($registry->get('session')->data['compare']) ? count($registry->get('session')->data['compare']) : 0));
-
-			$json['compare'] = $registry->get('url')->link('product/compare');
-
 			$registry->get('load')->model('catalog/category');
 
 			// 3 Level Category Search
@@ -761,7 +757,7 @@ if (!$api_info->num_rows) {
 						'tax'         => $tax,
 						'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,
 						'rating'      => $result['rating'],
-						'href'        => $registry->get('url')->link('product/product', 'product_id=' . $result['product_id'] . $url)
+						'href'        => ''
 					);
 				}
 
@@ -796,57 +792,57 @@ if (!$api_info->num_rows) {
 				$json['sorts'][] = array(
 					'text'  => $registry->get('language')->get('text_default'),
 					'value' => 'p.sort_order-ASC',
-					'href'  => $registry->get('url')->link('product/search', 'sort=p.sort_order&order=ASC' . $url)
+					'href'  => '',
 				);
 
 				$json['sorts'][] = array(
 					'text'  => $registry->get('language')->get('text_name_asc'),
 					'value' => 'pd.name-ASC',
-					'href'  => $registry->get('url')->link('product/search', 'sort=pd.name&order=ASC' . $url)
+					'href'  => '',
 				);
 
 				$json['sorts'][] = array(
 					'text'  => $registry->get('language')->get('text_name_desc'),
 					'value' => 'pd.name-DESC',
-					'href'  => $registry->get('url')->link('product/search', 'sort=pd.name&order=DESC' . $url)
+					'href'  => '',
 				);
 
 				$json['sorts'][] = array(
 					'text'  => $registry->get('language')->get('text_price_asc'),
 					'value' => 'p.price-ASC',
-					'href'  => $registry->get('url')->link('product/search', 'sort=p.price&order=ASC' . $url)
+					'href'  => '',
 				);
 
 				$json['sorts'][] = array(
 					'text'  => $registry->get('language')->get('text_price_desc'),
 					'value' => 'p.price-DESC',
-					'href'  => $registry->get('url')->link('product/search', 'sort=p.price&order=DESC' . $url)
+					'href'  => '',
 				);
 
 				if ($registry->get('config')->get('config_review_status')) {
 					$json['sorts'][] = array(
 						'text'  => $registry->get('language')->get('text_rating_desc'),
 						'value' => 'rating-DESC',
-						'href'  => $registry->get('url')->link('product/search', 'sort=rating&order=DESC' . $url)
+						'href'  => '',
 					);
 
 					$json['sorts'][] = array(
 						'text'  => $registry->get('language')->get('text_rating_asc'),
 						'value' => 'rating-ASC',
-						'href'  => $registry->get('url')->link('product/search', 'sort=rating&order=ASC' . $url)
+						'href'  => '',
 					);
 				}
 
 				$json['sorts'][] = array(
 					'text'  => $registry->get('language')->get('text_model_asc'),
 					'value' => 'p.model-ASC',
-					'href'  => $registry->get('url')->link('product/search', 'sort=p.model&order=ASC' . $url)
+					'href'  => '',
 				);
 
 				$json['sorts'][] = array(
 					'text'  => $registry->get('language')->get('text_model_desc'),
 					'value' => 'p.model-DESC',
-					'href'  => $registry->get('url')->link('product/search', 'sort=p.model&order=DESC' . $url)
+					'href'  => '',
 				);
 
 				$url = '';
@@ -889,7 +885,7 @@ if (!$api_info->num_rows) {
 					$json['limits'][] = array(
 						'text'  => $value,
 						'value' => $value,
-						'href'  => $registry->get('url')->link('product/search', $url . '&limit=' . $value)
+						'href'  => '',
 					);
 				}
 
@@ -927,13 +923,10 @@ if (!$api_info->num_rows) {
 					$url .= '&limit=' . $registry->get('request')->get['limit'];
 				}
 
-				$pagination = new Pagination();
-				$pagination->total = $product_total;
-				$pagination->page = $page;
-				$pagination->limit = $limit;
-				$pagination->url = $registry->get('url')->link('product/search', $url . '&page={page}');
-
-				$json['pagination'] = $pagination->render();
+				$json['pagination_total'] = $product_total;				
+				$json['pagination_page'] = $page;				
+				$json['pagination_limit'] = $limit;				
+				$json['pagination_url'] = $url;
 
 				$json['results'] = sprintf($registry->get('language')->get('text_pagination'), ($product_total) ? (($page - 1) * $limit) + 1 : 0, ((($page - 1) * $limit) > ($product_total - $limit)) ? $product_total : ((($page - 1) * $limit) + $limit), $product_total, ceil($product_total / $limit));
 
@@ -959,7 +952,7 @@ if (!$api_info->num_rows) {
 						'description'   => $description,
 						'products'      => $product_total,
 						'customer_id'   => $customer_id,
-						'ip'            => $ip
+						'ip'            => $ip,
 					);
 
 					$registry->get('model_account_search')->addSearch($search_data);
