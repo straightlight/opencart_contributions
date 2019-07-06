@@ -6,6 +6,12 @@ if (file_exists('../config.php')) {
 	require_once('../config.php');
 }
 
+// Check Installed
+if (!defined('DIR_APPLICATION')) {
+	$json['error'] = 'Opencart is not installed!';
+	sendOutput($json);
+}
+
 // Check Version
 if (version_compare(phpversion(), '7.0.0', '<') == true) {
 	exit('PHP7.0+ Required');
@@ -144,10 +150,6 @@ set_error_handler(function($code, $message, $file, $line) use($log, $registry) {
 		default:
 			$error = 'Unknown';
 			break;
-	}
-
-	if ($registry->get('config')->get('error_display')) {
-		echo '<b>' . $error . '</b>: ' . $message . ' in <b>' . $file . '</b> on line <b>' . $line . '</b>';
 	}
 
 	if ($registry->get('config')->get('error_log')) {
