@@ -239,7 +239,7 @@ if (!$api_info->num_rows) {
 		
 		die('You are not authorized to view this page!');
 	}
-} else {
+} elseif ($api_info->num_rows && $is_ajax) {
 	$json = array();
 	
 	$api_token = '';
