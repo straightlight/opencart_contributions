@@ -500,7 +500,7 @@ if (!$api_info->num_rows) {
 				$registry->get('session')->data['oc_api_currency'] = $code;
 			}
 					
-			if (!isset($registry->get('request')->cookie['currency']) || $registry->get('request')->cookie['currency'] != $code) {
+			if (!isset($registry->get('request')->cookie['oc_api_currency']) || $registry->get('request')->cookie['oc_api_currency'] != $code) {
 				setcookie('oc_api_currency', $code, time() + 60 * 60 * 24 * 30, '/', $registry->get('request')->server['HTTP_HOST']);
 			}		
 						
