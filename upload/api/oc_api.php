@@ -455,7 +455,7 @@ if (!$api_info->num_rows) {
 			if (isset($registry->get('session')->data['oc_api_customer']) && isset($registry->get('session')->data['oc_api_customer']['customer_group_id'])) {
 				// For API calls
 				$registry->get('config')->set('config_customer_group_id', $registry->get('session')->data['oc_api_customer']['customer_group_id']);
-			} elseif ($customer->isLogged()) {
+			} elseif (!empty($registry->get('request')->get['email']) && filter_var($registry->get('request')->get['email'], FILTER_VALIDATE_EMAIL) && $registry->get('request')->get['email'] == $registry->get('customer')->getEmail()) {
 				// Logged in customers
 				$registry->get('config')->set('config_customer_group_id', $customer->getGroupId());
 			} elseif (isset($registry->get('session')->data['oc_api_guest']) && isset($registry->get('session')->data['oc_api_guest']['customer_group_id'])) {
@@ -728,7 +728,7 @@ if (!$api_info->num_rows) {
 						$image = $registry->get('model_tool_image')->resize('placeholder.png', $registry->get('config')->get('theme_' . $registry->get('config')->get('config_theme') . '_image_product_width'), $registry->get('config')->get('theme_' . $registry->get('config')->get('config_theme') . '_image_product_height'));
 					}
 
-					if ($registry->get('customer')->isLogged() || !$registry->get('config')->get('config_customer_price')) {
+					if ((!empty($registry->get('request')->get['email']) && filter_var($registry->get('request')->get['email'], FILTER_VALIDATE_EMAIL) && $registry->get('request')->get['email'] == $registry->get('customer')->getEmail()) || (!$registry->get('config')->get('config_customer_price'))) {
 						$price = $registry->get('currency')->format($registry->get('tax')->calculate($result['price'], $result['tax_class_id'], $registry->get('config')->get('config_tax')), $registry->get('session')->data['currency']);
 					} else {
 						$price = false;
@@ -938,7 +938,7 @@ if (!$api_info->num_rows) {
 				if (isset($registry->get('request')->get['search']) && $registry->get('config')->get('config_customer_search')) {
 					$registry->get('load')->model('account/search');
 
-					if ($registry->get('customer')->isLogged()) {
+					if (!empty($registry->get('request')->get['email']) && filter_var($registry->get('request')->get['email'], FILTER_VALIDATE_EMAIL) && $registry->get('request')->get['email'] == $registry->get('customer')->getEmail()) {
 						$customer_id = $registry->get('customer')->getId();
 					} else {
 						$customer_id = 0;
@@ -981,7 +981,7 @@ if (!$api_info->num_rows) {
 			$total = 0;
 			
 			// Display prices
-			if ($registry->get('customer')->isLogged() || !$registry->get('config')->get('config_customer_price')) {
+			if ((!empty($registry->get('request')->get['email']) && filter_var($registry->get('request')->get['email'], FILTER_VALIDATE_EMAIL) && $registry->get('request')->get['email'] == $registry->get('customer')->getEmail()) || (!$registry->get('config')->get('config_customer_price'))) {
 				$sort_order = array();
 				
 				$results = $registry->get('model_setting_extension')->getExtensions('total');
