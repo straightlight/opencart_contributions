@@ -977,7 +977,7 @@ if (!$api_info->num_rows) {
 			$registry->get('load')->model('setting/extension');
 			
 			$totals = array();
-			$taxes = $registry->get('cart')->getTaxes();
+			$taxes = ($customer_logged ? $registry->get('cart')->getTaxes() : 0);
 			$total = 0;
 			
 			// Display prices
