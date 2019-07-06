@@ -296,9 +296,6 @@ if (!$api_info->num_rows) {
 			// Cache
 			$registry->set('cache', new Cache($registry->get('config')->get('cache_engine'), $registry->get('config')->get('cache_expire')));
 
-			// Url
-			$registry->set('url', new Url($registry->get('config')->get('site_url'), $registry->get('config')->get('site_ssl')));
-
 			// Language
 			$language = new Language($registry->get('config')->get('language_directory'));
 			$registry->set('language', $language);
