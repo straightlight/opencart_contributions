@@ -180,10 +180,6 @@ $registry->set('db', new DB(DB_DRIVER, DB_HOSTNAME, DB_USERNAME, DB_PASSWORD, DB
 // Request
 $registry->set('request', new Request());
 
-// Response
-$response = new Response();
-$registry->set('response', $response);
-
 // Database
 if ($registry->get('config')->get('db_autostart')) {
 	$registry->set('db', new DB($registry->get('config')->get('db_engine'), $registry->get('config')->get('db_hostname'), $registry->get('config')->get('db_username'), $registry->get('config')->get('db_password'), $registry->get('config')->get('db_database'), $registry->get('config')->get('db_port')));
@@ -192,6 +188,43 @@ if ($registry->get('config')->get('db_autostart')) {
 // Session
 $session = new Session($registry->get('config')->get('session_engine'), $registry);
 $registry->set('session', $session);
+
+// Store
+if ($registry->get('request')->server['HTTPS']) {
+	$query = $registry->get('db')->query("SELECT * FROM " . DB_PREFIX . "store WHERE REPLACE(`ssl`, 'www.', '') = '" . $registry->get('db')->escape('https://' . str_replace('www.', '', $registry->get('request')->server['HTTP_HOST']) . rtrim(dirname($registry->get('request')->server['PHP_SELF']), '/.\\') . '/') . "'");
+} else {
+	$query = $registry->get('db')->query("SELECT * FROM " . DB_PREFIX . "store WHERE REPLACE(`url`, 'www.', '') = '" . $registry->get('db')->escape('http://' . str_replace('www.', '', $registry->get('request')->server['HTTP_HOST']) . rtrim(dirname($registry->get('request')->server['PHP_SELF']), '/.\\') . '/') . "'");
+}
+						
+if (isset($registry->get('request')->get['store_id'])) {
+	$registry->get('config')->set('config_store_id', (int)$registry->get('request')->get['store_id']);
+} else if ($query->num_rows) {
+	$registry->get('config')->set('config_store_id', $query->row['store_id']);
+} else {
+	$registry->get('config')->set('config_store_id', 0);
+}
+					
+if (!$query->num_rows) {
+	$registry->get('config')->set('config_url', HTTP_SERVER);
+	$registry->get('config')->set('config_ssl', HTTPS_SERVER);
+}
+							
+// Settings
+$query = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "setting` WHERE store_id = '0' OR store_id = '" . (int)$registry->get('config')->get('config_store_id') . "' ORDER BY store_id ASC");
+						
+foreach ($query->rows as $result) {
+	if (!$result['serialized']) {
+		$registry->get('config')->set($result['key'], $result['value']);
+	} else {
+		$registry->get('config')->set($result['key'], json_decode($result['value'], true));
+	}
+}
+
+// Response
+$response = new Response();
+$response->addHeader('Content-Type: text/html; charset=utf-8');
+$response->setCompression($registry->get('config')->get('config_compression'));
+$registry->set('response', $response);
 
 // API login
 $api_info = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "api` WHERE api_id = '" . (int)$registry->get('config')->get('config_api_id') . "'");
@@ -207,9 +240,6 @@ if (!$api_info->num_rows) {
 		die('You are not authorized to view this page!');
 	}
 } else {
-	$registry->get('response')->addHeader('Content-Type: text/html; charset=utf-8');
-	$registry->get('response')->setCompression($registry->get('config')->get('config_compression'));
-	
 	$json = array();
 	
 	$api_token = '';
@@ -356,37 +386,6 @@ if (!$api_info->num_rows) {
 			}
 
 			// Startup
-
-			// Store
-			if ($registry->get('request')->server['HTTPS']) {
-				$query = $registry->get('db')->query("SELECT * FROM " . DB_PREFIX . "store WHERE REPLACE(`ssl`, 'www.', '') = '" . $registry->get('db')->escape('https://' . str_replace('www.', '', $registry->get('request')->server['HTTP_HOST']) . rtrim(dirname($registry->get('request')->server['PHP_SELF']), '/.\\') . '/') . "'");
-			} else {
-				$query = $registry->get('db')->query("SELECT * FROM " . DB_PREFIX . "store WHERE REPLACE(`url`, 'www.', '') = '" . $registry->get('db')->escape('http://' . str_replace('www.', '', $registry->get('request')->server['HTTP_HOST']) . rtrim(dirname($registry->get('request')->server['PHP_SELF']), '/.\\') . '/') . "'");
-			}
-						
-			if (isset($registry->get('request')->get['store_id'])) {
-				$registry->get('config')->set('config_store_id', (int)$registry->get('request')->get['store_id']);
-			} else if ($query->num_rows) {
-				$registry->get('config')->set('config_store_id', $query->row['store_id']);
-			} else {
-				$registry->get('config')->set('config_store_id', 0);
-			}
-					
-			if (!$query->num_rows) {
-				$registry->get('config')->set('config_url', HTTP_SERVER);
-				$registry->get('config')->set('config_ssl', HTTPS_SERVER);
-			}
-							
-			// Settings
-			$query = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "setting` WHERE store_id = '0' OR store_id = '" . (int)$registry->get('config')->get('config_store_id') . "' ORDER BY store_id ASC");
-						
-			foreach ($query->rows as $result) {
-				if (!$result['serialized']) {
-					$registry->get('config')->set($result['key'], $result['value']);
-				} else {
-					$registry->get('config')->set($result['key'], json_decode($result['value'], true));
-				}
-			}
 
 			// Theme
 			$registry->get('config')->set('template_cache', $registry->get('config')->get('developer_theme'));
