@@ -203,7 +203,7 @@ if (!$api_info->num_rows) {
 		$json = array();
 		
 		$json['error']['token'] = 'No API Access!';
-	} elseif (!$is_ajax) {
+	} else {
 		$registry->get('response')->addHeader($registry->get('request')->server['SERVER_PROTOCOL'] . ' 404 Not Found');
 		
 		die('You are not authorized to view this page!');
