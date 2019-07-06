@@ -757,7 +757,7 @@ if (!$api_info->num_rows) {
 						'tax'         => $tax,
 						'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,
 						'rating'      => $result['rating'],
-						'href'        => ''
+						'href'        => '',
 					);
 				}
 
