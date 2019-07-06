@@ -2,8 +2,6 @@
 // Error Reporting
 //error_reporting(E_ALL);
 
-$json = array();
-
 if (file_exists('../config.php')) {
 	require_once('../config.php');
 }
@@ -50,6 +48,10 @@ if ((isset($_SERVER['HTTPS']) && (($_SERVER['HTTPS'] == 'on') || ($_SERVER['HTTP
 } else {
 	$_SERVER['HTTPS'] = false;
 }
+
+// Ajax validation with PHP 7
+// Source: https://stackoverflow.com/questions/18260537/how-to-check-if-the-request-is-an-ajax-request-with-php
+$is_ajax = 'XMLHttpRequest' == ( $_SERVER['HTTP_X_REQUESTED_WITH'] ?? '' );
 
 // Modification Override
 function modification($filename) {
@@ -196,8 +198,18 @@ $registry->set('session', $session);
 $api_info = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "api` WHERE api_id = '" . (int)$registry->get('config')->get('config_api_id') . "'");
 
 if (!$api_info->num_rows) {
-	$json['error']['token'] = 'No API Access!';
+	if ($is_ajax) {
+		$json = array();
+		
+		$json['error']['token'] = 'No API Access!';
+	} elseif (!$is_ajax) {
+		$registry->get('response')->addHeader($registry->get('request')->server['SERVER_PROTOCOL'] . ' 404 Not Found');
+		
+		die('You are not authorized to view this page!');
+	}
 } else {
+	$json = array();
+	
 	$api_token = '';
 		
 	$api_session = new Session($registry->get('config')->get('session_engine'), $registry);
@@ -1020,7 +1032,7 @@ if (!$api_info->num_rows) {
 			}
 		}
 	}
+	
+	$registry->get('response')->addHeader('Content-Type: application/json');
+	$registry->get('response')->setOutput(json_encode($json));
 }
-
-$registry->get('response')->addHeader('Content-Type: application/json');
-$registry->get('response')->setOutput(json_encode($json));
