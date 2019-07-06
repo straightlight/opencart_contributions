@@ -989,7 +989,7 @@ if (!$api_info->num_rows) {
 						$registry->get('load')->model('extension/total/' . $result['code']);
 						
 						// __call can not pass-by-reference so we get PHP to call it as an anonymous function.
-						($registry->get({'model_extension_total_' . $result['code']}->getTotal)($totals, $taxes, $total);
+						($registry->get('model_extension_total_' . $result['code']->getTotal))($totals, $taxes, $total);
 					}
 				}
 				
