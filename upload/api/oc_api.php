@@ -8,8 +8,7 @@ if (file_exists('../config.php')) {
 
 // Check Installed
 if (!defined('DIR_APPLICATION')) {
-	$json['error'] = 'Opencart is not installed!';
-	sendOutput($json);
+	die('You are not authorized to view this page!');
 }
 
 // Check Version
