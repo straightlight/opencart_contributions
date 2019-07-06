@@ -337,9 +337,9 @@ if (!$api_info->num_rows) {
 						$session_id = '';
 					}
 
-					$api_session->start($session_id);
+					$registry->get('session')->start($session_id);
 
-					setcookie($registry->get('config')->get('session_name'), $api_session->getId(), ini_get('session.cookie_lifetime'), ini_get('session.cookie_path'), ini_get('session.cookie_domain'));
+					setcookie($registry->get('config')->get('session_name'), $registry->get('session')->getId(), ini_get('session.cookie_lifetime'), ini_get('session.cookie_path'), ini_get('session.cookie_domain'));
 				}
 
 				// Cache
