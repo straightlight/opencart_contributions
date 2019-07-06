@@ -708,7 +708,7 @@ if (!$api_info->num_rows) {
 					'sort'                => $sort,
 					'order'               => $order,
 					'start'               => ($page - 1) * $limit,
-					'limit'               => $limit
+					'limit'               => $limit,
 				);
 
 				$product_total = $registry->get('model_catalog_product')->getTotalProducts($filter_data);
