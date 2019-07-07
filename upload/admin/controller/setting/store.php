@@ -179,6 +179,12 @@ class ControllerSettingStore extends Controller {
 		} else {
 			$data['error_name'] = '';
 		}
+		
+		if (isset($this->error['code'])) {
+			$data['error_code'] = $this->error['code'];
+		} else {
+			$data['error_code'] = '';
+		}
 
 		if (isset($this->error['owner'])) {
 			$data['error_owner'] = $this->error['owner'];
@@ -354,6 +360,14 @@ class ControllerSettingStore extends Controller {
 			$data['config_name'] = $store_info['config_name'];
 		} else {
 			$data['config_name'] = '';
+		}
+		
+		if (isset($this->request->post['config_code'])) {
+			$data['config_code'] = $this->request->post['config_code'];
+		} elseif (isset($store_info['config_code'])) {
+			$data['config_code'] = $store_info['config_code'];
+		} else {
+			$data['config_code'] = '';
 		}
 
 		if (isset($this->request->post['config_owner'])) {
@@ -676,6 +690,10 @@ class ControllerSettingStore extends Controller {
 
 		if (!$this->request->post['config_name']) {
 			$this->error['name'] = $this->language->get('error_name');
+		}
+		
+		if (!$this->request->post['config_code']) {
+			$this->error['code'] = $this->language->get('error_code');
 		}
 
 		if ((utf8_strlen($this->request->post['config_owner']) < 3) || (utf8_strlen($this->request->post['config_owner']) > 64)) {
