@@ -30,6 +30,7 @@ $_['entry_meta_keyword']           = 'Meta Tag Keywords';
 $_['entry_layout']                 = 'Default Layout';
 $_['entry_theme']                  = 'Theme';
 $_['entry_name']                   = 'Store Name';
+$_['entry_code']				   = 'Store Code';
 $_['entry_owner']                  = 'Store Owner';
 $_['entry_address']                = 'Address';
 $_['entry_geocode']                = 'Geocode';
