@@ -284,16 +284,22 @@ if (!$api_info->num_rows) {
 				// Logged customer
 				$customer_logged = false;
 				
-				if (!empty($registry->get('request')->get['email']) && filter_var($registry->get('request')->get['email'], FILTER_VALIDATE_EMAIL) && $registry->get('request')->get['email'] == $registry->get('customer')->getEmail()) {
-					$cart_query = $registry->get('cart')->getProducts();
+				if (!empty($registry->get('request')->get['email']) && filter_var($registry->get('request')->get['email'], FILTER_VALIDATE_EMAIL)) {
+					$registry->get('load')->model('account/customer');
 					
-					foreach ($cart_query as $cart) {
-						if ($cart['customer_id'] == $registry->get('customer')->getId()) {
-							$json['cart'][] = $cart;
+					$customer_info = $registry->get('model_account_customer')->getCustomerByEmail($registry->get('request')->get['email']);
+					
+					if ($customer_info && $customer_info['status']) {
+						$cart_query = $registry->get('cart')->getProducts();
+						
+						foreach ($cart_query as $cart) {
+							if ($cart['customer_id'] == $customer_info['customer_id']) {
+								$json['cart'][] = $cart;
+							}
 						}
+						
+						$customer_logged = true;
 					}
-					
-					$customer_logged = true;
 				}
 				
 				$json['customer_logged'] = $customer_logged;
