@@ -419,9 +419,7 @@ if (!$api_info->num_rows) {
 					$json['heading_title'] = $registry->get('language')->get('heading_title') .  ' - ' . $registry->get('request')->get['search'];
 				} else {
 					$json['heading_title'] = $registry->get('language')->get('heading_title');
-				}
-
-				$registry->get('load')->model('catalog/category');
+				}				
 
 				// 3 Level Category Search
 				$json['categories'] = array();
