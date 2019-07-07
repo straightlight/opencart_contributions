@@ -5394,6 +5394,12 @@ function db_schema() {
 				'not_null' => true
 			),
 			array(
+				'name' => 'code',
+				'type' => 'varchar(64)',
+				'not_null' => true,
+				'default' => ''
+			),
+			array(
 				'name' => 'url',
 				'type' => 'varchar(255)',
 				'not_null' => true
