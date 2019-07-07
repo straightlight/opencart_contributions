@@ -12,6 +12,7 @@ $_['text_order_detail']          = 'Order Details';
 $_['text_customer_detail']       = 'Customer Details';
 $_['text_option']                = 'Options';
 $_['text_store']                 = 'Store';
+$_['text_store_code']            = 'Store Code';
 $_['text_date_added']            = 'Date Added';
 $_['text_payment_method']        = 'Payment Method';
 $_['text_shipping_method']       = 'Shipping Method';
