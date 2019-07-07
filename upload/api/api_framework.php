@@ -696,7 +696,7 @@ if (!$api_info->num_rows) {
 						$registry->get('load')->model('account/search');
 
 						if (!empty($registry->get('request')->get['email']) && filter_var($registry->get('request')->get['email'], FILTER_VALIDATE_EMAIL) && !empty($customer_info['email']) && $registry->get('request')->get['email'] == $customer_info['email']) {
-							$customer_id = $registry->get('customer')->getId();
+							$customer_id = $customer_info['customer_id'];
 						} else {
 							$customer_id = 0;
 						}
