@@ -76,6 +76,7 @@ class ModelSaleOrder extends Model {
 				'invoice_prefix'          => $order_query->row['invoice_prefix'],
 				'store_id'                => $order_query->row['store_id'],
 				'store_name'              => $order_query->row['store_name'],
+				'store_code'			  => $order_query->row['store_code'],
 				'store_url'               => $order_query->row['store_url'],
 				'customer_id'             => $order_query->row['customer_id'],
 				'customer'                => $order_query->row['customer'],
@@ -304,6 +305,12 @@ class ModelSaleOrder extends Model {
 
 	public function getTotalOrdersByStoreId($store_id) {
 		$query = $this->db->query("SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "order` WHERE store_id = '" . (int)$store_id . "'");
+
+		return $query->row['total'];
+	}
+	
+	public function getTotalOrdersByStoreCode($store_code) {
+		$query = $this->db->query("SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "order` WHERE store_code = '" . $this->db->escape($store_code) . "'");
 
 		return $query->row['total'];
 	}
