@@ -164,10 +164,10 @@ if ($config->has('action_pre_action')) {
 // Dispatch
 $route->dispatch(new Action($config->get('action_router')), new Action($config->get('action_error')));
 
-$is_ajax = 'XMLHttpRequest' == ($registry->get('request')->server['HTTP_X_REQUESTED_WITH'] ?? '');
-
 // API login
 if (!empty($registry->get('request')->get['store_code']) && !empty($registry->get('config')->get('config_code')) && $registry->get('request')->get['store_code'] == $registry->get('config')->get('config_code')) {
+	$is_ajax = 'XMLHttpRequest' == ($registry->get('request')->server['HTTP_X_REQUESTED_WITH'] ?? '');
+	
 	$api_info = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "api` WHERE api_id = '" . (int)$registry->get('config')->get('config_api_id') . "'");
 
 	$registry->get('load')->language('api/login');
