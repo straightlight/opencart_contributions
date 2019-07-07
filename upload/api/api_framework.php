@@ -419,7 +419,7 @@ if (!$api_info->num_rows) {
 					$json['heading_title'] = $registry->get('language')->get('heading_title') .  ' - ' . $registry->get('request')->get['search'];
 				} else {
 					$json['heading_title'] = $registry->get('language')->get('heading_title');
-				}				
+				}
 
 				// 3 Level Category Search
 				$json['categories'] = array();
@@ -772,6 +772,17 @@ if (!$api_info->num_rows) {
 						'title' => $total['title'],
 						'text'  => $registry->get('currency')->format($total['value'], $registry->get('session')->data['currency'])
 					);
+				}
+				
+				// Store Code
+				$json['store_code'] = false;
+				
+				if (!empty($registry->get('request')->get['store_code']) && !empty($this->config->get('config_code'))) {
+					$store_code = $registry->get('request')->get['store_code'];
+					
+					if ($store_code == $this->config->get('config_code')) {
+						$json['store_code'] = true;
+					}
 				}
 			}
 		}
