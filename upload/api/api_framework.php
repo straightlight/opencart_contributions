@@ -485,7 +485,7 @@ if (!$api_info->num_rows) {
 							$image = $registry->get('model_tool_image')->resize('placeholder.png', $registry->get('config')->get('theme_' . $registry->get('config')->get('config_theme') . '_image_product_width'), $registry->get('config')->get('theme_' . $registry->get('config')->get('config_theme') . '_image_product_height'));
 						}
 
-						if ((!empty($registry->get('request')->get['email']) && filter_var($registry->get('request')->get['email'], FILTER_VALIDATE_EMAIL) && $registry->get('request')->get['email'] == $registry->get('customer')->getEmail()) || (!$registry->get('config')->get('config_customer_price'))) {
+						if ((!empty($registry->get('request')->get['email']) && filter_var($registry->get('request')->get['email'], FILTER_VALIDATE_EMAIL) && !empty($customer_info['email']) && $registry->get('request')->get['email'] == $customer_info['email']) || (!$registry->get('config')->get('config_customer_price'))) {
 							$price = $registry->get('currency')->format($registry->get('tax')->calculate($result['price'], $result['tax_class_id'], $registry->get('config')->get('config_tax')), $registry->get('session')->data['currency']);
 						} else {
 							$price = false;
@@ -695,7 +695,7 @@ if (!$api_info->num_rows) {
 					if (isset($registry->get('request')->get['search']) && $registry->get('config')->get('config_customer_search')) {
 						$registry->get('load')->model('account/search');
 
-						if (!empty($registry->get('request')->get['email']) && filter_var($registry->get('request')->get['email'], FILTER_VALIDATE_EMAIL) && $registry->get('request')->get['email'] == $registry->get('customer')->getEmail()) {
+						if (!empty($registry->get('request')->get['email']) && filter_var($registry->get('request')->get['email'], FILTER_VALIDATE_EMAIL) && !empty($customer_info['email']) && $registry->get('request')->get['email'] == $customer_info['email']) {
 							$customer_id = $registry->get('customer')->getId();
 						} else {
 							$customer_id = 0;
@@ -738,7 +738,7 @@ if (!$api_info->num_rows) {
 				$total = 0;
 				
 				// Display prices
-				if ((!empty($registry->get('request')->get['email']) && filter_var($registry->get('request')->get['email'], FILTER_VALIDATE_EMAIL) && $registry->get('request')->get['email'] == $registry->get('customer')->getEmail()) || (!$registry->get('config')->get('config_customer_price'))) {
+				if ((!empty($registry->get('request')->get['email']) && filter_var($registry->get('request')->get['email'], FILTER_VALIDATE_EMAIL) && !empty($customer_info['email']) && $registry->get('request')->get['email'] == $customer_info['email']) || (!$registry->get('config')->get('config_customer_price'))) {
 					$sort_order = array();
 					
 					$results = $registry->get('model_setting_extension')->getExtensions('total');
