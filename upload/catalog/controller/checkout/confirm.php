@@ -103,6 +103,7 @@ class ControllerCheckoutConfirm extends Controller {
 			$order_data['invoice_prefix'] = $this->config->get('config_invoice_prefix');
 			$order_data['store_id'] = $this->config->get('config_store_id');
 			$order_data['store_name'] = $this->config->get('config_name');
+			$order_data['store_code'] = $this->config->get('config_code');
 
 			if ($order_data['store_id']) {
 				$order_data['store_url'] = $this->config->get('config_url');
