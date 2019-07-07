@@ -180,12 +180,6 @@ class ControllerSettingStore extends Controller {
 			$data['error_name'] = '';
 		}
 		
-		if (isset($this->error['code'])) {
-			$data['error_code'] = $this->error['code'];
-		} else {
-			$data['error_code'] = '';
-		}
-
 		if (isset($this->error['owner'])) {
 			$data['error_owner'] = $this->error['owner'];
 		} else {
@@ -692,10 +686,6 @@ class ControllerSettingStore extends Controller {
 			$this->error['name'] = $this->language->get('error_name');
 		}
 		
-		if (!$this->request->post['config_code']) {
-			$this->error['code'] = $this->language->get('error_code');
-		}
-
 		if ((utf8_strlen($this->request->post['config_owner']) < 3) || (utf8_strlen($this->request->post['config_owner']) > 64)) {
 			$this->error['owner'] = $this->language->get('error_owner');
 		}
