@@ -165,111 +165,105 @@ if ($config->has('action_pre_action')) {
 $route->dispatch(new Action($config->get('action_router')), new Action($config->get('action_error')));
 
 // API login
-if (!empty($registry->get('request')->get['store_code']) && !empty($registry->get('config')->get('config_code')) && $registry->get('request')->get['store_code'] == $registry->get('config')->get('config_code')) {
-	$is_ajax = 'XMLHttpRequest' == ($registry->get('request')->server['HTTP_X_REQUESTED_WITH'] ?? '');
-	
-	$api_info = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "api` WHERE api_id = '" . (int)$registry->get('config')->get('config_api_id') . "'");
+$is_ajax = 'XMLHttpRequest' == ($registry->get('request')->server['HTTP_X_REQUESTED_WITH'] ?? '');
 
-	$registry->get('load')->language('api/login');
+if (!$is_ajax) {
+	exit('You are not authorized to view this page!');
+} else {
+	if (!empty($registry->get('request')->get['store_code']) && !empty($registry->get('config')->get('config_code')) && $registry->get('request')->get['store_code'] == $registry->get('config')->get('config_code') && !empty($registry->get('request')->get['geocode']) && !empty($registry->get('config')->get('config_geocode')) && $registry->get('request')->get['geocode'] == $registry->get('config')->get('config_geocode')) {
+		$api_info = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "api` WHERE api_id = '" . (int)$registry->get('config')->get('config_api_id') . "'");
 
-	if (!$api_info->num_rows) {
-		if ($is_ajax) {
-			$json = array();
-			
+		$registry->get('load')->language('api/login');
+
+		if (!$api_info->num_rows) {
 			$json['error']['token'] = $registry->get('language')->get('error_token');
-		} else {
-			exit('You are not authorized to view this page!');
-		}
-	} elseif ($api_info->num_rows) {
-		if (!$is_ajax) {
-			exit('You are not authorized to view this page!');
-		} else {
+		} elseif ($api_info->num_rows) {
 			$json = array();
-			
-			$registry->get('load')->model('account/api');
-			
-			$api_token = '';
 				
+			$registry->get('load')->model('account/api');
+				
+			$api_token = '';
+					
 			$api_session = new Session($registry->get('config')->get('session_engine'), $registry);
 
 			$api_session->start();
-				
+					
 			$registry->get('db')->query("DELETE FROM `" . DB_PREFIX . "api_session` WHERE session_id = '" . $registry->get('db')->escape($session->getId()) . "'");
 
 			$api_ip_query = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "api_ip` WHERE ip = '" . $registry->get('db')->escape($registry->get('request')->server['REMOTE_ADDR']) . "'");
-					
+						
 			if (!$api_ip_query->num_rows) {
 				$registry->get('db')->query("INSERT INTO `" . DB_PREFIX . "api_ip` SET api_id = '" . (int)$api_info['api_id'] . "', ip = '" . $registry->get('db')->escape($registry->get('request')->server['REMOTE_ADDR']) . "'");
 			}
-					
+						
 			$registry->get('model_account_api')->addApiSession($api_info['api_id'], $api_session->getId(), $registry->get('request')->server['REMOTE_ADDR']);
 
 			$api_session->data['oc_api_id'] = $api_info->row['api_id'];
-				
+					
 			$api_token = $api_session->getId();
-				
+					
 			if (!$api_token) {
 				$json['error']['token'] = $registry->get('language')->get('error_token');
 			} else {
 				$api_info = array();
-				
+					
 				// Login with API Key
 				if (isset($registry->get('request')->post['username'])) {
 					$api_info = $registry->get('model_account_api')->login($registry->get('request')->post['username'], $registry->get('request')->post['key']);
 				}
-				
+					
 				if (!$api_info) {
 					$json['error']['login'] = $registry->get('language')->get('error_login');
 				} else {
 					// Check if IP is allowed
 					$ip_data = array();
-			
+				
 					$results = $registry->get('model_account_api')->getApiIps($api_info['api_id']);
-			
+				
 					foreach ($results as $result) {
 						$ip_data[] = trim($result['ip']);
 					}
-					
+						
 					$json['error']['ip'] = $registry->get('language')->get('error_permission');
-			
+				
 					if (!in_array($registry->get('request')->server['REMOTE_ADDR'], $ip_data)) {
 						$json['error']['ip'] = sprintf($registry->get('language')->get('error_ip'), $registry->get('request')->server['REMOTE_ADDR']);
 					}
-					
+						
 					if (!$json) {
 						$json['success'] = $registry->get('language')->get('text_success');
-						
+							
 						$api_session = new Session($registry->get('config')->get('session_engine'), $registry);
-						
+							
 						$api_session->start();
-						
+							
 						$registry->get('model_account_api')->addApiSession($api_info['api_id'], $api_session->getId(), $registry->get('request')->server['REMOTE_ADDR']);
-						
+							
 						$api_session->data['oc_api_id'] = $api_info['api_id'];
-						
+							
 						$json['api_session_id'] = $api_session->getId();
-						
+							
 						// Create Token
 						$json['oc_api_token'] = $api_session->getId();
 					} else {
 						$json['error']['key'] = $registry->get('language')->get('error_key');
 					}
-							
+								
 					// Currency
 					$code = '';
-							
-					$registry->get('load')->model('localisation/currency');
-							
-					$currencies = $registry->get('model_localisation_currency')->getCurrencies();
 								
+					$registry->get('load')->model('localisation/currency');
+								
+					$currencies = $registry->get('model_localisation_currency')->getCurrencies();
+									
 					if (isset($registry->get('session')->data['oc_api_currency'])) {
 						$code = $registry->get('session')->data['oc_api_currency'];
 					}
-							
+								
 					if (isset($registry->get('request')->cookie['oc_api_currency']) && !array_key_exists($code, $currencies)) {
 						$code = $registry->get('request')->cookie['oc_api_currency'];
 					}
-							
+								
 					if (!array_key_exists($code, $currencies)) {
 						$code = $registry->get('config')->get('config_currency');
 					}
@@ -277,41 +271,41 @@ if (!empty($registry->get('request')->get['store_code']) && !empty($registry->ge
 					if (!isset($registry->get('session')->data['oc_api_currency']) || $registry->get('session')->data['oc_api_currency'] != $code) {
 						$registry->get('session')->data['oc_api_currency'] = $code;
 					}
-							
+								
 					if (!isset($registry->get('request')->cookie['oc_api_currency']) || $registry->get('request')->cookie['oc_api_currency'] != $code) {
 						setcookie('oc_api_currency', $code, time() + 60 * 60 * 24 * 30, '/', $registry->get('request')->server['HTTP_HOST']);
 					}		
-								
+									
 					// Logged customer
 					$customer_logged = false;
-					
+						
 					if (!empty($registry->get('request')->get['email']) && filter_var($registry->get('request')->get['email'], FILTER_VALIDATE_EMAIL)) {
 						$registry->get('load')->model('account/customer');
-						
+							
 						$customer_info = $registry->get('model_account_customer')->getCustomerByEmail($registry->get('request')->get['email']);
-						
+							
 						if ($customer_info && $customer_info['status']) {
 							$cart_query = $registry->get('cart')->getProducts();
-							
+								
 							foreach ($cart_query as $cart) {
 								if ($cart['customer_id'] == $customer_info['customer_id']) {
 									$json['cart'][] = $cart;
 								}
 							}
-							
+								
 							$customer_logged = true;
 						}
 					}
-					
+						
 					$json['customer_logged'] = $customer_logged;
-					
+						
 					// Site Search
 					$registry->get('load')->language('product/search');
-					
+						
 					$registry->get('load')->model('catalog/category');
-					
+						
 					$registry->get('load')->model('catalog/product');
-					
+						
 					$registry->get('load')->model('tool/image');
 
 					if (isset($registry->get('request')->get['search'])) {
@@ -728,26 +722,26 @@ if (!empty($registry->get('request')->get['store_code']) && !empty($registry->ge
 					$json['sort'] = $sort;
 					$json['order'] = $order;
 					$json['limit'] = $limit;
-					
+						
 					// Totals
 					$registry->get('load')->model('setting/extension');
-					
+						
 					$totals = array();
 					$taxes = ($customer_logged ? $registry->get('cart')->getTaxes() : 0);
 					$total = 0;
-					
+						
 					// Display prices
 					if ((!empty($registry->get('request')->get['email']) && filter_var($registry->get('request')->get['email'], FILTER_VALIDATE_EMAIL) && !empty($customer_info['email']) && $registry->get('request')->get['email'] == $customer_info['email']) || (!$registry->get('config')->get('config_customer_price'))) {
 						$sort_order = array();
 						
 						$results = $registry->get('model_setting_extension')->getExtensions('total');
-						
+							
 						foreach ($results as $key => $value) {
 							$sort_order[$key] = $registry->get('config')->get('total_' . $value['code'] . '_sort_order');
 						}
-						
+							
 						array_multisort($sort_order, SORT_ASC, $results);
-						
+							
 						foreach ($results as $result) {
 							if ($registry->get('config')->get('total_' . $result['code'] . '_status')) {
 								$registry->get('load')->model('extension/total/' . $result['code']);
@@ -758,16 +752,16 @@ if (!empty($registry->get('request')->get['store_code']) && !empty($registry->ge
 						}
 						
 						$sort_order = array();
-						
+							
 						foreach ($totals as $key => $value) {
 							$sort_order[$key] = $value['sort_order'];
 						}
-						
+							
 						array_multisort($sort_order, SORT_ASC, $totals);
 					}
-					
+						
 					$json['totals'] = array();
-					
+						
 					foreach ($totals as $total) {
 						$json['totals'][] = array(
 							'title' => $total['title'],
@@ -776,11 +770,9 @@ if (!empty($registry->get('request')->get['store_code']) && !empty($registry->ge
 					}
 				}
 			}
-			
+				
 			$registry->get('response')->addHeader('Content-Type: application/json');
-			$registry->get('response')->setOutput(json_encode($json));
+			$registry->get('response')->setOutput(json_encode($json));			
 		}
 	}
-} else {
-	exit('You are not authorized to view this page!');	
 }
