@@ -122,6 +122,12 @@
                   <input type="text" name="config_code" value="{{ config_code }}" placeholder="{{ entry_code }}" id="input-code" class="form-control" />                  
                 </div>
               </div>
+	      <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-hash">{{ entry_hash }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="config_hash" value="{{ config_hash }}" placeholder="{{ entry_hash }}" id="input-hash" class="form-control" readonly="readonly" />
+                </div>
+              </div>
               <div class="form-group required">
                 <label class="col-sm-2 control-label" for="input-owner">{{ entry_owner }}</label>
                 <div class="col-sm-10">
