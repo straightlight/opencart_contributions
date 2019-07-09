@@ -5405,6 +5405,11 @@ function db_schema() {
 				'default' => ''
 			),
 			array(
+				'name' => 'hash',
+				'type' => 'varchar(64)',
+				'not_null' => true
+			),
+			array(
 				'name' => 'url',
 				'type' => 'varchar(255)',
 				'not_null' => true
