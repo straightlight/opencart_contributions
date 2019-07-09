@@ -431,6 +431,11 @@ function db_schema() {
 				'name' => 'date_added',
 				'type' => 'datetime',
 				'not_null' => true
+			),
+			array(
+				'name' => 'ip',
+				'type' => 'varchar(40)',
+				'not_null' => true
 			)
 		),
 		'primary' => array(
