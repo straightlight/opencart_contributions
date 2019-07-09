@@ -4,7 +4,7 @@ $_['heading_title']                = 'Stores';
 
 // Text
 $_['text_settings']                = 'Settings';
-$_['text_success']                 = 'Success: You have modified Stores!';
+$_['text_success']                 = 'Success: You have modified Stores. If you\'re using the API, ensure to copy the store hash string to your remote platform!';
 $_['text_list']                    = 'Store List';
 $_['text_add']                     = 'Add Store';
 $_['text_edit']                    = 'Edit Store';
@@ -30,7 +30,8 @@ $_['entry_meta_keyword']           = 'Meta Tag Keywords';
 $_['entry_layout']                 = 'Default Layout';
 $_['entry_theme']                  = 'Theme';
 $_['entry_name']                   = 'Store Name';
-$_['entry_code']				   = 'Store Code';
+$_['entry_code']				           = 'Store Code';
+$_['entry_hash']				           = 'Store Hash';
 $_['entry_owner']                  = 'Store Owner';
 $_['entry_address']                = 'Address';
 $_['entry_geocode']                = 'Geocode';
