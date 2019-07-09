@@ -363,6 +363,12 @@ class ControllerSettingStore extends Controller {
 		} else {
 			$data['config_code'] = '';
 		}
+		
+		if (isset($this->request->post['config_hash'])) {
+			$data['config_hash'] = $this->request->post['config_hash'];
+		} else {
+			$data['config_hash'] = hash('sha512', mt_rand());
+		}
 
 		if (isset($this->request->post['config_owner'])) {
 			$data['config_owner'] = $this->request->post['config_owner'];
