@@ -287,7 +287,7 @@ if (!$is_ajax) {
 					
 					$customer_id = 0;
 					
-					if (!empty($registry->registry->get('request')->get['ip']) && !empty($registry->get('request')->get['cart_id']) && !empty($registry->get('request')->get['product_id'])) {
+					if (!empty($registry->get('request')->get['ip']) && !empty($registry->get('request')->get['cart_id']) && !empty($registry->get('request')->get['product_id'])) {
 						$cart_query = $registry->get('cart')->getProducts();
 								
 						foreach ($cart_query as $cart) {
