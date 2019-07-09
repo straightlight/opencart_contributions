@@ -282,28 +282,35 @@ if (!$is_ajax) {
 						setcookie('oc_api_currency', $code, time() + 60 * 60 * 24 * 30, '/', $registry->get('request')->server['HTTP_HOST']);
 					}		
 									
-					// Logged customer
-					$customer_logged = false;
-						
-					if (!empty($registry->get('request')->get['email']) && filter_var($registry->get('request')->get['email'], FILTER_VALIDATE_EMAIL)) {
-						$registry->get('load')->model('account/customer');
-							
-						$customer_info = $registry->get('model_account_customer')->getCustomerByEmail($registry->get('request')->get['email']);
-							
-						if ($customer_info && $customer_info['status']) {
-							$cart_query = $registry->get('cart')->getProducts();
+					// Cart
+					$json['cart'] = array();
+					
+					$customer_id = 0;
+					
+					if (!empty($registry->registry->get('request')->get['ip']) && !empty($registry->get('request')->get['cart_id']) && !empty($registry->get('request')->get['product_id'])) {
+						$cart_query = $registry->get('cart')->getProducts();
 								
-							foreach ($cart_query as $cart) {
-								if ($cart['customer_id'] == $customer_info['customer_id']) {
-									$json['cart'][] = $cart;
+						foreach ($cart_query as $cart) {
+							if ($cart['ip'] == $registry->get('request')->get['ip'] && $cart['cart_id'] == $registry->get('request')->get['cart_id'] && $cart['product_id'] == $registry->get('request')->get['product_id']) {
+								$json['cart'][] = $cart;
+								
+								if ($cart['customer_id']) {
+									$customer_id = $cart['customer_id'];
 								}
 							}
-								
-							$customer_logged = true;
 						}
 					}
+					
+					// Customer Logged
+					$json['customer_logged'] = false;
+					
+					if ($registry->get('config')->get('config_customer_online') && $customer_id) {
+						$customer_info = $registry->get('db')->query("SELECT c.* FROM `" . DB_PREFIX . "customer_online` `co` LEFT JOIN `" . DB_PREFIX . "customer` `c` ON (`c`.`customer_id` = `co`.`customer_id`) WHERE `c`.`status` = '1'");
 						
-					$json['customer_logged'] = $customer_logged;
+						if ($customer_info->num_rows) {
+							$json['customer_logged'] = true;
+						}
+					}
 						
 					// Site Search
 					$registry->get('load')->language('product/search');
