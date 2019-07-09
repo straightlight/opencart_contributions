@@ -170,10 +170,16 @@ $is_ajax = 'XMLHttpRequest' == ($registry->get('request')->server['HTTP_X_REQUES
 if (!$is_ajax) {
 	exit('You are not authorized to view this page!');
 } else {
-	if (!empty($registry->get('request')->get['store_code']) && !empty($registry->get('config')->get('config_code')) && $registry->get('request')->get['store_code'] == $registry->get('config')->get('config_code') && !empty($registry->get('request')->get['geocode']) && !empty($registry->get('config')->get('config_geocode')) && $registry->get('request')->get['geocode'] == $registry->get('config')->get('config_geocode')) {
+	$registry->get('load')->language('api/login');
+	
+	if (empty($registry->get('request')->get['hash']) || $registry->get('request')->get['hash'] != $registry->get('config')->get('config_hash')) {
+		$json['error']['hash'] = $registry->get('language')->get('error_hash');
+		
+	} elseif (empty($registry->get('request')->get['store_code']) || $registry->get('request')->get['store_code'] != $registry->get('config')->get('config_code')) {
+		$json['error']['code'] = $registry->get('language')->get('error_code');
+		
+	} elseif (!empty($registry->get('request')->get['store_code']) && !empty($registry->get('config')->get('config_code')) && $registry->get('request')->get['store_code'] == $registry->get('config')->get('config_code') && !empty($registry->get('request')->get['hash']) && $registry->get('request')->get['hash'] == $registry->get('config')->get('config_hash')) {
 		$api_info = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "api` WHERE api_id = '" . (int)$registry->get('config')->get('config_api_id') . "'");
-
-		$registry->get('load')->language('api/login');
 
 		if (!$api_info->num_rows) {
 			$json['error']['token'] = $registry->get('language')->get('error_token');
