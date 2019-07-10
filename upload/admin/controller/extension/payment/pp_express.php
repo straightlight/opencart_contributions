@@ -26,7 +26,7 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 
 			$this->session->data['success'] = $this->language->get('text_success');
 
-			$this->response->redirect($this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=payment&language=' . $this->config->get('config_language')));
+			$this->response->redirect($this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=payment'));
 		}
 
 		$data['user_token'] = $this->session->data['user_token'];
