@@ -664,7 +664,7 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 				'price'                 => $price,
 				'total'                 => $total,
 				'href'                  => $this->url->link('product/product', 'product_id=' . $product['product_id'] . '&language=' . $this->config->get('config_language')),
-				'remove'                => $this->url->link('checkout/cart', 'remove=' . $product['cart_id'] '&language=' . $this->config->get('config_language')),
+				'remove'                => $this->url->link('checkout/cart', 'remove=' . $product['cart_id'] . '&language=' . $this->config->get('config_language')),
 				'recurring'             => $product['recurring'],
 				'recurring_name'        => (isset($product['recurring']['name']) ? $product['recurring']['name'] : ''),
 				'recurring_description' => $recurring_description
