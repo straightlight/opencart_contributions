@@ -287,28 +287,36 @@ if (!$is_ajax) {
 					
 					$customer_id = 0;
 					
-					if (!empty($registry->get('request')->get['ip']) && !empty($registry->get('request')->get['cart_id']) && !empty($registry->get('request')->get['product_id'])) {
-						$cart_query = $registry->get('cart')->getProducts();
-								
+					if (!empty($registry->get('request')->get['customer_token'])) {
+						$registry->get('load')->model('account/customer');
+						
+						$customer_info = $registry->get('model_account_customer')->getCustomerByToken($registry->get('request')->get['customer_token']);
+						
+						if ($customer_info) {
+							$customer_id = $customer_info['customer_id'];
+						}
+					}
+					
+					if (!empty($registry->get('request')->get['ip']) && !empty($registry->get('request')->get['product_id'])) {
+						$cart_query = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "cart` WHERE `product_id` = '" . (int)$registry->get('request')->get['product_id'] . "' AND `ip` = '" . $registry->get('request')->get['ip'] . "' AND `customer_id` = '" . (int)$customer_id . "'");
+						
 						foreach ($cart_query as $cart) {
-							if ($cart['ip'] == $registry->get('request')->get['ip'] && $cart['cart_id'] == $registry->get('request')->get['cart_id'] && $cart['product_id'] == $registry->get('request')->get['product_id']) {
+							if ($cart['ip'] == $registry->get('request')->get['ip'] && $cart['product_id'] == $registry->get('request')->get['product_id']) {
 								$json['cart'][] = $cart;
-								
-								if ($cart['customer_id']) {
-									$customer_id = $cart['customer_id'];
-								}
 							}
 						}
 					}
 					
 					// Customer Logged
-					$json['customer_logged'] = false;
+					$json['customer_info'] = array();
 					
 					if ($registry->get('config')->get('config_customer_online') && $customer_id) {
-						$customer_info = $registry->get('db')->query("SELECT c.* FROM `" . DB_PREFIX . "customer_online` `co` LEFT JOIN `" . DB_PREFIX . "customer` `c` ON (`c`.`customer_id` = `co`.`customer_id`) WHERE `c`.`status` = '1'");
+						$customer_info = $registry->get('db')->query("SELECT `c`.* FROM `" . DB_PREFIX . "customer_online` `co` LEFT JOIN `" . DB_PREFIX . "customer` `c` ON (`c`.`customer_id` = `co`.`customer_id`) WHERE `c`.`customer_id` > '0' AND `c`.`customer_id` = '" . (int)$customer_id . "' AND `c`.`status` = '1'");
 						
 						if ($customer_info->num_rows) {
-							$json['customer_logged'] = true;
+							unset ($customer_info['customer_id']);
+							
+							$json['customer_info'] = $customer_info;
 						}
 					}
 						
