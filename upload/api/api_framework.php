@@ -306,6 +306,8 @@ if (!$is_ajax) {
 					}
 					
 					// Customer Logged
+					$customer_logged = false;
+					
 					$json['customer_info'] = array();
 					
 					if ($registry->get('config')->get('config_customer_online') && $customer_id) {
@@ -315,7 +317,55 @@ if (!$is_ajax) {
 							unset ($customer_info->row['customer_id']);
 							
 							$json['customer_info'] = $customer_info->row;
+							
+							$customer_logged = true;
 						}
+					}
+					
+					// Totals
+					$registry->get('load')->model('setting/extension');
+						
+					$totals = array();
+					$taxes = getTaxes($registry, $json['cart']);
+					$total = 0;
+						
+					// Display prices
+					if ($customer_logged || !$registry->get('config')->get('config_customer_price')) {
+						$sort_order = array();
+						
+						$results = $registry->get('model_setting_extension')->getExtensions('total');
+							
+						foreach ($results as $key => $value) {
+							$sort_order[$key] = $registry->get('config')->get('total_' . $value['code'] . '_sort_order');
+						}
+							
+						array_multisort($sort_order, SORT_ASC, $results);
+							
+						foreach ($results as $result) {
+							if ($registry->get('config')->get('total_' . $result['code'] . '_status')) {
+								$registry->get('load')->model('extension/total/' . $result['code']);
+								
+								// __call can not pass-by-reference so we get PHP to call it as an anonymous function.
+								($registry->get('model_extension_total_' . $result['code']->getTotal))($totals, $taxes, $total);
+							}
+						}
+						
+						$sort_order = array();
+							
+						foreach ($totals as $key => $value) {
+							$sort_order[$key] = $value['sort_order'];
+						}
+							
+						array_multisort($sort_order, SORT_ASC, $totals);
+					}
+						
+					$json['totals'] = array();
+						
+					foreach ($totals as $total) {
+						$json['totals'][] = array(
+							'title' => $total['title'],
+							'text'  => $registry->get('currency')->format($total['value'], $registry->get('session')->data['currency'])
+						);
 					}
 						
 					// Site Search
@@ -497,7 +547,7 @@ if (!$is_ajax) {
 								$image = $registry->get('model_tool_image')->resize('placeholder.png', $registry->get('config')->get('theme_' . $registry->get('config')->get('config_theme') . '_image_product_width'), $registry->get('config')->get('theme_' . $registry->get('config')->get('config_theme') . '_image_product_height'));
 							}
 
-							if ((!empty($registry->get('request')->get['email']) && filter_var($registry->get('request')->get['email'], FILTER_VALIDATE_EMAIL) && !empty($customer_info['email']) && $registry->get('request')->get['email'] == $customer_info['email']) || (!$registry->get('config')->get('config_customer_price'))) {
+							if ($customer_logged || (!$registry->get('config')->get('config_customer_price'))) {
 								$price = $registry->get('currency')->format($registry->get('tax')->calculate($result['price'], $result['tax_class_id'], $registry->get('config')->get('config_tax')), $registry->get('session')->data['currency']);
 							} else {
 								$price = false;
@@ -707,7 +757,7 @@ if (!$is_ajax) {
 						if (isset($registry->get('request')->get['search']) && $registry->get('config')->get('config_customer_search')) {
 							$registry->get('load')->model('account/search');
 
-							if (!empty($registry->get('request')->get['email']) && filter_var($registry->get('request')->get['email'], FILTER_VALIDATE_EMAIL) && !empty($customer_info['email']) && $registry->get('request')->get['email'] == $customer_info['email']) {
+							if ($customer_logged) {
 								$customer_id = $customer_info['customer_id'];
 							} else {
 								$customer_id = 0;
@@ -741,52 +791,6 @@ if (!$is_ajax) {
 					$json['sort'] = $sort;
 					$json['order'] = $order;
 					$json['limit'] = $limit;
-						
-					// Totals
-					$registry->get('load')->model('setting/extension');
-						
-					$totals = array();
-					$taxes = ($customer_logged ? $registry->get('cart')->getTaxes() : 0);
-					$total = 0;
-						
-					// Display prices
-					if ((!empty($registry->get('request')->get['email']) && filter_var($registry->get('request')->get['email'], FILTER_VALIDATE_EMAIL) && !empty($customer_info['email']) && $registry->get('request')->get['email'] == $customer_info['email']) || (!$registry->get('config')->get('config_customer_price'))) {
-						$sort_order = array();
-						
-						$results = $registry->get('model_setting_extension')->getExtensions('total');
-							
-						foreach ($results as $key => $value) {
-							$sort_order[$key] = $registry->get('config')->get('total_' . $value['code'] . '_sort_order');
-						}
-							
-						array_multisort($sort_order, SORT_ASC, $results);
-							
-						foreach ($results as $result) {
-							if ($registry->get('config')->get('total_' . $result['code'] . '_status')) {
-								$registry->get('load')->model('extension/total/' . $result['code']);
-								
-								// __call can not pass-by-reference so we get PHP to call it as an anonymous function.
-								($registry->get('model_extension_total_' . $result['code']->getTotal))($totals, $taxes, $total);
-							}
-						}
-						
-						$sort_order = array();
-							
-						foreach ($totals as $key => $value) {
-							$sort_order[$key] = $value['sort_order'];
-						}
-							
-						array_multisort($sort_order, SORT_ASC, $totals);
-					}
-						
-					$json['totals'] = array();
-						
-					foreach ($totals as $total) {
-						$json['totals'][] = array(
-							'title' => $total['title'],
-							'text'  => $registry->get('currency')->format($total['value'], $registry->get('session')->data['currency'])
-						);
-					}
 				}
 			}
 				
@@ -794,4 +798,24 @@ if (!$is_ajax) {
 			$registry->get('response')->setOutput(json_encode($json));			
 		}
 	}
+}
+
+function getTaxes($registry, $cart_query) {
+	$tax_data = array();
+
+	foreach ($cart_query as $product) {
+		if ($product['tax_class_id']) {
+			$tax_rates = $registry->get('tax')->getRates($product['price'], $product['tax_class_id']);
+
+			foreach ($tax_rates as $tax_rate) {
+				if (!isset($tax_data[$tax_rate['tax_rate_id']])) {
+					$tax_data[$tax_rate['tax_rate_id']] = ($tax_rate['amount'] * $product['quantity']);
+				} else {
+					$tax_data[$tax_rate['tax_rate_id']] += ($tax_rate['amount'] * $product['quantity']);
+				}
+			}
+		}
+	}
+	
+	return $tax_data;
 }
