@@ -375,15 +375,15 @@ if (!$is_ajax) {
 					// is enabled and that the $customer_id is a match ...
 					if ($registry->get('config')->get('config_customer_online') && $customer_id) {
 						// Checking the selected customer if he is currently online.
-						$customer_info = $registry->get('db')->query("SELECT `c`.* FROM `" . DB_PREFIX . "customer_online` `co` LEFT JOIN `" . DB_PREFIX . "customer` `c` ON (`c`.`customer_id` = `co`.`customer_id`) WHERE `c`.`customer_id` > '0' AND `c`.`customer_id` = '" . (int)$customer_id . "' AND `c`.`status` = '1'");
+						$customer_info = $registry->get('db')->query("SELECT `c`.* FROM `" . DB_PREFIX . "customer_online` `co` LEFT JOIN `" . DB_PREFIX . "customer` `c` ON (`c`.`customer_id` = `co`.`customer_id`) WHERE `c`.`customer_id` > '0' AND `c`.`customer_id` = '" . (int)$customer_id . "' AND `c`.`status` = '1'")->row;
 						
 						// If he is online ...
-						if ($customer_info->num_rows) {
+						if ($customer_info) {
 							// Remove the customer ID before being returned via the JSON POST.
-							unset ($customer_info->row['customer_id']);
+							unset ($customer_info['customer_id']);
 							
 							// Merging the customer's results via JSON POST.
-							$json['customer_info'] = $customer_info->row;
+							$json['customer_info'] = $customer_info;
 							
 							// The customer is currently logged in.
 							$customer_logged = true;
