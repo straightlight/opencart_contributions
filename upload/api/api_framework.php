@@ -312,9 +312,9 @@ if (!$is_ajax) {
 						$customer_info = $registry->get('db')->query("SELECT `c`.* FROM `" . DB_PREFIX . "customer_online` `co` LEFT JOIN `" . DB_PREFIX . "customer` `c` ON (`c`.`customer_id` = `co`.`customer_id`) WHERE `c`.`customer_id` > '0' AND `c`.`customer_id` = '" . (int)$customer_id . "' AND `c`.`status` = '1'");
 						
 						if ($customer_info->num_rows) {
-							unset ($customer_info['customer_id']);
+							unset ($customer_info->row['customer_id']);
 							
-							$json['customer_info'] = $customer_info;
+							$json['customer_info'] = $customer_info->row;
 						}
 					}
 						
