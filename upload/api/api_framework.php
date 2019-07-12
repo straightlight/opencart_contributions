@@ -300,7 +300,7 @@ if (!$is_ajax) {
 					if (!empty($registry->get('request')->get['ip']) && !empty($registry->get('request')->get['product_id'])) {
 						$cart_query = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "cart` WHERE `product_id` = '" . (int)$registry->get('request')->get['product_id'] . "' AND `ip` = '" . $registry->get('request')->get['ip'] . "' AND `customer_id` = '" . (int)$customer_id . "'");
 						
-						foreach ($cart_query as $cart) {
+						foreach ($cart_query->rows as $cart) {
 							if ($cart['ip'] == $registry->get('request')->get['ip'] && $cart['product_id'] == $registry->get('request')->get['product_id']) {
 								$json['cart'][] = $cart;
 							}
