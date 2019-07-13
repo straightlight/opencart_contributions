@@ -26,44 +26,6 @@ final class ApiLoader {
 	 * 
 	 *
 	 * @param	string	$route
-	 * @param	array	$data
-	 *
-	 * @return	mixed
- 	*/	
-	public function controller($route, $data = array()) {
-		// Sanitize the call
-		$route = preg_replace('/[^a-zA-Z0-9_\/]/', '', (string)$route);
-		
-		// Keep the original trigger
-		$trigger = $route;
-		
-		// Trigger the pre events
-		$result = $this->registry->get('event')->trigger('api/controller/' . $trigger . '/before', array(&$route, &$data));
-		
-		// Make sure its only the last event that returns an output if required.
-		if ($result != null && !$result instanceof Exception) {
-			$output = $result;
-		} else {
-			$action = new Action($route);
-			$output = $action->execute($this->registry, array(&$data));
-		}
-		
-		// Trigger the post events
-		$result = $this->registry->get('event')->trigger('api/controller/' . $trigger . '/after', array(&$route, &$data, &$output));
-		
-		if ($result && !$result instanceof Exception) {
-			$output = $result;
-		}
-
-		if (!$output instanceof Exception) {
-			return $output;
-		}
-	}
-
-	/**
-	 * 
-	 *
-	 * @param	string	$route
  	*/	
 	public function model($route) {
 		// Sanitize the call
