@@ -63,7 +63,7 @@ class Action {
 
 		$file  = DIR_API . 'controller/' . $this->route . '.php';
 		
-		$class = 'Controller' . preg_replace('/[^a-zA-Z0-9]/', '', $this->route);
+		$class = 'ApiController' . preg_replace('/[^a-zA-Z0-9]/', '', $this->route);
 		
 		// Initialize the class
 		if (is_file($file)) {
