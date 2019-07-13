@@ -23,7 +23,9 @@ $registry->set('log', $log);
 
 date_default_timezone_set($config->get('date_timezone'));
 
-set_error_handler(function($code, $message, $file, $line) use($log, $config) {
+$is_ajax = 'XMLHttpRequest' == ($registry->get('request')->server['HTTP_X_REQUESTED_WITH'] ?? '');
+
+set_error_handler(function($code, $message, $file, $line) use($log, $config, $is_ajax) {
 	// error suppressed with @
 	if (error_reporting() === 0) {
 		return false;
@@ -47,7 +49,7 @@ set_error_handler(function($code, $message, $file, $line) use($log, $config) {
 			break;
 	}
 
-	if ($config->get('error_display')) {
+	if ($config->get('error_display') && !$is_ajax) {
 		echo '<b>' . $error . '</b>: ' . $message . ' in <b>' . $file . '</b> on line <b>' . $line . '</b>';
 	}
 
@@ -72,8 +74,12 @@ if ($config->has('action_event')) {
 }
 
 // Loader
-$loader = new Loader($registry);
+$loader = new loader($registry);
 $registry->set('load', $loader);
+
+// API Loader
+$ApiLoader = new ApiLoader($registry);
+$registry->set('ApiLoad', $ApiLoader);
 
 // Request
 $registry->set('request', new Request());
@@ -93,37 +99,8 @@ if ($config->get('db_autostart')) {
 $session = new Session($config->get('session_engine'), $registry);
 $registry->set('session', $session);
 
-if ($config->get('session_autostart')) {
-	/*
-	We are adding the session cookie outside of the session class as I believe
-	PHP messed up in a big way handling sessions. Why in the hell is it so hard to
-	have more than one concurrent session using cookies!
-
-	Is it not better to have multiple cookies when accessing parts of the system
-	that requires different cookie sessions for security reasons.
-
-	Also cookies can be accessed via the URL parameters. So why force only one cookie
-	for all sessions!
-	*/
-
-	if (isset($_COOKIE[$config->get('session_name')])) {
-		$session_id = $_COOKIE[$config->get('session_name')];
-	} else {
-		$session_id = '';
-	}
-
-	$session->start($session_id);
-
-	setcookie($config->get('session_name'), $session->getId(), ini_get('session.cookie_lifetime'), ini_get('session.cookie_path'), ini_get('session.cookie_domain'));
-}
-
 // Cache
 $registry->set('cache', new Cache($config->get('cache_engine'), $config->get('cache_expire')));
-
-// Url
-if ($config->get('url_autostart')) {
-	$registry->set('url', new Url($config->get('site_url'), $config->get('site_ssl')));
-}
 
 // Language
 $language = new Language($config->get('language_directory'));
@@ -174,7 +151,6 @@ if ($config->has('action_pre_action')) {
 $route->dispatch(new Action($config->get('action_router')), new Action($config->get('action_error')));
 
 // API login
-$is_ajax = 'XMLHttpRequest' == ($registry->get('request')->server['HTTP_X_REQUESTED_WITH'] ?? '');
 
 // If user is not loading this file with JSON POST request,
 // we reject the API transaction directly from the browser
