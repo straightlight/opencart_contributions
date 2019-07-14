@@ -158,4 +158,6 @@ if (!$is_ajax) {
 // Otherwise, we instantiate the API lookups.
 } else {
 	require('login.php');
+	
+	require('store_startup.php');
 }
