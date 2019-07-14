@@ -16,6 +16,8 @@ if (isset($registry->get('request')->get['api_token']) && isset($registry->get('
 				
 	$customer_group_id = 0;
 	
+	$customer_group_name = '';
+	
 	// catalog/language/<default_language_code>/api/login.php
 	$registry->get('load')->language('api/login');
 		
@@ -205,6 +207,8 @@ if (isset($registry->get('request')->get['api_token']) && isset($registry->get('
 							
 							if ($customer_group) {
 								$customer_group_id = $customer_group['customer_group_id'];
+								
+								$customer_group_name = $customer_group['name'];
 							}
 							
 							// Remove the customer ID before being returned via the JSON POST.
@@ -220,6 +224,8 @@ if (isset($registry->get('request')->get['api_token']) && isset($registry->get('
 					
 					// Returning the customer logged in result via JSON POST.
 					$json['customer_logged'] = $customer_logged;
+					
+					$json['customer_group_name'] = $customer_group_name;
 					
 					// Totals
 					$registry->get('load')->model('setting/extension');
