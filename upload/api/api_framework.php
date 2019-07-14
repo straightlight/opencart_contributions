@@ -68,7 +68,7 @@ $registry->set('event', $event);
 if ($config->has('action_event')) {
 	foreach ($config->get('action_event') as $key => $value) {
 		foreach ($value as $priority => $action) {
-			$event->register($key, new Action($action), $priority);
+			$registry->get('event')->register($key, new Action($action), $priority);
 		}
 	}
 }
@@ -106,34 +106,31 @@ $registry->set('cache', new Cache($config->get('cache_engine'), $config->get('ca
 $language = new Language($config->get('language_directory'));
 $registry->set('language', $language);
 
-// Document
-$registry->set('document', new Document());
-
 // Config Autoload
 if ($config->has('config_autoload')) {
 	foreach ($config->get('config_autoload') as $value) {
-		$loader->config($value);
+		$registry->get('load')->config($value);
 	}
 }
 
 // Language Autoload
 if ($config->has('language_autoload')) {
 	foreach ($config->get('language_autoload') as $value) {
-		$loader->language($value);
+		$registry->get('load')->language($value);
 	}
 }
 
 // Library Autoload
 if ($config->has('library_autoload')) {
 	foreach ($config->get('library_autoload') as $value) {
-		$loader->library($value);
+		$registry->get('load')->library($value);
 	}
 }
 
 // Model Autoload
 if ($config->has('model_autoload')) {
 	foreach ($config->get('model_autoload') as $value) {
-		$loader->model($value);
+		$registry->get('load')->model($value);
 	}
 }
 
@@ -148,7 +145,7 @@ if ($config->has('action_pre_action')) {
 }
 
 // Dispatch
-$route->dispatch(new Action($config->get('action_router')), new Action($config->get('action_error')));
+$route->dispatch(new Action($registry->get('config')->get('action_router')), new Action($registry->get('config')->get('action_error')));
 
 // API login
 
