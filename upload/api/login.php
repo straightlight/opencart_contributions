@@ -1,5 +1,9 @@
 <?php
 
+$customer_logged = false;
+				
+$customer_group_id = 0;
+
 // catalog/language/<default_language_code>/api/login.php
 $registry->get('load')->language('api/login');
 	
@@ -172,8 +176,6 @@ if (empty($registry->get('request')->get['hash']) || $registry->get('request')->
 				}
 				
 				// Customer Logged
-				$customer_logged = false;
-					
 				$json['customer_info'] = array();
 				
 				// If customer online from admin - > systems - > settings - > add / edit settings page,
@@ -184,6 +186,15 @@ if (empty($registry->get('request')->get['hash']) || $registry->get('request')->
 						
 					// If he is online ...
 					if ($customer_info) {
+						// Customer Group
+						$registry->get('load')->model('account/customer_group');
+						
+						$customer_group = $registry->get('model_account_customer_group')->getCustomerGroup($customer_info['customer_group_id']);
+						
+						if ($customer_group) {
+							$customer_group_id = $customer_group['customer_group_id'];
+						}
+						
 						// Remove the customer ID before being returned via the JSON POST.
 						unset ($customer_info['customer_id']);
 							
