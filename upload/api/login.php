@@ -1,4 +1,6 @@
 <?php
+$flag = false;
+
 if (isset($registry->get('request')->get['api_token']) && isset($registry->get('request')->get['route']) && substr($registry->get('request')->get['route'], 0, 4) == 'api/') {
 	$registry->get('db')->query("DELETE FROM `" . DB_PREFIX . "api_session` WHERE TIMESTAMPADD(HOUR, 1, date_modified) < NOW()");
 					
@@ -10,8 +12,12 @@ if (isset($registry->get('request')->get['api_token']) && isset($registry->get('
 			
 		// keep the session alive
 		$registry->get('db')->query("UPDATE `" . DB_PREFIX . "api_session` SET `date_modified` = NOW() WHERE `api_session_id` = '" . (int)$api_query->row['api_session_id'] . "'");
+		
+		$flag = true;
 	}
-} else {
+}
+
+if (!$flag) {
 	$customer_logged = false;
 				
 	$customer_group_id = 0;
