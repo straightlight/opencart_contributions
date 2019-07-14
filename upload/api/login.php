@@ -124,11 +124,6 @@ if (empty($registry->get('request')->get['hash']) || $registry->get('request')->
 					$code = $registry->get('session')->data['oc_api_currency'];
 				}
 							
-				// Validating the API currency cookie aside from the core.
-				if (isset($registry->get('request')->cookie['oc_api_currency']) && !array_key_exists($code, $currencies)) {
-					$code = $registry->get('request')->cookie['oc_api_currency'];
-				}
-							
 				// If no currency code can be found,
 				// we capture the default one from the current store.
 				if (!array_key_exists($code, $currencies)) {
@@ -141,12 +136,6 @@ if (empty($registry->get('request')->get['hash']) || $registry->get('request')->
 					$registry->get('session')->data['oc_api_currency'] = $code;
 				}
 					
-				// If the API currency cookie code does not match,
-				// we create a new cookie with the API currency based on the captured code.
-				if (!isset($registry->get('request')->cookie['oc_api_currency']) || $registry->get('request')->cookie['oc_api_currency'] != $code) {
-					setcookie('oc_api_currency', $code, time() + 60 * 60 * 24 * 30, '/', $registry->get('request')->server['HTTP_HOST']);
-				}		
-									
 				// Cart
 				$json['cart'] = array();
 				
