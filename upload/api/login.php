@@ -77,7 +77,7 @@ if (isset($registry->get('request')->get['api_token']) && isset($registry->get('
 			$api_token = $api_session->getId();
 					
 			// If the API token could not be created,
-			// we return an error message via JSON POST.
+			// we return an error message.
 			if (!$api_token) {
 				$json['error']['token'] = $registry->get('language')->get('error_token');
 					
@@ -91,7 +91,7 @@ if (isset($registry->get('request')->get['api_token']) && isset($registry->get('
 				}
 					
 				// If the API login is unsuccessful,
-				// we return an error message via JSON POST.
+				// we return an error message.
 				if (!$api_info) {
 					$json['error']['login'] = $registry->get('language')->get('error_login');
 					
@@ -112,20 +112,20 @@ if (isset($registry->get('request')->get['api_token']) && isset($registry->get('
 					$json['error']['ip'] = $registry->get('language')->get('error_permission');
 				
 					// If the authorized IP address is not listed,
-					// we return an error message via JSON POST.
+					// we return an error message.
 					if (!in_array($registry->get('request')->server['REMOTE_ADDR'], $ip_data)) {
 						$json['error']['ip'] = sprintf($registry->get('language')->get('error_ip'), $registry->get('request')->server['REMOTE_ADDR']);
 					}
 						
 					// If no errors have been found.
 					if (!$json) {
-						// We return a success message via JSON POST.
+						// We return a success message.
 						$json['success'] = $registry->get('language')->get('text_success');
 							
 						// Create Token
 						$json['oc_api_token'] = $api_session->getId();
 						
-					// Else, we return an error message via JSON POST.
+					// Else, we return an error message.
 					} else {
 						$json['error']['key'] = $registry->get('language')->get('error_key');
 					}
@@ -182,8 +182,7 @@ if (isset($registry->get('request')->get['api_token']) && isset($registry->get('
 						$cart_query = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "cart` WHERE `product_id` = '" . (int)$registry->get('request')->get['product_id'] . "' AND `ip` = '" . $registry->get('request')->get['ip'] . "' AND `customer_id` = '" . (int)$customer_id . "'");
 						
 						// If the query does find a match,
-						// we add the results into the 'cart' array
-						// via JSON POST.
+						// we add the results into the 'cart' array.						
 						foreach ($cart_query->rows as $cart) {
 							$json['cart'][] = $cart;
 						}
@@ -214,7 +213,7 @@ if (isset($registry->get('request')->get['api_token']) && isset($registry->get('
 							// Remove the customer ID before being returned via the JSON POST.
 							unset ($customer_info['customer_id']);
 								
-							// Merging the customer's results via JSON POST.
+							// Merging the customer's results.
 							$json['customer_info'] = $customer_info;
 								
 							// The customer is currently logged in.
@@ -222,7 +221,7 @@ if (isset($registry->get('request')->get['api_token']) && isset($registry->get('
 						}
 					}
 					
-					// Returning the customer logged in result via JSON POST.
+					// Returning the customer logged in result.
 					$json['customer_logged'] = $customer_logged;
 					
 					$json['customer_group_name'] = $customer_group_name;
