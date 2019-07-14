@@ -245,7 +245,7 @@ if (empty($registry->get('request')->get['hash']) || $registry->get('request')->
 				foreach ($totals as $total) {
 					$json['totals'][] = array(
 						'title' => $total['title'],
-						'text'  => $registry->get('currency')->format($total['value'], $registry->get('session')->data['currency'])
+						'text'  => $registry->get('currency')->format($total['value'], $registry->get('session')->data['oc_api_currency'])
 					);
 				}
 			}
