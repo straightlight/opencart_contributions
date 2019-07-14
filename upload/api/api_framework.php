@@ -18,14 +18,14 @@ $config->load($application_config);
 $registry->set('config', $config);
 
 // Log
-$log = new Log($config->get('error_filename'));
+$log = new Log($registry->get('config')->get('error_filename'));
 $registry->set('log', $log);
 
-date_default_timezone_set($config->get('date_timezone'));
+date_default_timezone_set($registry->get('config')->get('date_timezone'));
 
 $is_ajax = 'XMLHttpRequest' == ($registry->get('request')->server['HTTP_X_REQUESTED_WITH'] ?? '');
 
-set_error_handler(function($code, $message, $file, $line) use($log, $config, $is_ajax) {
+set_error_handler(function($code, $message, $file, $line) use($log, $registry, $is_ajax) {
 	// error suppressed with @
 	if (error_reporting() === 0) {
 		return false;
@@ -49,11 +49,11 @@ set_error_handler(function($code, $message, $file, $line) use($log, $config, $is
 			break;
 	}
 
-	if ($config->get('error_display') && !$is_ajax) {
+	if ($registry->get('config')->get('error_display') && !$is_ajax) {
 		echo '<b>' . $error . '</b>: ' . $message . ' in <b>' . $file . '</b> on line <b>' . $line . '</b>';
 	}
 
-	if ($config->get('error_log')) {
+	if ($registry->get('config')->get('error_log')) {
 		$log->write('PHP ' . $error . ':  ' . $message . ' in ' . $file . ' on line ' . $line);
 	}
 
@@ -65,8 +65,8 @@ $event = new Event($registry);
 $registry->set('event', $event);
 
 // Event Register
-if ($config->has('action_event')) {
-	foreach ($config->get('action_event') as $key => $value) {
+if ($registry->get('config')->has('action_event')) {
+	foreach ($registry->get('config')->get('action_event') as $key => $value) {
 		foreach ($value as $priority => $action) {
 			$registry->get('event')->register($key, new Action($action), $priority);
 		}
@@ -87,49 +87,49 @@ $registry->set('request', new Request());
 // Response
 $response = new Response();
 $response->addHeader('Content-Type: text/html; charset=utf-8');
-$response->setCompression($config->get('config_compression'));
+$response->setCompression($registry->get('config')->get('config_compression'));
 $registry->set('response', $response);
 
 // Database
-if ($config->get('db_autostart')) {
-	$registry->set('db', new DB($config->get('db_engine'), $config->get('db_hostname'), $config->get('db_username'), $config->get('db_password'), $config->get('db_database'), $config->get('db_port')));
+if ($registry->get('config')->get('db_autostart')) {
+	$registry->set('db', new DB($registry->get('config')->get('db_engine'), $registry->get('config')->get('db_hostname'), $registry->get('config')->get('db_username'), $registry->get('config')->get('db_password'), $registry->get('config')->get('db_database'), $registry->get('config')->get('db_port')));
 }
 
 // Session
-$session = new Session($config->get('session_engine'), $registry);
+$session = new Session($registry->get('config')->get('session_engine'), $registry);
 $registry->set('session', $session);
 
 // Cache
-$registry->set('cache', new Cache($config->get('cache_engine'), $config->get('cache_expire')));
+$registry->set('cache', new Cache($registry->get('config')->get('cache_engine'), $registry->get('config')->get('cache_expire')));
 
 // Language
-$language = new Language($config->get('language_directory'));
+$language = new Language($registry->get('config')->get('language_directory'));
 $registry->set('language', $language);
 
 // Config Autoload
-if ($config->has('config_autoload')) {
-	foreach ($config->get('config_autoload') as $value) {
+if ($registry->get('config')->has('config_autoload')) {
+	foreach ($registry->get('config')->get('config_autoload') as $value) {
 		$registry->get('load')->config($value);
 	}
 }
 
 // Language Autoload
-if ($config->has('language_autoload')) {
-	foreach ($config->get('language_autoload') as $value) {
+if ($registry->get('config')->has('language_autoload')) {
+	foreach ($registry->get('config')->get('language_autoload') as $value) {
 		$registry->get('load')->language($value);
 	}
 }
 
 // Library Autoload
-if ($config->has('library_autoload')) {
-	foreach ($config->get('library_autoload') as $value) {
+if ($registry->get('config')->has('library_autoload')) {
+	foreach ($registry->get('config')->get('library_autoload') as $value) {
 		$registry->get('load')->library($value);
 	}
 }
 
 // Model Autoload
-if ($config->has('model_autoload')) {
-	foreach ($config->get('model_autoload') as $value) {
+if ($registry->get('config')->has('model_autoload')) {
+	foreach ($registry->get('config')->get('model_autoload') as $value) {
 		$registry->get('load')->model($value);
 	}
 }
@@ -138,8 +138,8 @@ if ($config->has('model_autoload')) {
 $route = new Router($registry);
 
 // Pre Actions
-if ($config->has('action_pre_action')) {
-	foreach ($config->get('action_pre_action') as $value) {
+if ($registry->get('config')->has('action_pre_action')) {
+	foreach ($registry->get('config')->get('action_pre_action') as $value) {
 		$route->addPreAction(new Action($value));
 	}
 }
