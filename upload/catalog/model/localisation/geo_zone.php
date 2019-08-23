@@ -9,7 +9,7 @@ class ModelLocalisationGeoZone extends Model {
 	public function getZoneToGeoZoneLocation($location) {
 		$this->load->model('setting/extension');
 
-		/ Totals
+		// Totals
 		$totals = array();
 		$taxes = $this->cart->getTaxes();
 		$total = 0;
