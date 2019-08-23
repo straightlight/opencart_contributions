@@ -40,7 +40,7 @@ class ModelLocalisationGeoZone extends Model {
 		$results = $this->model_setting_extension->getExtensions('payment');
 
 		foreach ($results as $result) {
-			if (!empty($this->config->get('payment_' . $result['code'] . '_status') && $this->config->get('payment_' . $result['code'] . '_status') {
+			if (!empty($this->config->get('payment_' . $result['code'] . '_status')) && $this->config->get('payment_' . $result['code'] . '_status') {
 				// Accounts
 				if (!empty($this->session->data['api_session_id']) && !empty($this->config->get('payment_' . $result['code'] . '_location') && $location == $this->config->get('payment_' . $result['code'] . '_location') && $this->config->get('payment_' . $result['code'] . '_location') == 'account') {
 					$address_data['payment_account'][$result['code']] = true;
