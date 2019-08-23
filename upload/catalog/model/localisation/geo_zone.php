@@ -1,11 +1,12 @@
 <?php
+
 class ModelLocalisationGeoZone extends Model {
 	public function getZoneToGeoZoneByKey($address, $key) {
 		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . (int)$this->config->get($key) . "' AND country_id = '" . (int)$address['country_id'] . "' AND (zone_id = '" . $address['zone_id'] . "' OR zone_id = '0')");
-	
+
 		return $query->row;
-	}
-	
+	}	
+
 	public function getZoneToGeoZoneLocation($location) {
 		$this->load->model('setting/extension');
 
@@ -15,9 +16,9 @@ class ModelLocalisationGeoZone extends Model {
 		$total = 0;
 
 		$sort_order = array();
-
+		
 		$results = $this->model_setting_extension->getExtensions('total');
-
+		
 		foreach ($results as $key => $value) {
 			$sort_order[$key] = $this->config->get('total_' . $value['code'] . '_sort_order');
 		}
@@ -30,24 +31,23 @@ class ModelLocalisationGeoZone extends Model {
 
 				// __call can not pass-by-reference so we get PHP to call it as an anonymous function.
 				($this->{'model_extension_total_' . $result['code']}->getTotal)($totals, $taxes, $total);
-
 			}
 		}
 
 		// Payment Methods
 		$address_data = array();
-
+		
 		$results = $this->model_setting_extension->getExtensions('payment');
-
+		
 		foreach ($results as $result) {
-			if (!empty($this->config->get('payment_' . $result['code'] . '_status')) && $this->config->get('payment_' . $result['code'] . '_status') {
+			if ($this->config->get('payment_' . $result['code'] . '_status') && $this->config->get('payment_' . $result['code'] . '_status') {				
 				// Accounts
-				if (!empty($this->session->data['api_session_id']) && !empty($this->config->get('payment_' . $result['code'] . '_location')) && $location == $this->config->get('payment_' . $result['code'] . '_location') && $this->config->get('payment_' . $result['code'] . '_location') == 'account') {
+				if (!empty($this->session->data['api_session_id']) && $this->config->get('payment_' . $result['code'] . '_location') && $location == $this->config->get('payment_' . $result['code'] . '_location') && $this->config->get('payment_' . $result['code'] . '_location') == 'account') {
 					$address_data['payment_account'][$result['code']] = true;
-				}							
+				}
 
 				// Addresses
-				if (!empty($this->config->get('payment_' . $result['code'] . '_location')) && $location == $this->config->get('payment_' . $result['code'] . '_location') && $this->config->get('payment_' . $result['code'] . '_location') == 'address') {
+				if ($this->config->get('payment_' . $result['code'] . '_location') && $location == $this->config->get('payment_' . $result['code'] . '_location') && $this->config->get('payment_' . $result['code'] . '_location') == 'address') {
 					$address_data['payment_address'][$result['code']] = true;
 				}
 			}
@@ -62,8 +62,8 @@ class ModelLocalisationGeoZone extends Model {
 					$address_data['shipping_address'][$result['code']] = true;
 				}
 			}
-		}
-				    
+		}				    
+
 		return $address_data;
 	}
 }
