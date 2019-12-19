@@ -88,6 +88,14 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 			'PAYFLOWCOLOR'       => $this->config->get('payment_pp_express_colour'),															   
 			'CHANNELTYPE'        => 'Merchant'
 		);
+		
+		if (!$this->cart->hasProducts()) {
+			$this->session->data['error'] = $this->language->get('text_cart_empty');
+						
+			$this->model_extension_payment_pp_express->log($data['METHOD'] . ': The cart is currently empty from store name: ' . $this->config->get('config_name') . '.');
+					
+			$json['redirect'] = $this->url->link('checkout/checkout', 'language=' . $this->config->get('config_language'));
+		}
 
 		if (isset($this->session->data['pp_login']['seamless']['access_token']) && (isset($this->session->data['pp_login']['seamless']['customer_id']) && $this->session->data['pp_login']['seamless']['customer_id'] == $this->customer->getId()) && $this->config->get('module_pp_login_seamless')) {
 			$data['IDENTITYACCESSTOKEN'] = $this->session->data['pp_login']['seamless']['access_token'];
@@ -143,6 +151,14 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 			'METHOD' => 'GetExpressCheckoutDetails',
 			'TOKEN'  => $this->session->data['paypal']['token']
 		);
+		
+		if (!$this->cart->hasProducts()) {
+			$this->session->data['error'] = $this->language->get('text_cart_empty');
+						
+			$this->model_extension_payment_pp_express->log($data['METHOD'] . ': The cart is currently empty from store name: ' . $this->config->get('config_name') . '.');
+					
+			$this->response->redirect($this->url->link('checkout/checkout', 'language=' . $this->config->get('config_language')));
+		}
 
 		$result = $this->model_extension_payment_pp_express->call($data);
 		
@@ -1602,6 +1618,14 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 				'ALLOWNOTE'          => $this->config->get('payment_pp_express_allow_note')
 			);
 			
+			if (!$this->cart->hasProducts()) {
+				$this->session->data['error'] = $this->language->get('text_cart_empty');
+						
+				$this->model_extension_payment_pp_express->log($data['METHOD'] . ': The cart is currently empty from store name: ' . $this->config->get('config_name') . '.');
+					
+				$this->response->redirect($this->url->link('checkout/checkout', 'language=' . $this->config->get('config_language')));
+			}
+			
 			$data = array_merge($data, $data_shipping);
 
 			if (isset($this->session->data['pp_login']['seamless']['access_token']) && (isset($this->session->data['pp_login']['seamless']['customer_id']) && $this->session->data['pp_login']['seamless']['customer_id'] == $this->customer->getId()) && $this->config->get('module_pp_login_seamless')) {
@@ -1669,6 +1693,14 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 			'METHOD' => 'GetExpressCheckoutDetails',
 			'TOKEN'  => $this->session->data['paypal']['token']
 		);
+		
+		if (!$this->cart->hasProducts()) {
+			$this->session->data['error'] = $this->language->get('text_cart_empty');
+						
+			$this->model_extension_payment_pp_express->log($data['METHOD'] . ': The cart is currently empty from store name: ' . $this->config->get('config_name') . '.');
+					
+			$this->response->redirect($this->url->link('checkout/checkout', 'language=' . $this->config->get('config_language')));
+		}
 
 		$result = $this->model_extension_payment_pp_express->call($data);
 
