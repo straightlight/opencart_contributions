@@ -592,7 +592,7 @@ class ModelExtensionPaymentPpExpress extends Model {
 				}
 
 				// Date added
-				if ($data['txn_type'] == 'recurring_payment_profile_date_added') {
+				if ($data['txn_type'] == 'recurring_payment_profile_created') {
 					$recurring = $this->model_account_recurring->getOrderRecurringByReference($data['recurring_payment_id']);
 
 					if ($recurring != false) {
