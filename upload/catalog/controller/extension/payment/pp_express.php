@@ -252,7 +252,7 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 				$this->session->data['shipping_postcode'] = $result['PAYMENTREQUEST_0_SHIPTOZIP'];
 				
 				// Address Verification (Business Users)
-				if (!empty($address_verify['CONFIRMATIONCODE']) && (strtoupper($address_verify['CONFIRMATIONCODE']) == 'CONFIRMED' || strtoupper($address_verify['CONFIRMATIONCODE']) == 'UNCONFIRMED') && !empty($address_verify['STREETMATCH']) && strtoupper($address_verify['STREETMATCH']) == 'MATCHED' && !empty($address_verify['ZIPMATCH']) && strtoupper($address_verify['ZIPMATCH']) == 'MATCHED' && !empty($address_verify['COUNTRYCODE']) && !empty($address_verify['TOKEN'])) {
+				if (!empty($address_verify['ACK']) && strtoupper($address_verify['ACK']) == 'SUCCESS' && !empty($address_verify['CONFIRMATIONCODE']) && strtoupper($address_verify['CONFIRMATIONCODE']) == 'CONFIRMED' && !empty($address_verify['STREETMATCH']) && strtoupper($address_verify['STREETMATCH']) == 'MATCHED' && !empty($address_verify['COUNTRYCODE'])) {
 					$country_info = $this->db->query("SELECT * FROM `" . DB_PREFIX . "country` WHERE UCASE(TRIM(`iso_code_2`)) = '" . $this->db->escape(strtoupper($address_verify['COUNTRYCODE'])) . "' AND `status` = '1' LIMIT 1")->row;
 					
 					$this->model_extension_payment_pp_express->log($data['METHOD'] . ' :: AddressVerify :: ' . print_r($address_verify));
@@ -351,14 +351,14 @@ class ControllerExtensionPaymentPpExpress extends Controller {
 					} else {
 						$this->session->data['error'] = sprintf($this->language->get('error_ship_to_state_zone'), $country_info['name'], $this->url->link('information/contact', 'language=' . $this->config->get('config_language')), $this->config->get('config_name'));
 						
-						$this->model_extension_payment_pp_express->log($data['METHOD'] . ': Either the store or PayPal cannot process the order with the selected country name: ' . $country_info['name'] . ' as it cannot track the zone name from store name: ' . $this->config->get('config_name') . '.');
+						$this->model_extension_payment_pp_express->log($data['METHOD'] . ': Either the store or PayPal cannot process the order with the selected country name: ' . $country_info['name'] . ' and the zone name: ' . $result['PAYMENTREQUEST_0_SHIPTOSTATE'] . ' from store name: ' . $this->config->get('config_name') . '.');
 					
 						$this->response->redirect($this->url->link('checkout/checkout', 'language=' . $this->config->get('config_language')));
 					}
 				} else {
 					$this->session->data['error'] = sprintf($this->language->get('error_no_country'), $this->url->link('information/contact', 'language=' . $this->config->get('config_language')), $this->config->get('config_name'));
 					
-					$this->model_extension_payment_pp_express->log($data['METHOD'] . ': The selected country could not be found with this transaction.');
+					$this->model_extension_payment_pp_express->log($data['METHOD'] . ': The selected country: ' . $result['PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE'] . ' could not be found with this transaction.');
 					
 					$this->response->redirect($this->url->link('checkout/checkout', 'language=' . $this->config->get('config_language')));
 				}
