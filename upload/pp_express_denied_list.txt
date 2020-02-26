@@ -1,3 +1,0 @@
-List of tested Countries and Zones being denied by PayPal Express Checkout, so far:
-
-- Greece/Attica
