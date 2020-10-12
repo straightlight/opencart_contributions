@@ -43,7 +43,9 @@ final class ApiLoader {
 				// Overriding models is a little harder so we have to use PHP's magic methods
 				// In future version we can use runkit
 				foreach (get_class_methods($class) as $method) {
-					$proxy->{$method} = $this->callback($this->registry, $route . '/' . $method);
+					if ((substr($method, 0, 2) != '__') && is_callable($class, $method))  {
+						$proxy->{$method} = $this->callback($route . '/' . $method);
+					}
 				}
 				
 				$this->registry->set('api_model_' . str_replace('/', '_', (string)$route), $proxy);
