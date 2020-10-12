@@ -2,14 +2,14 @@
 
 // Store
 if ($registry->get('request')->server['HTTPS']) {
-	$query = $registry->get('db')->query("SELECT * FROM " . DB_PREFIX . "store WHERE REPLACE(`ssl`, 'www.', '') = '" . $registry->get('db')->escape('https://' . str_replace('www.', '', $_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/.\\') . '/') . "'");
+	$query = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "store` WHERE REPLACE(`ssl`, 'www.', '') = '" . $registry->get('db')->escape('https://' . str_replace('www.', '', $_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/.\\') . '/') . "'");
 } else {
-	$query = $registry->get('db')->query("SELECT * FROM " . DB_PREFIX . "store WHERE REPLACE(`url`, 'www.', '') = '" . $registry->get('db')->escape('http://' . str_replace('www.', '', $_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/.\\') . '/') . "'");
+	$query = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "store` WHERE REPLACE(`url`, 'www.', '') = '" . $registry->get('db')->escape('http://' . str_replace('www.', '', $_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/.\\') . '/') . "'");
 }
 		
 if (isset($registry->get('request')->get['store_id'])) {
 	$registry->get('config')->set('config_store_id', (int)$registry->get('request')->get['store_id']);
-} else if ($query->num_rows) {
+} elseif ($query->num_rows) {
 	$registry->get('config')->set('config_store_id', $query->row['store_id']);
 } else {
 	$registry->get('config')->set('config_store_id', 0);
@@ -21,7 +21,7 @@ if (!$query->num_rows) {
 }
 		
 // Settings
-$query = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "setting` WHERE store_id = '0' OR store_id = '" . (int)$registry->get('config')->get('config_store_id') . "' ORDER BY store_id ASC");
+$query = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "setting` WHERE `store_id` = '0' OR `store_id` = '" . (int)$registry->get('config')->get('config_store_id') . "' ORDER BY `store_id` ASC");
 		
 foreach ($query->rows as $result) {
 	if (!$result['serialized']) {
@@ -106,7 +106,7 @@ if (isset($registry->get('session')->data['customer']) && isset($registry->get('
 		
 // Tracking Code
 if (isset($registry->get('request')->get['tracking'])) {
-	$registry->get('db')->query("UPDATE `" . DB_PREFIX . "marketing` SET clicks = (clicks + 1) WHERE code = '" . $registry->get('db')->escape($registry->get('request')->get['tracking']) . "'");
+	$registry->get('db')->query("UPDATE `" . DB_PREFIX . "marketing` SET `clicks` = (clicks + 1) WHERE `code` = '" . $registry->get('db')->escape($registry->get('request')->get['tracking']) . "'");
 }		
 		
 // Currency
