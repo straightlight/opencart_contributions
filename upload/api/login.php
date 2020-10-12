@@ -2,10 +2,10 @@
 $flag = false;
 
 if (isset($registry->get('request')->get['api_token']) && isset($registry->get('request')->get['route']) && substr($registry->get('request')->get['route'], 0, 4) == 'api/') {
-	$registry->get('db')->query("DELETE FROM `" . DB_PREFIX . "api_session` WHERE TIMESTAMPADD(HOUR, 1, date_modified) < NOW()");
+	$registry->get('db')->query("DELETE FROM `" . DB_PREFIX . "api_session` WHERE TIMESTAMPADD(HOUR, 1, `date_modified`) < NOW()");
 					
 	// Make sure the IP is allowed
-	$api_query = $registry->get('db')->query("SELECT DISTINCT * FROM `" . DB_PREFIX . "api` `a` LEFT JOIN `" . DB_PREFIX . "api_session` `as` ON (a.api_id = as.api_id) LEFT JOIN " . DB_PREFIX . "api_ip `ai` ON (a.api_id = ai.api_id) WHERE a.status = '1' AND `as`.`session_id` = '" . $registry->get('db')->escape($registry->get('request')->get['api_token']) . "' AND ai.ip = '" . $registry->get('db')->escape($registry->get('request')->server['REMOTE_ADDR']) . "'");
+	$api_query = $registry->get('db')->query("SELECT DISTINCT * FROM `" . DB_PREFIX . "api` a LEFT JOIN `" . DB_PREFIX . "api_session` `as` ON (a.`api_id` = `as`.`api_id`) LEFT JOIN `" . DB_PREFIX . "api_ip` ai ON (a.`api_id` = ai.`api_id`) WHERE a.`status` = '1' AND `as`.`session_id` = '" . $registry->get('db')->escape($registry->get('request')->get['api_token']) . "' AND ai.`ip` = '" . $registry->get('db')->escape($registry->get('request')->server['REMOTE_ADDR']) . "'");
 		 
 	if ($api_query->num_rows) {
 		$registry->get('session')->start($registry->get('request')->get['api_token']);
@@ -36,9 +36,9 @@ if (!$flag) {
 		$json['error']['code'] = $registry->get('language')->get('error_code');
 			
 	// Else, we instantiate the next lookups.
-	} elseif (!empty($registry->get('request')->get['store_code']) && !empty($registry->get('config')->get('config_code')) && $registry->get('request')->get['store_code'] == $registry->get('config')->get('config_code') && !empty($registry->get('request')->get['hash']) && $registry->get('request')->get['hash'] == $registry->get('config')->get('config_hash')) {
+	} elseif (!empty($registry->get('request')->get['store_code']) && $registry->get('request')->get['store_code'] == $registry->get('config')->get('config_code') && !empty($registry->get('request')->get['hash']) && $registry->get('request')->get['hash'] == $registry->get('config')->get('config_hash')) {
 		// Finding a relative API ID for the default selected store by the store owner.
-		$api_info = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "api` WHERE api_id = '" . (int)$registry->get('config')->get('config_api_id') . "'");
+		$api_info = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "api` WHERE `api_id` = '" . (int)$registry->get('config')->get('config_api_id') . "'");
 
 		// If no API ID can be found, relatively with the store,
 		// we reject the API transaction directly from the browser
@@ -62,16 +62,16 @@ if (!$flag) {
 			$api_session->start();
 					
 			// Delete old API sessions.
-			$registry->get('db')->query("DELETE FROM `" . DB_PREFIX . "api_session` WHERE session_id = '" . $registry->get('db')->escape($session->getId()) . "'");
+			$registry->get('db')->query("DELETE FROM `" . DB_PREFIX . "api_session` WHERE `session_id` = '" . $registry->get('db')->escape($session->getId()) . "'");
 
 			// Acquire authorized IP address to connect via
 			// the API defined from the OC admin.
-			$api_ip_query = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "api_ip` WHERE ip = '" . $registry->get('db')->escape($registry->get('request')->server['REMOTE_ADDR']) . "'");
+			$api_ip_query = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "api_ip` WHERE `ip` = '" . $registry->get('db')->escape($registry->get('request')->server['REMOTE_ADDR']) . "'");
 						
 			// If no results are being found with authorized IP addresses,
 			// we add the results.
 			if (!$api_ip_query->num_rows) {
-				$registry->get('db')->query("INSERT INTO `" . DB_PREFIX . "api_ip` SET api_id = '" . (int)$api_info['api_id'] . "', ip = '" . $registry->get('db')->escape($registry->get('request')->server['REMOTE_ADDR']) . "'");
+				$registry->get('db')->query("INSERT INTO `" . DB_PREFIX . "api_ip` SET `api_id` = '" . (int)$api_info['api_id'] . "', `ip` = '" . $registry->get('db')->escape($registry->get('request')->server['REMOTE_ADDR']) . "'");
 			}
 				
 			// Adding API session on database ...
@@ -201,7 +201,7 @@ if (!$flag) {
 					// is enabled and that the $customer_id is a match ...
 					if ($registry->get('config')->get('config_customer_online') && $customer_id) {
 						// Checking the selected customer if he is currently online.
-						$customer_info = $registry->get('db')->query("SELECT `c`.* FROM `" . DB_PREFIX . "customer_online` `co` LEFT JOIN `" . DB_PREFIX . "customer` `c` ON (`c`.`customer_id` = `co`.`customer_id`) WHERE `c`.`customer_id` > '0' AND `c`.`customer_id` = '" . (int)$customer_id . "' AND `c`.`status` = '1'")->row;
+						$customer_info = $registry->get('db')->query("SELECT `c`.* FROM `" . DB_PREFIX . "customer_online` co LEFT JOIN `" . DB_PREFIX . "customer` c ON (c.`customer_id` = co.`customer_id`) WHERE c.`customer_id` > '0' AND c.`customer_id` = '" . (int)$customer_id . "' AND c.`status` = '1'")->row;
 							
 						// If he is online ...
 						if ($customer_info) {
