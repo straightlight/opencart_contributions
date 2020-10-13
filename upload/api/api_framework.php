@@ -78,8 +78,8 @@ $loader = new loader($registry);
 $registry->set('load', $loader);
 
 // API Loader
-$ApiLoader = new ApiLoader($registry);
-$registry->set('ApiLoad', $ApiLoader);
+$apiLoader = new apiLoader($registry);
+$registry->set('apiLoad', $apiLoader);
 
 // Request
 $registry->set('request', new Request());
