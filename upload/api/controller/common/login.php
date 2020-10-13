@@ -1,5 +1,7 @@
 <?php
 class ApiControllerCommonLogin extends Controller {
+	// At the programmers' complete discretion to modify this
+	// authentication method for their remote platforms.
 	public function index() {
 		$this->apiLoad->language('common/login');
 
