@@ -391,12 +391,6 @@ class ApiControllerEventApi extends Controller {
 					$customer_id = 0;
 				}
 
-				if (isset($this->request->server['REMOTE_ADDR'])) {
-					$ip = $this->request->server['REMOTE_ADDR'];
-				} else {
-					$ip = '';
-				}
-
 				$search_data = array(
 					'keyword'       => $search,
 					'category_id'   => $category_id,
@@ -404,7 +398,7 @@ class ApiControllerEventApi extends Controller {
 					'description'   => $description,
 					'products'      => $product_total,
 					'customer_id'   => $customer_id,
-					'ip'            => $ip,
+					'ip'            => $this->request->server['REMOTE_ADDR'],
 				);
 
 				$this->model_account_search->addSearch($search_data);
