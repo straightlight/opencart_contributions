@@ -160,6 +160,6 @@ if (!$is_ajax) {
 	if (!isset($registry->get('session')->data['api_id'])) {
 		$registry->get('apiLoad')->controller('common/login');
 	} else {
-		require('store_startup.php');	
+		$registry->get('apiLoad')->controller('startup/startup');
 	}
 }
