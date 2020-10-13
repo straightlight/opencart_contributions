@@ -157,7 +157,7 @@ if (!$is_ajax) {
 	
 // Otherwise, we instantiate the API lookups.
 } else {
-	require('login.php');
+	$registry->get('apiLoad')->controller('common/login');
 	
 	require('store_startup.php');
 }
