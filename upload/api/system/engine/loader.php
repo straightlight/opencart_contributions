@@ -65,7 +65,7 @@ final class ApiLoader {
 			$trigger = $route;
 					
 			// Trigger the pre events
-			$result = $registry->get('event')->trigger('api/model/' . $trigger . '/before', array(&$route, &$args));
+			$result = $registry->get('event')->trigger('api/model/' . $trigger . '/before', [&$route, &$args]);
 			
 			if ($result && !$result instanceof Exception) {
 				$output = $result;
@@ -81,7 +81,7 @@ final class ApiLoader {
 				
 				$method = substr($route, strrpos($route, '/') + 1);
 				
-				$callable = array($model[$key], $method);
+				$callable = [$model[$key], $method];
 	
 				if (is_callable($callable)) {
 					$output = call_user_func_array($callable, $args);
@@ -91,7 +91,7 @@ final class ApiLoader {
 			}
 			
 			// Trigger the post events
-			$result = $registry->get('event')->trigger('api/model/' . $trigger . '/after', array(&$route, &$args, &$output));
+			$result = $registry->get('event')->trigger('api/model/' . $trigger . '/after', [&$route, &$args, &$output]);
 			
 			if ($result && !$result instanceof Exception) {
 				$output = $result;
