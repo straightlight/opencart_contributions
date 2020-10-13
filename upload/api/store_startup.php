@@ -155,6 +155,4 @@ $registry->set('length', new Cart\Length($registry));
 		
 // Encryption
 $registry->set('encryption', new Encryption($registry->get('config')->get('config_encryption')));
-		
-// OpenBay Pro
-$registry->set('openbay', new Openbay($registry));
+	
