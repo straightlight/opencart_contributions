@@ -6,28 +6,34 @@ if ($registry->get('request')->server['HTTPS']) {
 } else {
 	$query = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "store` WHERE REPLACE(`url`, 'www.', '') = '" . $registry->get('db')->escape('http://' . str_replace('www.', '', $_SERVER['HTTP_HOST']) . rtrim(dirname($_SERVER['PHP_SELF']), '/.\\') . '/') . "'");
 }
-		
-if (isset($registry->get('request')->get['store_id'])) {
-	$registry->get('config')->set('config_store_id', (int)$registry->get('request')->get['store_id']);
-} elseif ($query->num_rows) {
-	$registry->get('config')->set('config_store_id', $query->row['store_id']);
-} else {
-	$registry->get('config')->set('config_store_id', 0);
+	
+if (!$registry->get('config')->has('config_store_id')) {
+	if (isset($registry->get('request')->get['store_id'])) {
+		$registry->get('config')->set('config_store_id', (int)$registry->get('request')->get['store_id']);
+	} elseif ($query->num_rows) {
+		$registry->get('config')->set('config_store_id', $query->row['store_id']);
+	} else {
+		$registry->get('config')->set('config_store_id', 0);
+	}
 }
-		
-if (!$query->num_rows) {
-	$registry->get('config')->set('config_url', HTTP_SERVER);
-	$registry->get('config')->set('config_ssl', HTTPS_SERVER);
+
+if (!$registry->get('config')->has('config_url') && !$registry->get('config')->has('config_ssl')) {
+	if (!$query->num_rows) {
+		$registry->get('config')->set('config_url', HTTP_SERVER);
+		$registry->get('config')->set('config_ssl', HTTPS_SERVER);
+	}
 }
 		
 // Settings
 $query = $registry->get('db')->query("SELECT * FROM `" . DB_PREFIX . "setting` WHERE `store_id` = '0' OR `store_id` = '" . (int)$registry->get('config')->get('config_store_id') . "' ORDER BY `store_id` ASC");
 		
 foreach ($query->rows as $result) {
-	if (!$result['serialized']) {
-		$registry->get('config')->set($result['key'], $result['value']);
-	} else {
-		$registry->get('config')->set($result['key'], json_decode($result['value'], true));
+	if (!$registry->get('config')->has($result['key'])) {
+		if (!$result['serialized']) {
+			$registry->get('config')->set($result['key'], $result['value']);
+		} else {
+			$registry->get('config')->set($result['key'], json_decode($result['value'], true));
+		}
 	}
 }
 
@@ -66,8 +72,7 @@ if (!empty($registry->get('request')->server['HTTP_ACCEPT_LANGUAGE']) && !array_
 		// Try using language folder to detect the language
 		foreach ($browser_languages as $browser_language) {
 			if (array_key_exists(strtolower($browser_language), $languages)) {
-				$detect = strtolower($browser_language);
-						
+				$detect = strtolower($browser_language);						
 				break;
 			}
 		}
@@ -86,22 +91,23 @@ if (!isset($registry->get('session')->data['language']) || $registry->get('sessi
 				
 // Overwrite the default language object
 $language = new Language($code);
-$language->load($code);
-		
+$language->load($code);		
 $registry->set('language', $language);
 		
 // Set the config language_id
 $registry->get('config')->set('config_language_id', $languages[$code]['language_id']);	
 
 // Customer Group
-if (isset($registry->get('session')->data['customer']) && isset($registry->get('session')->data['customer']['customer_group_id'])) {
-	// For API calls
-	$registry->get('config')->set('config_customer_group_id', $registry->get('session')->data['customer']['customer_group_id']);
-} elseif ($customer_logged) {
-	// Logged in customers
-	$registry->get('config')->set('config_customer_group_id', $customer_group_id);
-} elseif (isset($registry->get('session')->data['guest']) && isset($registry->get('session')->data['guest']['customer_group_id'])) {
-	$registry->get('config')->set('config_customer_group_id', $registry->get('session')->data['guest']['customer_group_id']);
+if (!$registry->get('config')->has('config_customer_group_id')) {
+	if (isset($registry->get('session')->data['customer']) && isset($registry->get('session')->data['customer']['customer_group_id'])) {
+		// For API calls
+		$registry->get('config')->set('config_customer_group_id', $registry->get('session')->data['customer']['customer_group_id']);
+	} elseif ($customer_logged) {
+		// Logged in customers
+		$registry->get('config')->set('config_customer_group_id', $customer_group_id);
+	} elseif (isset($registry->get('session')->data['guest']) && isset($registry->get('session')->data['guest']['customer_group_id'])) {
+		$registry->get('config')->set('config_customer_group_id', $registry->get('session')->data['guest']['customer_group_id']);
+	}
 }
 		
 // Tracking Code
@@ -133,13 +139,13 @@ $registry->set('currency', new Cart\Currency($registry));
 // Tax
 $registry->set('tax', new Cart\Tax($registry));
 		
-if (isset($registry->get('session')->data['shipping_address'])) {
+if (isset($registry->get('session')->data['shipping_address']['country_id']) && sset($registry->get('session')->data['shipping_address']['zone_id'])) {
 	$registry->get('tax')->setShippingAddress($registry->get('session')->data['shipping_address']['country_id'], $registry->get('session')->data['shipping_address']['zone_id']);
 } elseif ($registry->get('config')->get('config_tax_default') == 'shipping') {
 	$registry->get('tax')->setShippingAddress($registry->get('config')->get('config_country_id'), $registry->get('config')->get('config_zone_id'));
 }
 
-if (isset($registry->get('session')->data['payment_address'])) {
+if (isset($registry->get('session')->data['payment_address']['country_id']) && isset($registry->get('session')->data['payment_address']['zone_id'])) {
 	$registry->get('tax')->setPaymentAddress($registry->get('session')->data['payment_address']['country_id'], $registry->get('session')->data['payment_address']['zone_id']);
 } elseif ($registry->get('config')->get('config_tax_default') == 'payment') {
 	$registry->get('tax')->setPaymentAddress($registry->get('config')->get('config_country_id'), $registry->get('config')->get('config_zone_id'));
