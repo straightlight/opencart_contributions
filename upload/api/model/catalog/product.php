@@ -1,6 +1,6 @@
 <?php
 class ApiModelCatalogProduct extends Model {
-	public function getProducts($data = array()) {
+	public function getProducts($data = []) {
 		$sql = "SELECT p.`product_id`, (SELECT AVG(`rating`) AS total FROM `" . DB_PREFIX . "review` r1 WHERE r1.`product_id` = p.`product_id` AND r1.`status` = '1' GROUP BY r1.`product_id`) AS rating, (SELECT `price` FROM `" . DB_PREFIX . "product_discount` pd2 WHERE pd2.`product_id` = p.`product_id` AND pd2.`customer_group_id` = '" . (int)$this->config->get('config_customer_group_id') . "' AND pd2.`quantity` = '1' AND ((pd2.`date_start` = '0000-00-00' OR pd2.`date_start` < NOW()) AND (pd2.`date_end` = '0000-00-00' OR pd2.`date_end` > NOW())) ORDER BY pd2.`priority` ASC, pd2.`price` ASC LIMIT 1) AS discount, (SELECT `price` FROM `" . DB_PREFIX . "product_special` ps WHERE ps.`product_id` = p.`product_id` AND ps.`customer_group_id` = '" . (int)$this->config->get('config_customer_group_id') . "' AND ((ps.`date_start` = '0000-00-00' OR ps.`date_start` < NOW()) AND (ps.`date_end` = '0000-00-00' OR ps.`date_end` > NOW())) ORDER BY ps.`priority` ASC, ps.`price` ASC LIMIT 1) AS special";
 
 		if (!empty($data['filter_category_id'])) {
@@ -29,7 +29,7 @@ class ApiModelCatalogProduct extends Model {
 			}
 
 			if (!empty($data['filter_filter'])) {
-				$implode = array();
+				$implode = [];
 
 				$filters = explode(',', $data['filter_filter']);
 
@@ -45,7 +45,7 @@ class ApiModelCatalogProduct extends Model {
 			$sql .= " AND (";
 
 			if (!empty($data['filter_name'])) {
-				$implode = array();
+				$implode = [];
 
 				$words = explode(' ', trim(preg_replace('/\s+/', ' ', $data['filter_name'])));
 
@@ -67,7 +67,7 @@ class ApiModelCatalogProduct extends Model {
 			}
 
 			if (!empty($data['filter_tag'])) {
-				$implode = array();
+				$implode = [];
 
 				$words = explode(' ', trim(preg_replace('/\s+/', ' ', $data['filter_tag'])));
 
@@ -99,7 +99,7 @@ class ApiModelCatalogProduct extends Model {
 
 		$sql .= " GROUP BY p.`product_id`";
 
-		$sort_data = array(
+		$sort_data = [
 			'pd.name',
 			'p.model',
 			'p.quantity',
@@ -107,7 +107,7 @@ class ApiModelCatalogProduct extends Model {
 			'rating',
 			'p.sort_order',
 			'p.date_added'
-		);
+		];
 
 		if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {
 			if ($data['sort'] == 'pd.name' || $data['sort'] == 'p.model') {
@@ -139,7 +139,7 @@ class ApiModelCatalogProduct extends Model {
 			$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
 		}
 
-		$product_data = array();
+		$product_data = [];
 
 		$query = $this->db->query($sql);
 		
@@ -152,7 +152,7 @@ class ApiModelCatalogProduct extends Model {
 		return $product_data;
 	}
 	
-	public function getTotalProducts($data = array()) {
+	public function getTotalProducts($data = []) {
 		$sql = "SELECT COUNT(DISTINCT p.`product_id`) AS total";
 
 		if (!empty($data['filter_category_id'])) {
@@ -181,7 +181,7 @@ class ApiModelCatalogProduct extends Model {
 			}
 
 			if (!empty($data['filter_filter'])) {
-				$implode = array();
+				$implode = [];
 
 				$filters = explode(',', $data['filter_filter']);
 
@@ -197,7 +197,7 @@ class ApiModelCatalogProduct extends Model {
 			$sql .= " AND (";
 
 			if (!empty($data['filter_name'])) {
-				$implode = array();
+				$implode = [];
 
 				$words = explode(' ', trim(preg_replace('/\s+/', ' ', $data['filter_name'])));
 
@@ -219,7 +219,7 @@ class ApiModelCatalogProduct extends Model {
 			}
 
 			if (!empty($data['filter_tag'])) {
-				$implode = array();
+				$implode = [];
 
 				$words = explode(' ', trim(preg_replace('/\s+/', ' ', $data['filter_tag'])));
 
