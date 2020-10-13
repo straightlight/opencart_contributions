@@ -50,11 +50,11 @@ set_error_handler(function($code, $message, $file, $line) use($log, $registry, $
 	}
 
 	if ($registry->get('config')->get('error_display') && !$is_ajax) {
-		echo '<b>' . $error . '</b>: ' . $message . ' in <b>' . $file . '</b> on line <b>' . $line . '</b>';
+		echo '<b>API :: ' . $error . '</b>: ' . $message . ' in <b>' . $file . '</b> on line <b>' . $line . '</b>';
 	}
 
 	if ($registry->get('config')->get('error_log')) {
-		$log->write('PHP ' . $error . ':  ' . $message . ' in ' . $file . ' on line ' . $line);
+		$log->write('API :: PHP ' . $error . ':  ' . $message . ' in ' . $file . ' on line ' . $line);
 	}
 
 	return true;
