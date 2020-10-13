@@ -31,10 +31,9 @@ class ApiControllerCommonLogin extends Controller {
 
 				$session = new Session($this->config->get('session_engine'), $this->registry);
 				$session->start();
+				$session->data['api_id'] = $api_info['api_id'];
 				
 				$this->model_account_api->addSession($api_info['api_id'], $session->getId(), $this->request->server['REMOTE_ADDR']);
-				
-				$session->data['api_id'] = $api_info['api_id'];
 				
 				// Create Token
 				$json['api_token'] = $session->getId();
