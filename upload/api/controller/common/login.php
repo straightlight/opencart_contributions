@@ -20,10 +20,8 @@ class ApiControllerCommonLogin extends Controller {
 		}
 
 		if (!$flag) {
-			$customer_logged = false;
-						
-			$customer_group_id = 0;
-			
+			$customer_logged = false;						
+			$customer_group_id = 0;			
 			$customer_group_name = '';
 			
 			// catalog/language/<default_language_code>/api/login.php
