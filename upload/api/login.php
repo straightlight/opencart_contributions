@@ -48,7 +48,7 @@ if (!$flag) {
 				
 		// Else, we instantiate the next lookups.
 		} elseif ($api_info->num_rows) {
-			$json = array();
+			$json = [];
 					
 			// catalog/model/account/api.php			
 			$registry->get('load')->model('account/api');
@@ -89,7 +89,7 @@ if (!$flag) {
 					
 			// Otherwise ...
 			} else {
-				$api_info = array();
+				$api_info = [];
 					
 				// Login with API Key
 				if (isset($registry->get('request')->post['username'])) {
@@ -104,7 +104,7 @@ if (!$flag) {
 				// Otherwise ...
 				} else {
 					// Check if IP is allowed
-					$ip_data = array();
+					$ip_data = [];
 				
 					// Capturing IP addresses linked with this API ID ...
 					$results = $registry->get('model_account_api')->getApiIps($api_info['api_id']);
@@ -161,7 +161,7 @@ if (!$flag) {
 					}
 						
 					// Cart
-					$json['cart'] = array();
+					$json['cart'] = [];
 					
 					// Guest customers by default.
 					$customer_id = 0;
@@ -195,7 +195,7 @@ if (!$flag) {
 					}
 					
 					// Customer Logged
-					$json['customer_info'] = array();
+					$json['customer_info'] = [];
 					
 					// If customer online from admin - > systems - > settings - > add / edit settings page,
 					// is enabled and that the $customer_id is a match ...
@@ -235,7 +235,7 @@ if (!$flag) {
 					// Totals
 					$registry->get('load')->model('setting/extension');
 						
-					$totals = array();
+					$totals = [];
 					
 					// Uses a stand-alone function with the API,
 					// since the cart library can't specifically capture products
@@ -246,7 +246,7 @@ if (!$flag) {
 						
 					// Display prices
 					if ($customer_logged || !$registry->get('config')->get('config_customer_price')) {
-						$sort_order = array();
+						$sort_order = [];
 						
 						$results = $registry->get('model_setting_extension')->getExtensions('total');
 							
@@ -265,7 +265,7 @@ if (!$flag) {
 							}
 						}
 						
-						$sort_order = array();
+						$sort_order = [];
 							
 						foreach ($totals as $key => $value) {
 							$sort_order[$key] = $value['sort_order'];
@@ -274,13 +274,13 @@ if (!$flag) {
 						array_multisort($sort_order, SORT_ASC, $totals);
 					}
 							
-					$json['totals'] = array();
+					$json['totals'] = [];
 							
 					foreach ($totals as $total) {
-						$json['totals'][] = array(
+						$json['totals'][] = [
 							'title' => $total['title'],
 							'text'  => $registry->get('currency')->format($total['value'], $registry->get('session')->data['oc_api_currency'])
-						);
+						];
 					}
 				}
 			}
@@ -293,7 +293,7 @@ if (!$flag) {
 	// Stand-alone taxes calculations.
 	// Pulled from system/library/cart/cart.php file.
 	function getTaxes($registry, $cart_query) {
-		$tax_data = array();
+		$tax_data = [];
 
 		foreach ($cart_query as $product) {
 			if ($product['tax_class_id']) {
