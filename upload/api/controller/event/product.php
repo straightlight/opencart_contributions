@@ -2,7 +2,7 @@
 class ApiControllerEventApi extends Controller {
 	// api/model/catalog/product/getProducts/before
 	public function search(&$route, &$args) {
-		$data = array();
+		$data = [];
 		
 		// Site Search
 		$this->load->language('product/search');
@@ -114,45 +114,45 @@ class ApiControllerEventApi extends Controller {
 		}
 
 		// 3 Level Category Search
-		$data['categories'] = array();
+		$data['categories'] = [];
 
 		$categories_1 = $this->model_catalog_category->getCategories(0);
 
 		foreach ($categories_1 as $category_1) {
-			$level_2_data = array();
+			$level_2_data = [];
 
 			$categories_2 = $this->model_catalog_category->getCategories($category_1['category_id']);
 
 			foreach ($categories_2 as $category_2) {
-				$level_3_data = array();
+				$level_3_data = [];
 
 				$categories_3 = $this->model_catalog_category->getCategories($category_2['category_id']);
 
 				foreach ($categories_3 as $category_3) {
-					$level_3_data[] = array(
+					$level_3_data[] = [
 						'category_id' => $category_3['category_id'],
 						'name'        => $category_3['name'],
-					);
+					];
 				}
 
-				$level_2_data[] = array(
+				$level_2_data[] = [
 					'category_id' => $category_2['category_id'],
 					'name'        => $category_2['name'],
 					'children'    => $level_3_data
-				);
+				];
 			}
 
-			$data['categories'][] = array(
+			$data['categories'][] = [
 				'category_id' => $category_1['category_id'],
 				'name'        => $category_1['name'],
 				'children'    => $level_2_data
-			);
+			];
 		}
 
-		$data['products'] = array();
+		$data['products'] = [];
 
 		if (isset($this->request->get['search']) || isset($this->request->get['tag'])) {
-			$filter_data = array(
+			$filter_data = [
 				'filter_name'         => $search,
 				'filter_tag'          => $tag,
 				'filter_description'  => $description,
@@ -162,7 +162,7 @@ class ApiControllerEventApi extends Controller {
 				'order'               => $order,
 				'start'               => ($page - 1) * $limit,
 				'limit'               => $limit,
-			);
+			];
 
 			$product_total = $this->api_model_catalog_product->getTotalProducts($filter_data);
 
@@ -199,7 +199,7 @@ class ApiControllerEventApi extends Controller {
 					$rating = false;
 				}
 
-				$data['products'][] = array(
+				$data['products'][] = [
 					'product_id'  => $result['product_id'],
 					'thumb'       => $image,
 					'name'        => $result['name'],
@@ -210,7 +210,7 @@ class ApiControllerEventApi extends Controller {
 					'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,
 					'rating'      => $result['rating'],
 					'href'        => '',
-				);
+				];
 			}
 
 			$url = '';
@@ -239,63 +239,63 @@ class ApiControllerEventApi extends Controller {
 				$url .= '&limit=' . $this->request->get['limit'];
 			}
 
-			$data['sorts'] = array();
+			$data['sorts'] = [];
 
-			$data['sorts'][] = array(
+			$data['sorts'][] = [
 				'text'  => $this->language->get('text_default'),
 				'value' => 'p.sort_order-ASC',
 				'href'  => '',
-			);
+			];
 
-			$data['sorts'][] = array(
+			$data['sorts'][] = [
 				'text'  => $this->language->get('text_name_asc'),
 				'value' => 'pd.name-ASC',
 				'href'  => '',
-			);
+			];
 
-			$data['sorts'][] = array(
+			$data['sorts'][] = [
 				'text'  => $this->language->get('text_name_desc'),
 				'value' => 'pd.name-DESC',
 				'href'  => '',
-			);
+			];
 
-			$data['sorts'][] = array(
+			$data['sorts'][] = [
 				'text'  => $this->language->get('text_price_asc'),
 				'value' => 'p.price-ASC',
 				'href'  => '',
 			);
 
-			$data['sorts'][] = array(
+			$data['sorts'][] = [
 				'text'  => $this->language->get('text_price_desc'),
 				'value' => 'p.price-DESC',
 				'href'  => '',
-			);
+			];
 
 			if ($this->config->get('config_review_status')) {
-				$data['sorts'][] = array(
+				$data['sorts'][] = [
 					'text'  => $this->language->get('text_rating_desc'),
 					'value' => 'rating-DESC',
 					'href'  => '',
-				);
+				];
 
-				$data['sorts'][] = array(
+				$data['sorts'][] = [
 					'text'  => $this->language->get('text_rating_asc'),
 					'value' => 'rating-ASC',
 					'href'  => '',
-				);
+				];
 			}
 
-			$data['sorts'][] = array(
+			$data['sorts'][] = [
 				'text'  => $this->language->get('text_model_asc'),
 				'value' => 'p.model-ASC',
 				'href'  => '',
-			);
+			];
 
-			$data['sorts'][] = array(
+			$data['sorts'][] = [
 				'text'  => $this->language->get('text_model_desc'),
 				'value' => 'p.model-DESC',
 				'href'  => '',
-			);
+			];
 
 			$url = '';
 
@@ -327,18 +327,18 @@ class ApiControllerEventApi extends Controller {
 				$url .= '&order=' . $this->request->get['order'];
 			}
 
-			$data['limits'] = array();
+			$data['limits'] = [];
 
-			$limits = array_unique(array($this->config->get('theme_' . $this->config->get('config_theme') . '_product_limit'), 25, 50, 75, 100));
+			$limits = array_unique([$this->config->get('theme_' . $this->config->get('config_theme') . '_product_limit'), 25, 50, 75, 100]);
 			
 			sort($limits);
 
 			foreach($limits as $value) {
-				$data['limits'][] = array(
+				$data['limits'][] = [
 					'text'  => $value,
 					'value' => $value,
 					'href'  => '',
-				);
+				];
 			}
 
 			$url = '';
@@ -391,7 +391,7 @@ class ApiControllerEventApi extends Controller {
 					$customer_id = 0;
 				}
 
-				$search_data = array(
+				$search_data = [
 					'keyword'       => $search,
 					'category_id'   => $category_id,
 					'sub_category'  => $sub_category,
@@ -399,7 +399,7 @@ class ApiControllerEventApi extends Controller {
 					'products'      => $product_total,
 					'customer_id'   => $customer_id,
 					'ip'            => $this->request->server['REMOTE_ADDR'],
-				);
+				];
 
 				$this->model_account_search->addSearch($search_data);
 			}
