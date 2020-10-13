@@ -9,7 +9,7 @@ class ApiControllerEventApi extends Controller {
 					
 		$this->load->model('catalog/category');
 						
-		$this->ApiLoad->model('catalog/product');
+		$this->apiLoad->model('catalog/product');
 					
 		$this->load->model('tool/image');
 
