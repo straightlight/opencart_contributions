@@ -37,6 +37,9 @@ class ApiControllerCommonLogin extends Controller {
 				
 				// Create Token
 				$json['api_token'] = $session->getId();
+				
+				// Opencart API Version
+				$json['opencart_api_version'] = OPENCART_API_VERSION;
 			} else {
 				$json['error']['key'] = $this->language->get('error_key');
 			}
