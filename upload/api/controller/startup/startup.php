@@ -112,7 +112,7 @@ class ApiControllerStartupStartup extends Controller {
 		}
 				
 		// Tracking Code
-		if (isset($this->request->get['tracking'])) {
+		if (isset($this->request->get['tracking']) && !isset($this->request->cookie['tracking'])) {
 			setcookie('tracking', $this->request->get['tracking'], time() + 3600 * 24 * 1000, '/');
 			
 			$this->db->query("UPDATE `" . DB_PREFIX . "marketing` SET `clicks` = (clicks + 1) WHERE `code` = '" . $this->db->escape($this->request->get['tracking']) . "'");
