@@ -3,10 +3,12 @@ class ApiControllerCommonLogin extends Controller {
 	// At the programmers' complete discretion to modify this
 	// authentication method for their remote platforms.
 	public function index() {
-		$this->apiLoad->language('common/login');
-
 		$json = [];
-
+		
+		// API
+		$this->apiLoad->language('common/login');
+		
+		// Core
 		$this->load->model('account/api');
 
 		// Login with API Key
