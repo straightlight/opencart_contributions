@@ -12,7 +12,7 @@ class ApiControllerEventApi extends Controller {
 		$this->load->model('catalog/category');
 		
 		// API
-		$this->apiLoad->model('catalog/product');
+		$this->loadApi->model('catalog/product');
 
 		if (isset($this->request->get['search'])) {
 			$search = $this->request->get['search'];
