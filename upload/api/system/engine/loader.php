@@ -10,7 +10,7 @@
 /**
 * Loader class
 */
-final class apiLoader {
+final class loaderApi {
 	protected $registry;
 
 	/**
