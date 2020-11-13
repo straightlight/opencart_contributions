@@ -78,8 +78,8 @@ $loader = new loader($registry);
 $registry->set('load', $loader);
 
 // API Loader
-$apiLoader = new apiLoader($registry);
-$registry->set('apiLoad', $apiLoader);
+$loaderApi = new loaderApi($registry);
+$registry->set('loadApi', $loaderApi);
 
 // Request
 $registry->set('request', new Request());
@@ -158,8 +158,8 @@ if (!$is_ajax) {
 // Otherwise, we instantiate the API lookups.
 } else {
 	if (!isset($registry->get('session')->data['api_token'])) {
-		$registry->get('apiLoad')->controller('common/login');
+		$registry->get('loadApi')->controller('common/login');
 	} else {
-		$registry->get('apiLoad')->controller('startup/startup');
+		$registry->get('loadApi')->controller('startup/startup');
 	}
 }
