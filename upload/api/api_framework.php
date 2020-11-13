@@ -157,7 +157,7 @@ if (!$is_ajax) {
 	
 // Otherwise, we instantiate the API lookups.
 } else {
-	if (!isset($registry->get('session')->data['api_id'])) {
+	if (!isset($registry->get('session')->data['api_token'])) {
 		$registry->get('apiLoad')->controller('common/login');
 	} else {
 		$registry->get('apiLoad')->controller('startup/startup');
