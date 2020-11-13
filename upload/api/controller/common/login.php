@@ -8,7 +8,7 @@ class ApiControllerCommonLogin extends Controller {
 		$json = [];
 		
 		// API
-		$this->apiLoad->language('common/login');
+		$this->loadApi->language('common/login');
 		
 		// Core
 		$this->load->model('account/api');
