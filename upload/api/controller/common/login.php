@@ -2,6 +2,8 @@
 class ApiControllerCommonLogin extends Controller {
 	// At the programmers' complete discretion to modify this
 	// authentication method for their remote platforms.
+	
+	// GuzzleHttp e.g: https://forum.opencart.com/viewtopic.php?f=202&t=220903#p805005
 	public function index() {
 		$json = [];
 		
